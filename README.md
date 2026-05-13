@@ -37,14 +37,15 @@ The project moves through five realizations:
 1. **Walking Is Not a Style** — Walking is a recurring whole-body load-transfer strategy, not a visual aesthetic.
 2. **The Type List Is Not the Object** — Visible walking categories are provisional language. The object is the step, the support path, and the gait-cycle data.
 3. **OpenCap Is the Translation Layer** — OpenCap converts video into biomechanical time series. It is not the classifier.
-4. **Friends Are a Pre-Pilot** — The first friend cohort exists to break the pipeline, not to validate the theory.
-5. **What Broke** — The first field report documents what survived, what failed, what was visible, and what was not.
+4. **Existing Data Comes First** — Process existing validation datasets before collecting new participant data.
+5. **Friends Are Not Validation** — The friend cohort tests pipeline robustness, not theoretical claims.
+6. **What Broke** — The first field report documents what survived, what failed, what was visible, and what was not.
 
 ## Current Status
 
 See [PROJECT.md](PROJECT.md) for current stage, implementation status, and next steps.
 
-This repository is at the methods-design stage. All 24 content files have been written. The next step is field testing: execute the friend pre-pilot protocol to test whether the pipeline can capture, process, and analyze gait data coherently.
+This repository is at the existing-data zeroth pilot stage. All 24 content files have been written. The next step is processing existing OpenCap Lab Validation walking data to test whether the pipeline can segment gait cycles, extract features, and generate interpretable support-path hypotheses before collecting new participant data.
 
 ## Safety Boundary
 

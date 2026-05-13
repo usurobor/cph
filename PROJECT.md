@@ -4,9 +4,9 @@ This file owns project status, current stage, and implementation progress.
 
 ## Current Stage
 
-**Stage:** Methods design and documentation complete
-**Phase:** Ready for field testing
-**Next action:** Execute friend pre-pilot protocol
+**Stage:** Existing-data zeroth pilot
+**Phase:** Data processing and pipeline validation  
+**Next action:** Process existing OpenCap Lab Validation walking data
 
 ## Implementation Status
 
@@ -22,18 +22,18 @@ All 24 content files have been written and organized:
 - 3 analysis documents in `analysis/`
 - 2 report templates in `reports/`
 
-### Next Phase: Field Testing
+### Next Phase: Existing Data Processing
 
-**Immediate next step:** Execute the friend pre-pilot protocol defined in [protocols/friend-pre-pilot.md](protocols/friend-pre-pilot.md)
+**Immediate next step:** Process existing OpenCap Lab Validation walking data as defined in [protocols/existing-data-zeroth-pilot.md](protocols/existing-data-zeroth-pilot.md)
 
-**Goals for pre-pilot:**
-- Test whether the pipeline can capture usable OpenCap data
-- Validate gait cycle segmentation
-- Extract interpretable movement curves
-- Compare left and right stance phases
-- Test whether blind observation can be compared with kinematic data
+**Goals for existing-data processing:**
+- Test whether the pipeline can process downloaded OpenCap validation data
+- Validate gait cycle segmentation on existing datasets  
+- Extract interpretable movement curves from known-good data
+- Compare OpenCap estimates against reference measurements
+- Generate first-pass support-path hypotheses from controlled conditions
 
-**Success condition:** Methodological clarity about whether OpenCap-derived gait-cycle data contains enough structure to pursue support-path classification.
+**Success condition:** Technical validation that the analysis pipeline can produce meaningful outputs from existing OpenCap data before collecting new participant data.
 
 ## Current Realization Sequence
 
@@ -60,19 +60,26 @@ OpenCap converts video into biomechanical time series. It is not the classifier.
 **Status:** Complete ✓
 **Artifact:** `docs/realizations/03-opencap-is-the-translation-layer.md`
 
-### Realization 04 — Friends Are a Pre-Pilot
+### Realization 04 — Existing Data Comes First
 
-The first friend cohort exists to break the pipeline, not to validate the theory.
+Process existing validation datasets before collecting new participant data.
 
-**Status:** Complete ✓
-**Artifact:** `docs/realizations/04-friends-are-a-pre-pilot.md`
+**Status:** In progress
+**Artifact:** `docs/realizations/04-existing-data-comes-first.md`
 
-### Realization 05 — What Broke
+### Realization 05 — Friends Are Not Validation
+
+The friend cohort tests pipeline robustness, not theoretical claims.
+
+**Status:** Complete ✓  
+**Artifact:** `docs/realizations/05-friends-are-not-validation.md`
+
+### Realization 06 — What Broke
 
 The first field report documents what survived, what failed, what was visible, and what was not.
 
 **Status:** Pending field testing
-**Artifact:** `docs/realizations/05-what-broke.md` (template ready)
+**Artifact:** `docs/realizations/06-what-broke.md` (template ready)
 
 ## Implementation Timeline
 
