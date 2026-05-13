@@ -1,0 +1,3 @@
+# Blind Observation Memo
+
+TODO
