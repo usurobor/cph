@@ -1,0 +1,18 @@
+# Raw video files
+*.mp4
+*.mov
+*.m4v
+*.avi
+*.heic
+
+# Image files
+*.jpg
+*.jpeg
+*.png
+
+# Private data directories
+data/raw/
+data/private/
+opencap_exports/
+participants/
+consent/

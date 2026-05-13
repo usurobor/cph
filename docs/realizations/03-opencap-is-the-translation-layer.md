@@ -24,7 +24,7 @@ For this repo, OpenCap should be used to obtain candidate traces such as:
 - left-right differences
 - trial-to-trial repeatability
 
-The owning file for specific outputs is [Outputs To Extract](/tmp/gait-support-paths/instruments/opencap/outputs-to-extract.md).
+The owning file for specific outputs is [Outputs To Extract](../../instruments/opencap/outputs-to-extract.md).
 
 ## What OpenCap does not provide
 

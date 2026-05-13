@@ -59,4 +59,4 @@ OpenCap is not treated as a diagnosis system.
 
 It is treated as a practical translation layer whose outputs may or may not be stable enough for this project's question.
 
-Primary references are listed in [Bibliography](/tmp/gait-support-paths/references/bibliography.md).
+Primary references are listed in [Bibliography](../../references/bibliography.md).

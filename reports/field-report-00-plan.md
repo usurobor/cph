@@ -69,7 +69,7 @@ Do not use:
 
 ## Participant privacy
 
-Reports must follow [Data Handling](/tmp/gait-support-paths/docs/ethics/data-handling.md) and [Public Sharing Rules](/tmp/gait-support-paths/docs/ethics/public-sharing-rules.md).
+Reports must follow [Data Handling](../docs/ethics/data-handling.md) and [Public Sharing Rules](../docs/ethics/public-sharing-rules.md).
 
 Use participant codes only.
 Do not include raw video stills.

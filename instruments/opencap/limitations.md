@@ -78,7 +78,7 @@ For this repo, dynamics are optional second-pass outputs. They should not be use
 
 OpenCap does not anonymize the original video.
 
-Even if the analysis uses curves, raw capture data remain identifiable. Follow [Data Handling](/tmp/gait-support-paths/docs/ethics/data-handling.md) and [Public Sharing Rules](/tmp/gait-support-paths/docs/ethics/public-sharing-rules.md).
+Even if the analysis uses curves, raw capture data remain identifiable. Follow [Data Handling](../../docs/ethics/data-handling.md) and [Public Sharing Rules](../../docs/ethics/public-sharing-rules.md).
 
 ## Failure rule
 

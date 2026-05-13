@@ -101,7 +101,7 @@ Candidate asymmetry features:
 - right-left coordination difference
 - within-participant side consistency across conditions
 
-The method is defined in [Left Right Comparison](/tmp/gait-support-paths/analysis/left-right-comparison.md).
+The method is defined in [Left Right Comparison](left-right-comparison.md).
 
 ## Condition-response features
 

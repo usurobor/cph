@@ -106,4 +106,4 @@ Do not delete failed trials silently. Record why they failed.
 Use participant codes in file names.
 Keep raw videos out of the public repo.
 
-Follow [Data Handling](/tmp/gait-support-paths/docs/ethics/data-handling.md).
+Follow [Data Handling](../docs/ethics/data-handling.md).

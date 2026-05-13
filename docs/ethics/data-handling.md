@@ -28,7 +28,7 @@ The public repository may contain:
 - field reports
 - failure notes
 
-Any public example must be checked against [Public Sharing Rules](/tmp/gait-support-paths/docs/ethics/public-sharing-rules.md).
+Any public example must be checked against [Public Sharing Rules](public-sharing-rules.md).
 
 ## Participant codes
 
@@ -85,7 +85,7 @@ Do not record broad personal history because it is interesting. If a note does n
 
 ## Consent and withdrawal
 
-Use the consent language in [Consent Template](/tmp/gait-support-paths/docs/ethics/consent-template.md) before recording.
+Use the consent language in [Consent Template](consent-template.md) before recording.
 
 Participants may decline any condition, stop recording, ask questions, or withdraw their data. If a participant withdraws, remove raw data and any derived traces that can reasonably be linked back to that participant. Record that deletion occurred without retaining unnecessary personal detail.
 

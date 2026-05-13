@@ -57,11 +57,11 @@ The project can use qualitative observation, but only as a proposal to be tested
 
 ## Relation to other project files
 
-The unit used to test a support path is defined in [Gait Cycle As Unit](/tmp/gait-support-paths/docs/concepts/gait-cycle-as-unit.md).
+The unit used to test a support path is defined in [Gait Cycle As Unit](gait-cycle-as-unit.md).
 
-The functional action being studied is defined in [Load Transfer Strategy](/tmp/gait-support-paths/docs/concepts/load-transfer-strategy.md).
+The functional action being studied is defined in [Load Transfer Strategy](load-transfer-strategy.md).
 
-The analysis features used as candidate traces are listed in [Features](/tmp/gait-support-paths/analysis/features.md).
+The analysis features used as candidate traces are listed in [Features](../../analysis/features.md).
 
 ## Safe claim
 

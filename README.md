@@ -300,13 +300,7 @@ The goal is to find out what survives contact with measurement.
 
 This repository is at the methods-design stage.
 
-The next step is to write:
-
-1. `docs/realizations/01-walking-is-not-a-style.md`
-2. `docs/concepts/support-path.md`
-3. `protocols/friend-pre-pilot.md`
-4. `docs/ethics/data-handling.md`
-5. `instruments/opencap/why-opencap.md`
+All 24 content files have been written. The next step is field testing: execute the friend pre-pilot protocol to test whether the pipeline can capture, process, and analyze gait data coherently.
 
 ## References
 

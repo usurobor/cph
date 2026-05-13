@@ -61,7 +61,7 @@ Needed exports:
 - side-specific timing
 - side-specific exclusion flags
 
-Left-right comparison is owned by [Left Right Comparison](/tmp/gait-support-paths/analysis/left-right-comparison.md).
+Left-right comparison is owned by [Left Right Comparison](../../analysis/left-right-comparison.md).
 
 ## Optional second-pass outputs
 
