@@ -32,275 +32,62 @@ Measurement decides.
 
 ## Method
 
-The project moves through five realizations.
+The project moves through five realizations:
 
-### Realization 01 — Walking Is Not a Style
+1. **Walking Is Not a Style** — Walking is a recurring whole-body load-transfer strategy, not a visual aesthetic.
+2. **The Type List Is Not the Object** — Visible walking categories are provisional language. The object is the step, the support path, and the gait-cycle data.
+3. **OpenCap Is the Translation Layer** — OpenCap converts video into biomechanical time series. It is not the classifier.
+4. **Friends Are a Pre-Pilot** — The first friend cohort exists to break the pipeline, not to validate the theory.
+5. **What Broke** — The first field report documents what survived, what failed, what was visible, and what was not.
 
-Walking is a recurring whole-body load-transfer strategy, not a visual aesthetic.
+## Current Status
 
-### Realization 02 — The Type List Is Not the Object
+See [PROJECT.md](PROJECT.md) for current stage, implementation status, and next steps.
 
-Visible walking categories are provisional language. The object is the step, the support path, and the gait-cycle data.
+This repository is at the methods-design stage. All 24 content files have been written. The next step is field testing: execute the friend pre-pilot protocol to test whether the pipeline can capture, process, and analyze gait data coherently.
 
-### Realization 03 — OpenCap Is the Translation Layer
-
-OpenCap converts video into biomechanical time series. It is not the classifier.
-
-### Realization 04 — Friends Are a Pre-Pilot
-
-The first friend cohort exists to break the pipeline, not to validate the theory.
-
-### Realization 05 — What Broke
-
-The first field report documents what survived, what failed, what was visible, and what was not.
-
-## Instrument
-
-OpenCap is treated as a translation layer.
-
-Raw video contains gait, but it also contains face, clothing, camera angle, lighting, shoes, body size, age, sex, background, and observer expectation. Training directly on raw video risks learning the wrong thing with confidence.
-
-OpenCap changes the substrate.
-
-The object stops being the person in the video and becomes movement curves: joint angles, segment motion, marker trajectories, gait-cycle timing, asymmetry, and related biomechanical traces.
-
-OpenCap does not see support paths directly.
-It provides data from which support-path hypotheses can be tested.
-
-## Unit of Analysis
-
-The unit is the gait cycle under a condition.
-
-Examples:
-
-- normal speed, shod, right stance
-- normal speed, shod, left stance
-- slow speed, barefoot, right stance
-- fast speed, barefoot, left stance
-- repeat session, same condition, different day
-
-The person is not classified first.
-Steps are analyzed first.
-
-Only after enough cycles are collected do we ask whether a person tends to return to a recognizable movement attractor.
-
-## Candidate Traces
-
-A support path may leave traces in:
-
-- pelvis rotation
-- trunk rotation
-- hip-knee-ankle timing
-- stance duration
-- left-right asymmetry
-- segment coupling
-- smoothness
-- delayed stabilization
-- reduced counter-rotation
-- push-off timing
-- changes across speed, fatigue, footwear, or attention
-
-These traces are not the support path itself.
-They are measurable signs that may or may not support the hypothesis.
-
-## Analysis Direction
-
-The first AI task should not be supervised label imitation.
-
-Do not label friends as fixed walking types and train a model to reproduce those labels. That would only automate observer bias.
-
-The first useful model should be unsupervised or self-supervised.
-
-Input:
-
-- OpenCap-derived gait-cycle curves
-
-Task:
-
-- find recurring structures
-
-Then compare those structures with the proposed families.
-
-If the clusters resemble proposed patterns, the typology earns a first pass.
-If the clusters produce fewer families, more families, or no useful families, the theory updates.
-If clusters collapse into sex, height, shoe type, camera setup, or walking speed, the project has failed usefully.
-
-## Friend Pre-Pilot
-
-The first cohort is a pre-pilot.
-
-It is not a study.
-It is not validation.
-It is not evidence for a public claim.
-
-Its purpose is to test whether the pipeline is coherent.
-
-Questions:
-
-- Can we capture usable OpenCap data?
-- Can we segment gait cycles?
-- Can we extract interpretable curves?
-- Can we compare left and right stance phases?
-- Can we repeat trials without the data falling apart?
-- Can blind qualitative observation be compared with kinematic data?
-- Which proposed features are useless?
-- Which proposed categories become clearer?
-- Which proposed categories fail?
-
-## Minimal Pre-Pilot Design
-
-Use 5–10 people.
-
-Do not recruit "interesting bodies." Use available participants and record context carefully.
-
-Record:
-
-- footwear
-- fatigue
-- pain or injury history
-- dominant side
-- recent exercise
-- comfort with being recorded
-- walking condition
-- repeat session if possible
-
-Walking conditions:
-
-- normal walking
-- slow walking
-- fast walking
-- barefoot walking
-- shod walking
-- repeat session on another day if possible
-
-Before processing the videos, write a blind observation memo.
-After processing, compare observation with data.
-
-The valuable result is discrepancy.
-
-Where did the eye invent a pattern?
-Where did the data show a pattern the eye missed?
-Where did OpenCap fail?
-Where did the setup distort the result?
-Where did the categories become too vague?
-
-## Ethics
+## Safety Boundary
 
 Gait video is identifiable biometric data.
 
-Do not publish raw friend videos casually.
-Do not diagnose participants.
-Do not tell a participant, "you are this type."
-Do not imply pathology.
-Do not turn private body observations into public labels.
+- Do not publish raw friend videos casually
+- Do not diagnose participants
+- Do not tell a participant, "you are this type"
+- Do not imply pathology
+- Do not turn private body observations into public labels
 
-Use explicit consent.
-State what is captured, where it is stored, who can see it, and what may be published.
+The output sentence is: "Under this condition, this recording shows this movement pattern."
 
-Public materials should use anonymized movement traces when possible.
+Not: "This is who you are."
 
-The output sentence is:
-
-> Under this condition, this recording shows this movement pattern.
-
-Not:
-
-> This is who you are.
+Complete ethics protocols are in [docs/ethics/](docs/ethics/).
 
 ## Repository Structure
 
 ```txt
 gait-support-paths/
-  README.md
-  PROJECT.md
+  README.md                    # What the repo is, core claim, status overview
+  PROJECT.md                   # Current stage, implementation status, next steps
   docs/
-    realizations/
-      01-walking-is-not-a-style.md
-      02-the-type-list-is-not-the-object.md
-      03-opencap-is-the-translation-layer.md
-      04-friends-are-a-pre-pilot.md
-      05-what-broke.md
-    concepts/
-      support-path.md
-      gait-cycle-as-unit.md
-      load-transfer-strategy.md
-      failure-conditions.md
-    ethics/
-      consent-template.md
-      data-handling.md
-      public-sharing-rules.md
-  protocols/
-    friend-pre-pilot.md
-    capture-setup.md
-    walking-conditions.md
-    blind-observation-memo.md
-  instruments/
-    opencap/
-      why-opencap.md
-      outputs-to-extract.md
-      limitations.md
-  analysis/
-    features.md
-    clustering-plan.md
-    left-right-comparison.md
-  reports/
-    field-report-00-plan.md
-    field-report-01-friend-pre-pilot.md
-  data/
-    README.md
-  notebooks/
-    README.md
-  references/
-    bibliography.md
+    realizations/              # The five project realizations
+    concepts/                  # Core theory: support paths, units, failure conditions
+    ethics/                    # Consent, data handling, public sharing rules
+  protocols/                   # How to run the friend pre-pilot
+  instruments/                 # OpenCap usage, outputs, limitations
+  analysis/                    # Feature extraction, clustering plans
+  reports/                     # Field reports from testing
+  data/                        # Private storage guidelines
+  notebooks/                   # Analysis code
+  references/                  # Bibliography
 ```
 
-## Data Policy
+## Where to Go Next
 
-Do not commit raw videos.
-
-Do not commit names, faces, injury histories, consent forms, or identifiable participant notes.
-
-The public repository may contain:
-
-- theory
-- protocols
-- consent language
-- analysis code
-- anonymized traces
-- synthetic examples
-- field reports
-- failure notes
-
-Raw data belongs in private storage with explicit consent and access rules.
-
-## Success Condition
-
-The first success condition is methodological clarity, not classification accuracy.
-
-After the pre-pilot, the project should know whether OpenCap-derived gait-cycle data contains enough structure to pursue support-path classification.
-
-## Failure Conditions
-
-The project weakens or fails if:
-
-- proposed gait families remain only visual impressions
-- support path cannot be translated into measurable features
-- OpenCap outputs are too noisy for the intended questions
-- clusters reflect camera setup, footwear, sex, height, body size, or walking speed instead of load-transfer organization
-- left-right asymmetry cannot be represented clearly
-- blind observation and kinematic traces cannot be compared coherently
-- the friend pre-pilot does not produce repeatable, interpretable gait-cycle data
-
-All of these outcomes are useful.
-
-The goal is not to protect the theory.
-The goal is to find out what survives contact with measurement.
-
-## Current Status
-
-This repository is at the methods-design stage.
-
-All 24 content files have been written. The next step is field testing: execute the friend pre-pilot protocol to test whether the pipeline can capture, process, and analyze gait data coherently.
+- **What is a support path?** → [docs/concepts/support-path.md](docs/concepts/support-path.md)
+- **How to run the pre-pilot?** → [protocols/friend-pre-pilot.md](protocols/friend-pre-pilot.md)
+- **What features are extracted?** → [analysis/features.md](analysis/features.md)
+- **What can go wrong?** → [docs/concepts/failure-conditions.md](docs/concepts/failure-conditions.md)
+- **How is data handled ethically?** → [docs/ethics/data-handling.md](docs/ethics/data-handling.md)
 
 ## References
 

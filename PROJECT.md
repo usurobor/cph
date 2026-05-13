@@ -1,78 +1,121 @@
-# Project
+# Project Status and Implementation
 
-## Current realization sequence
+This file owns project status, current stage, and implementation progress.
 
-The project moves through realizations. Each realization should answer one question and produce one artifact.
+## Current Stage
+
+**Stage:** Methods design and documentation complete
+**Phase:** Ready for field testing
+**Next action:** Execute friend pre-pilot protocol
+
+## Implementation Status
+
+### Documentation Complete ✓
+
+All 24 content files have been written and organized:
+
+- 5 realization documents in `docs/realizations/`
+- 4 concept documents in `docs/concepts/`
+- 3 ethics documents in `docs/ethics/`
+- 4 protocol documents in `protocols/`
+- 3 instrument documents in `instruments/opencap/`
+- 3 analysis documents in `analysis/`
+- 2 report templates in `reports/`
+
+### Next Phase: Field Testing
+
+**Immediate next step:** Execute the friend pre-pilot protocol defined in [protocols/friend-pre-pilot.md](protocols/friend-pre-pilot.md)
+
+**Goals for pre-pilot:**
+- Test whether the pipeline can capture usable OpenCap data
+- Validate gait cycle segmentation
+- Extract interpretable movement curves
+- Compare left and right stance phases
+- Test whether blind observation can be compared with kinematic data
+
+**Success condition:** Methodological clarity about whether OpenCap-derived gait-cycle data contains enough structure to pursue support-path classification.
+
+## Current Realization Sequence
+
+The project moves through five realizations. Each realization should answer one question and produce one artifact.
 
 ### Realization 01 — Walking Is Not a Style
 
 Walking is a recurring whole-body load-transfer strategy, not a visual aesthetic.
 
-Expected artifact:
-- `docs/realizations/01-walking-is-not-a-style.md`
+**Status:** Complete ✓
+**Artifact:** `docs/realizations/01-walking-is-not-a-style.md`
 
 ### Realization 02 — The Type List Is Not the Object
 
 Visible walking categories are provisional language. The object is the step, the support path, and the gait-cycle data.
 
-Expected artifact:
-- `docs/realizations/02-the-type-list-is-not-the-object.md`
+**Status:** Complete ✓
+**Artifact:** `docs/realizations/02-the-type-list-is-not-the-object.md`
 
 ### Realization 03 — OpenCap Is the Translation Layer
 
 OpenCap converts video into biomechanical time series. It is not the classifier.
 
-Expected artifact:
-- `docs/realizations/03-opencap-is-the-translation-layer.md`
+**Status:** Complete ✓
+**Artifact:** `docs/realizations/03-opencap-is-the-translation-layer.md`
 
 ### Realization 04 — Friends Are a Pre-Pilot
 
 The first friend cohort exists to break the pipeline, not to validate the theory.
 
-Expected artifact:
-- `docs/realizations/04-friends-are-a-pre-pilot.md`
+**Status:** Complete ✓
+**Artifact:** `docs/realizations/04-friends-are-a-pre-pilot.md`
 
 ### Realization 05 — What Broke
 
 The first field report documents what survived, what failed, what was visible, and what was not.
 
-Expected artifact:
-- `docs/realizations/05-what-broke.md`
+**Status:** Pending field testing
+**Artifact:** `docs/realizations/05-what-broke.md` (template ready)
 
-## Friend pre-pilot
+## Implementation Timeline
 
-The first cohort is a pre-pilot. It is not a study, validation, or evidence for a public claim. Its purpose is to test whether the pipeline is coherent.
+### Completed
+- Methods design and theory documentation
+- Protocol development
+- Ethics framework
+- Analysis plan
+- Instrument selection and documentation
 
-The pre-pilot asks:
+### In Progress
+- Preparation for friend pre-pilot execution
 
-- Can we capture usable OpenCap data?
-- Can we segment gait cycles?
-- Can we extract interpretable curves?
-- Can we compare left and right stance phases?
-- Can we repeat trials without the data falling apart?
-- Can blind qualitative observation be compared with kinematic data?
-- Which proposed features are useless?
-- Which proposed categories become clearer?
-- Which proposed categories fail?
+### Upcoming
+- Friend pre-pilot execution (5-10 participants)
+- Pipeline testing and validation
+- Field report generation
+- Theory revision based on empirical results
 
-The valuable result is discrepancy. Where did the eye invent a pattern? Where did the data show a pattern the eye missed? Where did OpenCap fail? Where did the setup distort the result? Where did the categories become too vague?
+## Friend Pre-Pilot Overview
 
-## Data policy
+The first cohort tests pipeline coherence, not theory validation.
 
-Do not commit raw videos. Do not commit names, faces, injury histories, consent forms, or identifiable participant notes.
+**Purpose:** Test whether the pipeline can capture, process, segment, and compare walking data well enough to decide whether a larger pilot is worth designing.
 
-The public repository may contain:
+**Target outcome:** Discrepancy analysis between blind observation and processed data.
 
-- theory
-- protocols
-- consent language
-- analysis code
-- anonymized traces
-- synthetic examples
-- field reports
-- failure notes
+**Implementation details:** See [protocols/friend-pre-pilot.md](protocols/friend-pre-pilot.md)
 
-Raw data belongs in private storage with explicit consent and access rules.
+## Risk Management
+
+**Methodological risks:**
+- OpenCap outputs may be too noisy for intended analysis
+- Proposed categories may remain only visual impressions
+- Pipeline may fail at gait cycle segmentation
+
+**Mitigation:** Pre-pilot designed to reveal these failures early
+
+**Ethical risks:**
+- Identifiable biometric data mishandling
+- Participant pressure or inappropriate labeling
+
+**Mitigation:** Explicit consent protocols and data handling guidelines in [docs/ethics/](docs/ethics/)
 
 ## Source of truth
 
@@ -91,22 +134,26 @@ Raw data belongs in private storage with explicit consent and access rules.
 
 Do not duplicate stable facts across files. State the fact once in its owning file and point to it elsewhere.
 
-## Success condition
+## Success Criteria
 
-The first success condition is methodological clarity, not classification accuracy.
+**Primary success condition:** Methodological clarity, not classification accuracy.
 
 After the pre-pilot, the project should know whether OpenCap-derived gait-cycle data contains enough structure to pursue support-path classification.
 
-## Failure conditions
+**Specific success indicators:**
+- Usable gait cycles extracted from video data
+- Interpretable movement curves generated
+- Left-right stance phase comparison possible
+- Blind observation comparable with kinematic traces
+- Repeatable data across trials
 
-The project weakens or fails if:
+## Decision Points
 
-- proposed gait families remain only visual impressions
-- support path cannot be translated into measurable features
-- OpenCap outputs are too noisy for the intended questions
-- clusters reflect camera setup, footwear, sex, height, body size, or walking speed instead of load-transfer organization
-- left-right asymmetry cannot be represented clearly
-- blind observation and kinematic traces cannot be compared coherently
-- the friend pre-pilot does not produce repeatable, interpretable gait-cycle data
+**Go/No-Go after pre-pilot:**
+- **Go:** If pipeline produces interpretable, repeatable gait-cycle data
+- **Revise:** If method needs adjustment but concept remains viable  
+- **Stop:** If fundamental assumptions fail measurement test
 
-All of these outcomes are useful. The goal is not to protect the theory. The goal is to find out what survives contact with measurement.
+**Failure conditions:** See [docs/concepts/failure-conditions.md](docs/concepts/failure-conditions.md)
+
+The goal is to find out what survives contact with measurement, not to protect the theory.
