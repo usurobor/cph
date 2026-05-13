@@ -4,6 +4,20 @@ This protocol describes how to run the friend pre-pilot.
 
 The purpose is to test the pipeline, not to validate support paths.
 
+## CURRENT STATUS: BLOCKED
+
+This protocol is blocked pending successful completion of the existing-data zeroth pilot defined in [existing-data-zeroth-pilot.md](existing-data-zeroth-pilot.md).
+
+The existing-data protocol must demonstrate technical pipeline validation using publicly available OpenCap data before engaging friends or other participants in new data collection.
+
+**Blocking conditions:**
+- Existing-data protocol achieves GO recommendation
+- Technical pipeline validated on known-quality data  
+- Support-path falsification conditions assessed
+- Feature extraction methods confirmed functional
+
+**Release condition:** Field Report 01 (existing-data) shows technical readiness for friend data collection.
+
 ## Governing question
 
 Can the project capture, process, segment, and compare walking data well enough to decide whether a larger pilot is worth designing?
