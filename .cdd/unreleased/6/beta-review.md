@@ -54,3 +54,23 @@ git merge --no-ff origin/cycle/6 -m "Closes #6: Sub B — Build segmentation + f
 ```
 
 ### Verdict: REQUEST CHANGES — one binding (F1).
+
+---
+
+## Round 2 — Verdict: APPROVE
+
+α's fix-round at 0254d24:
+- `git rm -rf --cached scripts/__pycache__/` executed; tree at cycle/6 head shows no `.pyc` or `__pycache__` entries.
+- `.gitignore` extended with `__pycache__/` and `*.pyc` at the top.
+- self-coherence.md §FixRound1 documents the fix with command-level evidence.
+
+Re-verification: `git ls-tree -r origin/cycle/6 | grep -E "__pycache__|\.pyc$"` returns nothing. F1 closed.
+
+No new findings introduced by the fix-round.
+
+**Verdict: APPROVE for merge.** Merge command:
+```
+git switch main && git pull --ff-only
+git merge --no-ff origin/cycle/6 -m "Closes #6: Sub B — Build segmentation + feature-extraction pipeline in existing-data-processing.ipynb"
+git push origin main
+```
