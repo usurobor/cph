@@ -16,3 +16,14 @@ data/private/
 opencap_exports/
 participants/
 consent/
+
+# External datasets — manifests stay in git, raw payloads do not
+data/external/**/*.zip
+data/external/**/*.tar.gz
+data/external/**/*.trc
+data/external/**/*.mot
+data/external/**/*.c3d
+data/external/**/*.sto
+data/external/**/*.osim
+data/external/**/*.csv
+data/external/**/*.parquet
