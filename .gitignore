@@ -17,6 +17,10 @@ opencap_exports/
 participants/
 consent/
 
+# Python compile cache
+__pycache__/
+*.pyc
+
 # External datasets — manifests stay in git, raw payloads do not
 data/external/**/*.zip
 data/external/**/*.tar.gz

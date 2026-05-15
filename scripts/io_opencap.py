@@ -1,0 +1,203 @@
+"""Read OpenCap / OpenSim-format trial files into numpy/pandas.
+
+The OpenCap Lab Validation archive ships processed kinematics as OpenSim
+.mot / .sto plain-text files plus marker .trc files. Both formats have a
+header block ending in `endheader` followed by tab- or space-separated
+columns whose names are listed in a `time   col1   col2 ...` line.
+
+This module reads those files without an opensim dependency by parsing
+the plain-text headers directly.
+
+When the actual OpenCap dataset is unavailable, `synthesize_trial()`
+produces a synthetic walking trial with the same column schema so the
+rest of the pipeline can be smoke-tested.
+"""
+
+from __future__ import annotations
+
+import io
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterable, Optional
+
+import numpy as np
+import pandas as pd
+
+
+@dataclass
+class Trial:
+    """One walking trial. Time-series rows × labelled columns.
+
+    `df` columns include `time` plus per-quantity columns (joint angles,
+    marker XYZ, or force-plate channels depending on the source file).
+    `condition` is the trial-level label (e.g. `walking`, `walkingTS`)
+    pulled from the file name. `subject` is the participant code.
+    """
+
+    subject: str
+    trial_id: str
+    condition: str
+    sample_rate_hz: float
+    df: pd.DataFrame
+    source_path: Optional[Path] = None
+
+
+def read_mot(path: Path) -> pd.DataFrame:
+    """Parse an OpenSim .mot/.sto file. Returns dataframe with time + columns.
+
+    Header format:
+        <name>
+        version=1
+        nRows=...
+        nColumns=...
+        inDegrees=yes
+        endheader
+        time   pelvis_tilt   pelvis_list  ...
+        0.000  ...           ...
+    """
+    raw = Path(path).read_text()
+    parts = raw.split("endheader", 1)
+    if len(parts) != 2:
+        raise ValueError(f"no endheader in {path}")
+    header, body = parts
+    body = body.lstrip("\n")
+    df = pd.read_csv(io.StringIO(body), sep=r"\s+", engine="python")
+    return df
+
+
+def read_trc(path: Path) -> pd.DataFrame:
+    """Parse an OpenSim .trc marker file.
+
+    Header format (5 lines):
+        PathFileType  4  (X/Y/Z)  <filename>
+        DataRate  CameraRate  NumFrames  NumMarkers  Units  OrigDataRate  OrigDataStartFrame  OrigNumFrames
+        <data row 1>
+        Frame#  Time  M1     M2     M3   ...
+                      X1 Y1 Z1  X2 Y2 Z2  X3 Y3 Z3 ...
+        <numbers>
+    """
+    raw = Path(path).read_text().splitlines()
+    if len(raw) < 6:
+        raise ValueError(f"trc too short: {path}")
+    meta = raw[2].split()
+    marker_names = [m for m in raw[3].split() if m and m not in ("Frame#", "Time")]
+    cols: list[str] = ["Frame", "Time"]
+    for m in marker_names:
+        cols.extend([f"{m}_X", f"{m}_Y", f"{m}_Z"])
+    body = "\n".join(raw[6:])
+    df = pd.read_csv(io.StringIO(body), sep=r"\s+", engine="python",
+                     header=None, names=cols)
+    return df
+
+
+_TRIAL_NAME_RE = re.compile(r"(?P<subject>[Ss]ubject\d+|S\d+)[_-]?(?P<trial>.+)")
+
+
+def parse_trial_filename(stem: str) -> tuple[str, str, str]:
+    """Infer (subject, trial_id, condition) from an OpenCap file stem.
+
+    OpenCap Lab Validation file naming convention follows
+    `Subject01/MarkerData/walking1.trc` — subject comes from the parent
+    directory, trial_id and condition from the file stem.
+    """
+    base = stem.lower()
+    if base.startswith("walking"):
+        condition = "walking"
+        if "ts" in base or "trunksway" in base:
+            condition = "walkingTS"
+        elif re.match(r"walking[a-z]?\d", base):
+            condition = "walking"
+        return ("UNKNOWN", stem, condition)
+    return ("UNKNOWN", stem, "unknown")
+
+
+def synthesize_trial(subject: str = "Synth01",
+                     trial_id: str = "walking1",
+                     condition: str = "walking",
+                     n_cycles: int = 8,
+                     fs: float = 100.0,
+                     cycle_period_s: float = 1.1,
+                     noise_std: float = 0.5,
+                     left_right_asymmetry_deg: float = 1.5,
+                     rng: Optional[np.random.Generator] = None) -> Trial:
+    """Generate a synthetic walking trial for smoke-testing the pipeline.
+
+    The synthetic trial has:
+    - hip / knee / ankle flexion-extension curves with biomechanically
+      plausible shape (sinusoidal approximations of normative gait waveforms),
+    - left/right legs offset by 50% of cycle period,
+    - small added asymmetry on left,
+    - vertical marker positions for heel-strike detection,
+    - small white-noise additive at `noise_std` degrees.
+    """
+    rng = rng or np.random.default_rng(42)
+    n_samples = int(n_cycles * cycle_period_s * fs)
+    t = np.arange(n_samples) / fs
+    phase = (t % cycle_period_s) / cycle_period_s  # 0..1 within cycle
+
+    def hip_curve(p: np.ndarray) -> np.ndarray:
+        # peak flexion ~30° at swing (phase 0.8), peak extension ~-10° at terminal stance (phase 0.5)
+        return 10.0 + 20.0 * np.sin(2 * np.pi * (p - 0.25))
+
+    def knee_curve(p: np.ndarray) -> np.ndarray:
+        # primary peak in swing (~60°), small stance peak (~15°)
+        stance = 15.0 * np.exp(-((p - 0.15) / 0.08) ** 2)
+        swing = 55.0 * np.exp(-((p - 0.75) / 0.10) ** 2)
+        return stance + swing
+
+    def ankle_curve(p: np.ndarray) -> np.ndarray:
+        # dorsiflexion at heel-strike, plantarflexion at push-off
+        return -5.0 + 15.0 * np.sin(2 * np.pi * (p - 0.55))
+
+    def vertical_heel(p: np.ndarray) -> np.ndarray:
+        # vertical heel marker: 0 during stance, rises in swing
+        # heel-strike is detected at the falling edge (negative-to-positive zero crossing of velocity)
+        return np.maximum(0.0, 100.0 * np.sin(np.pi * np.clip(p - 0.6, 0, 0.4) / 0.4))
+
+    hip_r = hip_curve(phase) + rng.normal(0, noise_std, n_samples)
+    knee_r = knee_curve(phase) + rng.normal(0, noise_std, n_samples)
+    ankle_r = ankle_curve(phase) + rng.normal(0, noise_std, n_samples)
+    heel_r_y = vertical_heel(phase) + rng.normal(0, noise_std, n_samples)
+
+    phase_l = (phase + 0.5) % 1.0
+    hip_l = hip_curve(phase_l) + left_right_asymmetry_deg + rng.normal(0, noise_std, n_samples)
+    knee_l = knee_curve(phase_l) + rng.normal(0, noise_std, n_samples)
+    ankle_l = ankle_curve(phase_l) + rng.normal(0, noise_std, n_samples)
+    heel_l_y = vertical_heel(phase_l) + rng.normal(0, noise_std, n_samples)
+
+    df = pd.DataFrame({
+        "time": t,
+        "hip_flexion_r": hip_r,
+        "knee_angle_r": knee_r,
+        "ankle_angle_r": ankle_r,
+        "hip_flexion_l": hip_l,
+        "knee_angle_l": knee_l,
+        "ankle_angle_l": ankle_l,
+        "RHEE_Y": heel_r_y,
+        "LHEE_Y": heel_l_y,
+        "pelvis_tilt": 5.0 + 3.0 * np.sin(2 * np.pi * 2 * t / cycle_period_s) + rng.normal(0, noise_std/2, n_samples),
+        "pelvis_list": 2.0 * np.sin(2 * np.pi * t / cycle_period_s) + rng.normal(0, noise_std/2, n_samples),
+        "pelvis_rotation": 4.0 * np.sin(2 * np.pi * t / cycle_period_s) + rng.normal(0, noise_std/2, n_samples),
+    })
+    return Trial(subject=subject, trial_id=trial_id, condition=condition,
+                 sample_rate_hz=fs, df=df, source_path=None)
+
+
+def discover_trials(root: Path,
+                    pattern: str = "*.mot",
+                    walking_only: bool = True) -> list[Path]:
+    """Walk `root` for trial files matching `pattern`.
+
+    For an unzipped OpenCap Lab Validation archive, the canonical shape is
+    `subject<NN>/MarkerData/<trial>.trc` plus `subject<NN>/IKResults/<trial>_ik.mot`.
+    This function returns matching paths; the caller decides whether to
+    read marker or IK files.
+    """
+    root = Path(root)
+    if not root.exists():
+        return []
+    found = sorted(root.rglob(pattern))
+    if walking_only:
+        found = [p for p in found if "walk" in p.stem.lower()]
+    return found
