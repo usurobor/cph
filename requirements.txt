@@ -1,0 +1,18 @@
+# Pipeline dependencies for notebooks/existing-data-processing.ipynb
+# Pinned at zeroth-pilot wave (2026-05-15).
+#
+# Install with:
+#   pip install -r requirements.txt
+#
+# OpenSim / nimblephysics are NOT required by this pipeline — .mot and
+# .trc files are parsed directly as plain text in scripts/io_opencap.py.
+# If second-pass dynamics work is added later, add `opensim==<pin>`
+# (conda-only) or `nimblephysics==<pin>` and document install path.
+
+numpy==2.4.4
+pandas==3.0.3
+scipy==1.17.1
+matplotlib==3.10.9
+nbformat==5.10.4
+nbconvert==7.17.1
+ipykernel==7.2.0
