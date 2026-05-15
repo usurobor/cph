@@ -4,9 +4,9 @@ This file owns project status, current stage, and implementation progress.
 
 ## Current Stage
 
-**Stage:** Existing-data zeroth pilot
-**Phase:** Data processing and pipeline validation  
-**Next action:** Process existing OpenCap Lab Validation walking data
+**Stage:** Existing-data zeroth pilot — REVISE
+**Phase:** Pipeline implemented + smoke-tested; empirical run blocked at dataset acquisition (SimTK login).
+**Next action:** Operator runs the acquisition procedure in `data/external/opencap-lab-validation.md §Acquisition procedure`; protocol `protocols/existing-data-zeroth-pilot.md` to be revised with an "Access mechanism" subsection (see `reports/field-report-01-existing-data-zeroth-pilot.md` §Recommendation). After acquisition, re-execute `notebooks/existing-data-processing.ipynb` against real data and re-evaluate the GO/NO-GO criteria.
 
 ## Implementation Status
 
@@ -64,7 +64,7 @@ OpenCap converts video into biomechanical time series. It is not the classifier.
 
 Process existing validation datasets before collecting new participant data.
 
-**Status:** In progress
+**Status:** REVISE — pipeline implemented and smoke-tested under the zeroth-pilot wave (2026-05-15); empirical execution blocked at dataset acquisition (SimTK login gate). See `reports/field-report-01-existing-data-zeroth-pilot.md` for the wave's REVISE decision and required protocol revision.
 **Artifact:** `docs/realizations/04-existing-data-comes-first.md`
 
 ### Realization 05 — Friends Are Not Validation
