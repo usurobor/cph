@@ -1,5 +1,5 @@
-<!-- sections: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness] -->
-<!-- completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness] -->
+<!-- sections: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness, FixRound1] -->
+<!-- completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness, FixRound1] -->
 
 # Self-Coherence: Sub B — Pipeline
 
@@ -121,3 +121,18 @@ Round 1. Cycle branch base SHA: `fbcfbaf` (origin/main at branch creation). Pipe
 2. Is the AC4 NOT-IMPLEMENTED-for-real-data status acceptable as named debt, given the comparison primitive is verified on synthetic data?
 
 If β returns RC, α has fix-round paths available for code-level issues; the real-data evaluations remain blocked on #5.
+
+## FixRound1
+
+β returned RC at `ce0e3c6` with one binding finding:
+
+**F1 (pyc files committed).** Five `scripts/__pycache__/*.pyc` files were committed in α's round-1 push. Fix actions:
+- `git rm -rf --cached scripts/__pycache__/` to remove from index.
+- `.gitignore` extended with `__pycache__/` and `*.pyc` at the top of the file (above the existing `data/external/` rules).
+- Commit + push.
+
+Re-audit:
+- `git ls-files | grep -E "__pycache__|\.pyc$"` returns no matches → fix verified.
+- All AC oracles re-verified unchanged: notebook still executes; segmentation rate still 100% on smoke; missingness still 0%; 3 figures still embedded.
+
+No fix-round needed on F2 (informational/non-blocking).
