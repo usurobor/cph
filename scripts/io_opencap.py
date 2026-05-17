@@ -227,10 +227,12 @@ def discover_trials(root: Path,
                     walking_only: bool = True) -> list[Path]:
     """Walk `root` for trial files matching `pattern`.
 
-    For an unzipped OpenCap Lab Validation archive, the canonical shape is
-    `subject<NN>/MarkerData/<trial>.trc` plus `subject<NN>/IKResults/<trial>_ik.mot`.
-    This function returns matching paths; the caller decides whether to
-    read marker or IK files.
+    Generic recursive-glob discovery. For the typed OpenCap Lab Validation
+    layout — `subject<NN>/OpenSimData/Mocap/IK/<trial>.mot` paired with
+    `subject<NN>/MarkerData/Mocap/<trial>.trc`, plus per-backbone Video
+    variants under `OpenSimData/Video/<backbone>/<N>-cameras/IK/<trial>.mot`
+    — use `discover_walking_ik` / `load_paired_trial` instead; this function
+    is the lower-level primitive they build on.
     """
     root = Path(root)
     if not root.exists():
@@ -239,3 +241,125 @@ def discover_trials(root: Path,
     if walking_only:
         found = [p for p in found if "walk" in p.stem.lower()]
     return found
+
+
+# Subpaths under each `subject<NN>/OpenSimData/` for the four IK sources
+# shipped in the LabValidation archive. Mocap is the lab gold-standard
+# (8-camera Motion Analysis → marker IK); the three Video sources are the
+# OpenCap pipeline run with different pose-estimation backbones at the
+# 5-camera setup that the Uhlrich et al. 2023 paper headlines.
+IK_SOURCES = {
+    "Mocap": "Mocap/IK",
+    "HRNet_5cam": "Video/HRNet/5-cameras/IK",
+    "OpenPose_default_5cam": "Video/OpenPose_default/5-cameras/IK",
+    "OpenPose_highAccuracy_5cam": "Video/OpenPose_highAccuracy/5-cameras/IK",
+}
+
+
+def discover_walking_ik(extracted_root: Path,
+                        ik_source: str = "Mocap") -> list[Path]:
+    """List walking IK .mot paths across all subjects for one IK source.
+
+    Layout under `extracted_root` is assumed to be
+    `LabValidation_withoutVideos/subject<NN>/OpenSimData/<IK_SOURCES[ik_source]>/<trial>.mot`.
+    Only files whose stem starts with `walking` (case-insensitive) are
+    returned; ancillary `*_setup_ik.xml` and `*_ik_marker_errors.sto` are
+    excluded by extension.
+    """
+    if ik_source not in IK_SOURCES:
+        raise ValueError(f"ik_source must be one of {list(IK_SOURCES)}; got {ik_source!r}")
+    extracted_root = Path(extracted_root)
+    if not extracted_root.exists():
+        return []
+    # The archive nests one extra dir below `extracted/` — try both shapes
+    # so callers can pass either `…/extracted/` or `…/extracted/LabValidation_withoutVideos/`.
+    candidate_bases: list[Path] = [extracted_root]
+    nested = extracted_root / "LabValidation_withoutVideos"
+    if nested.is_dir():
+        candidate_bases.append(nested)
+    paths: list[Path] = []
+    sub_re = re.compile(r"^subject\d+$", re.IGNORECASE)
+    for base in candidate_bases:
+        for sub in sorted(base.iterdir(), key=lambda p: p.name):
+            if not (sub.is_dir() and sub_re.match(sub.name)):
+                continue
+            ik_dir = sub / "OpenSimData" / IK_SOURCES[ik_source]
+            if not ik_dir.is_dir():
+                continue
+            for p in sorted(ik_dir.glob("*.mot")):
+                if p.stem.lower().startswith("walking"):
+                    paths.append(p)
+        if paths:
+            break  # only one candidate base actually holds the archive
+    return paths
+
+
+def subject_dir_for(ik_path: Path) -> Path:
+    """Return the `subject<NN>` directory above an IK or marker file path."""
+    for parent in ik_path.parents:
+        if re.match(r"^subject\d+$", parent.name, re.IGNORECASE):
+            return parent
+    raise ValueError(f"no subject<NN> dir above {ik_path}")
+
+
+# Marker-name remap from the LabValidation .trc files to the column
+# convention the segmentation pipeline expects (RHEE_Y / LHEE_Y for the
+# vertical heel-marker channel; r_calc / L_calc are the calcaneus markers
+# in the Mocap .trc).
+_TRC_HEEL_COLS = {
+    "r_calc_Y": "RHEE_Y",
+    "L_calc_Y": "LHEE_Y",
+}
+
+
+def load_paired_trial(ik_path: Path,
+                      ik_source: str = "Mocap",
+                      trc_dir: str = "MarkerData/Mocap") -> Trial:
+    """Load one trial from a Mocap or Video IK .mot file paired with the
+    Mocap marker .trc, merging joint-angle columns and heel-marker columns
+    into a single per-row DataFrame.
+
+    The .mot file supplies joint-angle / pelvis coordinates; the .trc file
+    supplies the vertical heel-marker channel that `scripts.segmentation`
+    uses for heel-strike detection. The .trc is always read from the
+    Mocap marker source — heel-strike timing comes from the gold-standard
+    markers regardless of which IK source is being analysed.
+
+    Both files are expected at the same sample rate and trial duration;
+    they are joined positionally on row index (no resampling). If row
+    counts mismatch, the shorter length is used and the trimmed count is
+    reflected in the returned DataFrame.
+    """
+    ik_path = Path(ik_path)
+    subject_dir = subject_dir_for(ik_path)
+    subject = subject_dir.name
+    trial_stem = ik_path.stem  # e.g. "walking4"
+    _, _, condition = parse_trial_filename(trial_stem)
+
+    df_ik = read_mot(ik_path)
+    trc_path = subject_dir / trc_dir / f"{trial_stem}.trc"
+    if trc_path.exists():
+        df_trc = read_trc(trc_path)
+        # Bring heel-marker columns onto the IK row grid by positional trim.
+        n = min(len(df_ik), len(df_trc))
+        for src_col, dst_col in _TRC_HEEL_COLS.items():
+            if src_col in df_trc.columns:
+                df_ik = df_ik.iloc[:n].reset_index(drop=True)
+                df_trc_n = df_trc.iloc[:n].reset_index(drop=True)
+                df_ik[dst_col] = df_trc_n[src_col].to_numpy()
+    # Sample rate from the merged frame; fall back gracefully if `time`
+    # is monotonic-but-non-uniform.
+    if "time" in df_ik.columns and len(df_ik) > 1:
+        dt = float(np.median(np.diff(df_ik["time"].to_numpy())))
+        fs = 1.0 / dt if dt > 0 else 100.0
+    else:
+        fs = 100.0
+    return Trial(subject=subject, trial_id=trial_stem, condition=condition,
+                 sample_rate_hz=fs, df=df_ik, source_path=ik_path)
+
+
+def load_all_walking_trials(extracted_root: Path,
+                            ik_source: str = "Mocap") -> list[Trial]:
+    """Convenience: discover + load all walking trials for one IK source."""
+    return [load_paired_trial(p, ik_source=ik_source)
+            for p in discover_walking_ik(extracted_root, ik_source=ik_source)]

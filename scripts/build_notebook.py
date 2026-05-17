@@ -80,25 +80,23 @@ print(f"USE_REAL_DATA: {USE_REAL_DATA}")
     nb.cells.append(new_markdown_cell("## 1. Discover trials"))
 
     nb.cells.append(new_code_cell("""from scripts.io_opencap import (
-    discover_trials, read_mot, read_trc, parse_trial_filename, synthesize_trial, Trial
+    discover_walking_ik, load_paired_trial, load_all_walking_trials,
+    synthesize_trial, IK_SOURCES, Trial,
 )
 
+# Primary trial list = Mocap-IK (lab gold standard) with Mocap heel
+# markers merged in. This drives segmentation, feature extraction, and
+# all plots. The three Video IK sources are loaded separately in §5 for
+# the OpenCap-vs-reference comparison.
 trials: list[Trial] = []
 if USE_REAL_DATA:
-    # Canonical OpenCap Lab Validation layout:
-    # Subject<NN>/IKResults/<trial>_ik.mot
-    mot_files = discover_trials(DATA_PATH, pattern="*_ik.mot", walking_only=True)
-    print(f"Found {len(mot_files)} walking IK files under {DATA_PATH}")
-    for p in mot_files:
-        subject = p.parents[1].name if p.parents[1].name.lower().startswith("subject") else "UNKNOWN"
-        _, trial_id, condition = parse_trial_filename(p.stem.replace("_ik", ""))
-        df = read_mot(p)
-        fs = 1 / np.mean(np.diff(df["time"]))
-        # mock heel-marker columns if not present (would come from .trc file)
-        if "RHEE_Y" not in df.columns:
-            print(f"  {p.name}: no marker columns in MOT — need paired TRC, skipping for segmentation")
-        trials.append(Trial(subject=subject, trial_id=trial_id, condition=condition,
-                            sample_rate_hz=fs, df=df, source_path=p))
+    trials = load_all_walking_trials(DATA_PATH, ik_source="Mocap")
+    print(f"Found {len(trials)} walking trials from Mocap IK under {DATA_PATH}")
+    if not trials:
+        raise RuntimeError(
+            "USE_REAL_DATA was true but no walking trials discovered — "
+            "check that the archive is extracted at "
+            f"{DATA_PATH}/LabValidation_withoutVideos/subject*/OpenSimData/Mocap/IK/walking*.mot")
 else:
     print("No real data found — synthesizing 4 trials for smoke test")
     trials.append(synthesize_trial(subject="Synth01", trial_id="walking1", condition="walking", n_cycles=8))
@@ -110,8 +108,17 @@ else:
                                    rng=np.random.default_rng(45)))
 
 print(f"Total trials: {len(trials)}")
-for t in trials:
-    print(f"  subject={t.subject}  trial={t.trial_id}  condition={t.condition}  n_samples={len(t.df)}  fs={t.sample_rate_hz:.1f} Hz")
+# Compact summary instead of one row per trial when the count is large
+if len(trials) <= 12:
+    for t in trials:
+        print(f"  subject={t.subject}  trial={t.trial_id}  condition={t.condition}  n_samples={len(t.df)}  fs={t.sample_rate_hz:.1f} Hz")
+else:
+    by_cond = pd.Series([t.condition for t in trials]).value_counts()
+    by_sub = pd.Series([t.subject for t in trials]).value_counts().sort_index()
+    print(f"  by condition: {dict(by_cond)}")
+    print(f"  subjects: {len(by_sub)}  (trials per subject: min={by_sub.min()} max={by_sub.max()} mean={by_sub.mean():.1f})")
+    print(f"  sample-rate range: {min(t.sample_rate_hz for t in trials):.1f}-{max(t.sample_rate_hz for t in trials):.1f} Hz")
+    print(f"  rows per trial: min={min(len(t.df) for t in trials)} max={max(len(t.df) for t in trials)} mean={int(np.mean([len(t.df) for t in trials]))}")
 """))
 
     nb.cells.append(new_markdown_cell("## 2. Gait-cycle segmentation (AC1)"))
@@ -227,13 +234,50 @@ plt.show()
 
     nb.cells.append(new_code_cell("""from scripts.comparison import compare_joints
 
+# Joints compared across IK sources. These are the OpenSim coordinate
+# names used in both Mocap IK and Video IK output files; the IK pipeline
+# scales the same generic model in both cases, so column names match.
+COMPARISON_JOINTS = [
+    "hip_flexion_r", "hip_flexion_l",
+    "knee_angle_r", "knee_angle_l",
+    "ankle_angle_r", "ankle_angle_l",
+]
+
+VIDEO_SOURCES = [s for s in IK_SOURCES if s != "Mocap"]
+
 if USE_REAL_DATA:
-    # When real data is present, this cell will load paired (opencap, reference)
-    # IK results and compute RMSE / r / bias per joint. The OpenCap Lab
-    # Validation archive ships both — see README inside the archive.
-    print("Real-data comparison: NOT IMPLEMENTED in smoke build — requires paired IK files.")
-    print("Once data is available, populate `opencap_df` and `reference_df` here and call compare_joints().")
-    comparison = pd.DataFrame()
+    # For each Video IK source, pair against the Mocap IK from the same
+    # trial (matched by subject + trial_id) and compute per-joint RMSE,
+    # pearson r, and mean bias. Aggregate across trials per (source, joint).
+    mocap_index = {(t.subject, t.trial_id): t for t in trials}
+    rows = []
+    for src in VIDEO_SOURCES:
+        video_trials = load_all_walking_trials(DATA_PATH, ik_source=src)
+        for vt in video_trials:
+            mt = mocap_index.get((vt.subject, vt.trial_id))
+            if mt is None:
+                continue
+            per_joint = compare_joints(vt.df, mt.df, joints=COMPARISON_JOINTS)
+            per_joint["source"] = src
+            per_joint["subject"] = vt.subject
+            per_joint["trial_id"] = vt.trial_id
+            per_joint["condition"] = vt.condition
+            rows.append(per_joint)
+    per_trial = pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()
+    print(f"Paired comparisons: {len(per_trial)} rows ({len(VIDEO_SOURCES)} sources × ~{len(trials)} trials × {len(COMPARISON_JOINTS)} joints)")
+
+    # Aggregate: mean ± std RMSE / pearson r / bias per (source, joint).
+    if len(per_trial):
+        comparison = (per_trial
+                      .groupby(["source", "joint"], as_index=False)
+                      .agg(rmse_deg_mean=("rmse_deg", "mean"),
+                           rmse_deg_std=("rmse_deg", "std"),
+                           pearson_r_mean=("pearson_r", "mean"),
+                           pearson_r_std=("pearson_r", "std"),
+                           bias_deg_mean=("mean_bias_deg", "mean"),
+                           n_trials=("rmse_deg", "count")))
+    else:
+        comparison = pd.DataFrame()
 else:
     # Smoke: compare a synthetic trial against itself + noise to verify the function shape.
     rng = np.random.default_rng(99)
@@ -242,8 +286,20 @@ else:
     for col in ["hip_flexion_r", "knee_angle_r", "ankle_angle_r"]:
         noisy[col] = noisy[col] + rng.normal(0, 1.5, len(noisy))
     comparison = compare_joints(noisy, base, joints=["hip_flexion_r", "knee_angle_r", "ankle_angle_r"])
+    per_trial = pd.DataFrame()
     print("Smoke comparison (synthetic vs synthetic+noise):")
 comparison
+"""))
+
+    nb.cells.append(new_code_cell("""# AC4 oracle: per-source mean Pearson r ≥ 0.7 across knee+hip+ankle.
+# (RMSE and bias are reported but no fixed threshold — the paper itself
+# documents RMSE ~3-8° as the typical OpenCap-vs-mocap range, so we
+# surface the numbers and let the reader judge.)
+if USE_REAL_DATA and len(comparison):
+    overall_r = comparison.groupby("source")["pearson_r_mean"].mean()
+    print("Mean Pearson r across joints, per source:")
+    for src, r in overall_r.items():
+        print(f"  {src:32s} : r̄ = {r:.3f}  (GO ≥ 0.7)")
 """))
 
     nb.cells.append(new_markdown_cell("## 6. Persist feature table (private — not committed)"))
@@ -284,13 +340,13 @@ Maps notebook outputs to issue #6 ACs:
 - **AC1** — Gait-cycle segmentation ≥80%: printed in cell §2 with explicit threshold.
 - **AC2** — Feature table + missingness <20%: printed in cell §3 with explicit threshold.
 - **AC3** — First-pass plots (time-normalized hip/knee/ankle, L/R overlay, speed/condition comparisons, feature distributions): cells in §4.
-- **AC4** — OpenCap-vs-reference comparison: cell §5. Currently NOT IMPLEMENTED for real data; smoke comparison only.
+- **AC4** — OpenCap-vs-reference comparison: cell §5. Real-data implementation pairs Mocap IK against each of HRNet / OpenPose_default / OpenPose_highAccuracy at the 5-cameras setup; per-trial table is in `per_trial`, aggregate is in `comparison`. Smoke mode still exercises `compare_joints` against synthetic noise.
 - **AC5** — Reproducibility: dependencies pinned in `../requirements.txt`; this notebook re-runs end-to-end against `<GAIT_DATA_ROOT>/opencap-lab-validation/extracted/` (default `GAIT_DATA_ROOT=/opt/gait-data/`) when populated.
 
 **Known debt (carried into Sub C):**
 
-- AC4 real-data comparison stub: complete pairing logic for IK/marker files in the OpenCap Lab Validation layout once the archive is acquired.
 - The feature table omits some `analysis/features.md` features (asymmetry shape-correlation, condition-response deltas) — they require multi-trial aggregation that lives in Sub C's analysis, not Sub B's per-cycle extraction.
+- Hip ab/ad-duction features are not yet in `scripts/features.py::extract_range`; needed for Hypothesis 2's frontal-plane comparison. Trivial extension once a column-naming convention is fixed; queued for a later cycle per the operator-confirmed minimal-adaptation scope.
 """))
 
     return nb

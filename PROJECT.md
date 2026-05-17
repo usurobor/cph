@@ -4,9 +4,9 @@ This file owns project status, current stage, and implementation progress.
 
 ## Current Stage
 
-**Stage:** Existing-data zeroth pilot — REVISE
-**Phase:** Pipeline implemented + smoke-tested; empirical run blocked at dataset acquisition (SimTK login).
-**Next action:** Operator runs the acquisition procedure in `data/external/opencap-lab-validation.md §Acquisition procedure`; protocol `protocols/existing-data-zeroth-pilot.md` to be revised with an "Access mechanism" subsection (see `reports/field-report-01-existing-data-zeroth-pilot.md` §Recommendation). After acquisition, re-execute `notebooks/existing-data-processing.ipynb` against real data and re-evaluate the GO/NO-GO criteria.
+**Stage:** Existing-data zeroth pilot — REVISE (2026-05-17 real-data run; supersedes the 2026-05-15 acquisition-blocked REVISE)
+**Phase:** Archive acquired and processed end-to-end. OpenCap-vs-reference comparison passes (AC4: Pearson r̄ 0.93–0.96 across HRNet / OpenPose_default / OpenPose_highAccuracy at 5-cameras × 60 trials). Gait-cycle segmentation primitive fails on real Mocap calcaneus markers (AC1: 18.3% of 60 trials, R-side only, zero L-side); the rest of the pipeline (discovery, IK parsing, marker pairing, feature extraction, comparison, plotting, persistence) is real-data-ready.
+**Next action:** Single-issue cycle to tune `scripts/segmentation.py::detect_heel_strikes` against real heel-marker dynamics (per-side baseline subtraction + percentile-of-range threshold). Verification harness uses the 60 Mocap trials already in `/opt/gait-data/opencap-lab-validation/extracted/`. After the fix, re-run `notebooks/existing-data-processing.ipynb` and re-evaluate the falsification table. See [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) §Recommendation for the bounded revision plan.
 
 ## Implementation Status
 
@@ -64,7 +64,7 @@ OpenCap converts video into biomechanical time series. It is not the classifier.
 
 Process existing validation datasets before collecting new participant data.
 
-**Status:** REVISE — pipeline implemented and smoke-tested under the zeroth-pilot wave (2026-05-15); empirical execution blocked at dataset acquisition (SimTK login gate). See `reports/field-report-01-existing-data-zeroth-pilot.md` for the wave's REVISE decision and required protocol revision.
+**Status:** REVISE (2026-05-17, real-data) — acquisition gate cleared and the pipeline ran end-to-end against the real archive. OpenCap-vs-reference comparison cleanly passes (r̄ 0.93–0.96 across three Video backbones × 60 trials, validating the OpenCap technology stack). Gait-cycle segmentation primitive fails on real Mocap heel-marker dynamics (18.3% on the right side, 0% on the left), blocking 4 of 6 falsification conditions on cycle scarcity. The required revision is bounded to a single-issue cycle on `scripts/segmentation.py::detect_heel_strikes`. See `reports/field-report-01-existing-data-zeroth-pilot.md` for the full evaluation.
 **Artifact:** `docs/realizations/04-existing-data-comes-first.md`
 
 ### Realization 05 — Friends Are Not Validation

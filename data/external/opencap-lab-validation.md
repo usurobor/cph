@@ -61,10 +61,10 @@ The walking-relevant archive is `LabValidation_withoutVideos.zip` if we trust th
 The cycle uses only walking trials per protocol §Dataset Selection Rules and §Methodological Constraints ("Boring first").
 
 ### Walking conditions (from paper §Methods, confirmed at inventory 2026-05-17)
-- **Natural walking** (no instruction beyond "walk naturally") — 3 trials per subject (`walking1`, `walking2`, `walking3`)
-- **Trunk-sway modification** (instructed lateral trunk lean over stance leg) — 3 trials per subject (`walkingTS1`, `walkingTS2`, `walkingTS3`)
+- **Natural walking** (no instruction beyond "walk naturally") — 3 trials per subject, file stems `walking<N>`
+- **Trunk-sway modification** (instructed lateral trunk lean over stance leg) — 3 trials per subject, file stems `walkingTS<N>`
 
-Repetitions confirmed uniform across all 10 subjects: 3 natural + 3 trunk-sway = 6 walking trials per subject = **60 walking trials total**.
+Repetitions confirmed uniform across all 10 subjects: 3 natural + 3 trunk-sway = 6 walking trials per subject = **60 walking trials total**. Per-subject trial-index ranges vary — e.g. subject2 uses indices 1–3 (`walking1/2/3`) while subject11 uses 2–4 (`walking2/3/4`); the trunk-sway indices similarly vary. The pipeline discovery layer in `scripts.io_opencap.discover_walking_ik` is index-agnostic and matches any `walking*.mot` under `OpenSimData/Mocap/IK/`.
 
 ### Reference measurements
 - **Optical motion capture:** 8-camera Motion Analysis system (Motion Analysis Corp., Santa Rosa, CA, USA) tracking 31 retroreflective markers
@@ -99,7 +99,7 @@ Inventoried 2026-05-17 from extracted archive at `/opt/gait-data/opencap-lab-val
 - **Number of participants:** 10 (directory names `subject2`, `subject3`, …, `subject11`; archive numbering skips `subject1`).
 - **Per-subject directory layout:** `EMGData/`, `ForceData/`, `MarkerData/`, `OpenSimData/`, `sessionMetadata.yaml`, `desktop.ini`.
 - **Walking conditions:** 2 (natural, trunk-sway modification).
-- **Walking trials per subject:** 6 (3 natural: `walking1`, `walking2`, `walking3`; 3 trunk-sway: `walkingTS1`, `walkingTS2`, `walkingTS3`). Uniform across all 10 subjects (EMG-file count check).
+- **Walking trials per subject:** 6 (3 natural + 3 trunk-sway). Uniform across all 10 subjects (EMG-file count check). The per-subject *trial-index* range is not uniform — subject2 uses `walking{1,2,3}` and `walkingTS{1,2,3}`; subject11 uses `walking{2,3,4}` and `walkingTS{1,2,3}`; other subjects vary similarly. The pipeline discovery layer in `scripts.io_opencap.discover_walking_ik` is index-agnostic and matches any `walking*.mot` under `OpenSimData/Mocap/IK/`.
 - **Walking trials total:** 60.
 - **Speed variations:** Not graded — both conditions performed at self-selected speed. (See §Selection-Rules Check.)
 - **Gait cycle count estimate (revised after inventory):** 60 trials × ~3 cycles/trial ≈ 180 cycles lower bound; ~300–500 cycles plausible if trials run longer. Per-trial cycle count to be measured at segmentation stage (Sub B of `notebooks/existing-data-processing.ipynb`).
