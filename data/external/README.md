@@ -42,3 +42,14 @@ Others reproducing this work should:
 ## Privacy and Ethics
 
 External datasets may contain identifiable biometric data. Follow the ethics guidelines in `docs/ethics/` when working with any downloaded data.
+
+## Wave-manifest escalation rule (external data)
+
+Wave manifests that schedule cycles which consume external data must escalate to the operator on **either** of the following, not just the first:
+
+1. **Non-permissive license.** The candidate dataset's license forbids the project's intended use, attaches commercial restrictions the project cannot meet, or is unclear.
+2. **Access-mechanism gate requiring unsupplied credentials.** The candidate dataset is permissively licensed but the download channel requires an authenticated account, API token, signed DUA, or other credential that the wave's standing permissions do not already arrange.
+
+Both conditions are independently sufficient triggers. The historical wave-manifest convention framed escalation only around (1); the broadened rule above is the load-bearing form going forward.
+
+The protocol-side definition of "access mechanism" — including what counts as "publicly accessible," credential-gate examples, and the operator-credential expectations — lives in [`protocols/existing-data-zeroth-pilot.md` §Dataset Selection Rules → Access mechanism](../../protocols/existing-data-zeroth-pilot.md#access-mechanism). Wave-manifest authors should cite that anchor when documenting escalation decisions.
