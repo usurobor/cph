@@ -23,6 +23,8 @@ The `opencap-processing` Python client (Stanford NMBL) also requires an OpenCap 
 
 **Escalation:** This is an access-mechanism block, not a license block. Operator credentials (SimTK account) are required to complete the download. Reported in `.cdd/unreleased/5/self-coherence.md §Debt` and surfaced to wave operator.
 
+The protocol's treatment of credential-gated datasets — what counts as "publicly accessible," credential-gate examples, the unauthenticated-`curl` probe, and the operator-credential preconditions for proceeding with a licensed-permissive-but-gated candidate — is at [`protocols/existing-data-zeroth-pilot.md` §Dataset Selection Rules → Access mechanism](../../protocols/existing-data-zeroth-pilot.md#access-mechanism). The broadened wave-manifest escalation rule (escalate on EITHER non-permissive license OR access-mechanism gate) is at [`data/external/README.md` §Wave-manifest escalation rule](README.md#wave-manifest-escalation-rule-external-data). OpenCap Lab Validation falls into the second category and is the empirical case that motivated the broadening.
+
 ## Files (per SimTK project 2385 downloads page)
 
 | File | SimTK file id | Purpose |

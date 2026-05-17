@@ -24,6 +24,40 @@ This zeroth pilot validates the analysis pipeline using publicly available OpenC
 - Datasets with unclear licensing or access restrictions
 - Datasets with only single-trial recordings
 
+### Access mechanism
+
+A permissive license (Apache 2.0, MIT, CC-BY, public domain) is necessary but not sufficient: the project also requires that the chosen dataset be **acquireable in the cycle's actual execution environment**. The four selection rules above cover license; this subsection covers the access channel.
+
+**What counts as "publicly accessible" in this project's sense:**
+
+A dataset is publicly accessible if **all** of the following hold:
+1. The license permits the project's intended use without per-user agreement (the four rules above).
+2. The download endpoint serves the archive to an unauthenticated HTTP client (no login wall, no API token, no per-user agreement click-through that issues a session cookie).
+3. The archive can be fetched and verified (SHA-256 or equivalent) without operator-supplied credentials.
+
+A dataset that satisfies (1) but not (2) or (3) is **licensed-permissive-but-gated**. It is still a valid candidate; it just requires explicit operator credentials before the cycle can proceed.
+
+**Authentication / credential gates to check before selection:**
+
+- Account-required download portals (SimTK, Figshare-private, OSF-private, Synapse, PhysioNet credentialed tier).
+- API tokens (e.g., the OpenCap API `API_TOKEN`, dataset-specific service tokens).
+- Click-through Data Use Agreements that bind a named user.
+- IRB-style restricted-access tiers, even when the underlying data is de-identified.
+- Captcha or human-verification walls on the file endpoint.
+
+The probe is concrete: attempt an unauthenticated `curl -L -o /dev/null` against the file URL. A 200 with the archive bytes means "open access mechanism"; a redirect to a login page, a 401/403, or an HTML login form means "gated access mechanism."
+
+**Operator-supplied credential expectations:**
+
+If the chosen dataset is licensed-permissive-but-gated, the cycle proceeds only if **all** of the following are arranged before the wave's α cycle starts:
+- The operator commits to supplying the credentials (account, API token, signed DUA) for the cycle's execution environment.
+- The wave manifest's standing permissions explicitly include the credential channel (e.g., "operator will export `SIMTK_USER` / `SIMTK_PASS` into the cycle environment").
+- The dataset manifest (`data/external/<dataset>.md`) documents the acquisition procedure step-by-step so the credential exchange is auditable.
+
+If any of the three is missing, the candidate must be **escalated to the wave operator** before selection is finalized. Escalation is not rejection — the operator may supply the gap, or may direct the cycle to fall back to a backup dataset (see §Backup datasets above). Escalation is the same loop used for non-permissive license: a one-line note in the manifest's §Acquisition status, plus a follow-up entry in the wave's escalation log.
+
+The result: a reader of this protocol can answer "is this candidate dataset acquireable in our environment?" *before* selection is finalized, without consulting the wave manifest.
+
 ## Required Outputs
 
 The existing-data zeroth pilot must produce:
