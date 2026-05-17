@@ -32,7 +32,7 @@ This notebook is the canonical pipeline for issue #6. It produces:
 5. OpenCap-vs-reference comparison stats
 
 The notebook re-runs end-to-end against:
-- **Real data** when `/opt/gait-data/opencap-lab-validation/extracted/` is populated (see `data/external/opencap-lab-validation.md` §Acquisition procedure).
+- **Real data** when `<GAIT_DATA_ROOT>/opencap-lab-validation/extracted/` is populated (default `GAIT_DATA_ROOT=/opt/gait-data/`; see `data/external/opencap-lab-validation.md` §Acquisition procedure and `notebooks/README.md` §Overriding the data root).
 - **Synthetic data** otherwise — a smoke-test of pipeline shape using `scripts.io_opencap.synthesize_trial()`. The smoke-test produces real figures and a feature table but the support-path inference from synthetic data is *not* a valid empirical claim.
 
 **Active design constraints** (from issue #6):
@@ -40,7 +40,7 @@ The notebook re-runs end-to-end against:
 - No raw participant data committed.
 - Each numerical claim in the notebook traces to a cell that produced it.
 
-**Reproducibility (AC5):** dependencies pinned in `requirements.txt`; notebook re-runs against the manifest-described local data path with no manual edits.
+**Reproducibility (AC5):** dependencies pinned in `requirements.txt`; notebook re-runs against the manifest-described local data path with no manual edits. The data root is overridable via the `GAIT_DATA_ROOT` environment variable (default `/opt/gait-data/`).
 """))
 
     nb.cells.append(new_code_cell("""# Configuration
@@ -58,10 +58,21 @@ if REPO_ROOT.name == "notebooks":
     REPO_ROOT = REPO_ROOT.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-DATA_PATH = Path("/opt/gait-data/opencap-lab-validation/extracted/")
+# Data root resolution: GAIT_DATA_ROOT env var overrides the documented
+# default `/opt/gait-data/`. See notebooks/README.md §Overriding the data
+# root. The helpers live in scripts/io_opencap.py so calling code that
+# imports the module directly gets the same override behavior.
+from scripts.io_opencap import (
+    DEFAULT_DATA_ROOT, GAIT_DATA_ROOT_ENV,
+    get_data_root, get_opencap_extracted_root,
+)
+
+DATA_ROOT = get_data_root()
+DATA_PATH = get_opencap_extracted_root()
 USE_REAL_DATA = DATA_PATH.exists() and any(DATA_PATH.iterdir())
 
 print(f"REPO_ROOT: {REPO_ROOT}")
+print(f"DATA_ROOT: {DATA_ROOT}  (default {DEFAULT_DATA_ROOT}; override env {GAIT_DATA_ROOT_ENV})")
 print(f"DATA_PATH: {DATA_PATH}  (exists: {DATA_PATH.exists()})")
 print(f"USE_REAL_DATA: {USE_REAL_DATA}")
 """))
@@ -237,7 +248,7 @@ comparison
 
     nb.cells.append(new_markdown_cell("## 6. Persist feature table (private — not committed)"))
 
-    nb.cells.append(new_code_cell("""PRIVATE_OUT = Path("/opt/gait-data/gait-support-paths-features/")
+    nb.cells.append(new_code_cell("""PRIVATE_OUT = DATA_ROOT / "gait-support-paths-features"
 PRIVATE_OUT.mkdir(parents=True, exist_ok=True)
 
 feature_path = PRIVATE_OUT / "features-zeroth-pilot.parquet"
@@ -274,7 +285,7 @@ Maps notebook outputs to issue #6 ACs:
 - **AC2** — Feature table + missingness <20%: printed in cell §3 with explicit threshold.
 - **AC3** — First-pass plots (time-normalized hip/knee/ankle, L/R overlay, speed/condition comparisons, feature distributions): cells in §4.
 - **AC4** — OpenCap-vs-reference comparison: cell §5. Currently NOT IMPLEMENTED for real data; smoke comparison only.
-- **AC5** — Reproducibility: dependencies pinned in `../requirements.txt`; this notebook re-runs end-to-end against `/opt/gait-data/opencap-lab-validation/extracted/` when populated.
+- **AC5** — Reproducibility: dependencies pinned in `../requirements.txt`; this notebook re-runs end-to-end against `<GAIT_DATA_ROOT>/opencap-lab-validation/extracted/` (default `GAIT_DATA_ROOT=/opt/gait-data/`) when populated.
 
 **Known debt (carried into Sub C):**
 

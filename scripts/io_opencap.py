@@ -16,6 +16,7 @@ rest of the pipeline can be smoke-tested.
 from __future__ import annotations
 
 import io
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,6 +24,43 @@ from typing import Iterable, Optional
 
 import numpy as np
 import pandas as pd
+
+
+# Documented default. The OpenCap Lab Validation archive is expected at
+# `<DEFAULT_DATA_ROOT>/opencap-lab-validation/extracted/`; the persisted
+# feature table is written to `<DEFAULT_DATA_ROOT>/gait-support-paths-features/`.
+# Operators with a different filesystem layout override via the
+# `GAIT_DATA_ROOT` environment variable (see notebooks/README.md §Overriding
+# the data root). Stdlib only — no python-dotenv, no config libraries.
+DEFAULT_DATA_ROOT = Path("/opt/gait-data/")
+GAIT_DATA_ROOT_ENV = "GAIT_DATA_ROOT"
+
+
+def get_data_root() -> Path:
+    """Return the data root directory.
+
+    Resolution order:
+    1. `GAIT_DATA_ROOT` environment variable (if set and non-empty).
+    2. `DEFAULT_DATA_ROOT` (`/opt/gait-data/`).
+
+    The returned path is NOT required to exist — callers downstream
+    (`discover_trials`, the notebook's `USE_REAL_DATA` check) decide what
+    to do when it is missing. This keeps the override mechanism orthogonal
+    to the smoke-test fallback.
+    """
+    override = os.environ.get(GAIT_DATA_ROOT_ENV, "").strip()
+    if override:
+        return Path(override).expanduser()
+    return DEFAULT_DATA_ROOT
+
+
+def get_opencap_extracted_root() -> Path:
+    """Return the expected OpenCap Lab Validation `extracted/` directory.
+
+    Convenience wrapper for the pipeline's canonical subpath under
+    `get_data_root()`.
+    """
+    return get_data_root() / "opencap-lab-validation" / "extracted"
 
 
 @dataclass
