@@ -93,6 +93,17 @@ The analysis features used as candidate traces are listed in [Features](../../an
 
 The support path construct weakens under the following empirical conditions during existing-data processing:
 
+### Empirical-data prerequisite
+
+Five of the six conditions below (1, 2, 3, 4, 6) test for the *absence of empirical variation* — they ask whether features fail to be repeatable, fail to correlate with context, fail to organize asymmetry, fail to agree with reference instruments, or fail to produce distinguishable signatures. Each of these is meaningful only when applied to data that *could*, in principle, show variation. On synthetic or by-construction-coherent data (e.g. a smoke generator that hardcodes the very patterns under test), the conditions cannot be evaluated; running them anyway will produce a misleading "0 of 6 triggered" reading that mechanically resembles a GO signal.
+
+When evaluating the table, distinguish two verdicts:
+
+- **"Not triggered"** is a *positive empirical claim*: the condition was tested against data capable of triggering it, and the data did not. This counts toward the threshold rule below.
+- **"Not testable"** is a *deferred verdict*: the condition could not be evaluated on the available data (e.g. smoke-only, by-construction inputs, or missing reference channel). This does **not** count toward the threshold rule.
+
+Condition 5 (feature extraction reliability on clean data) is the exception: it can be evaluated against synthetic clean inputs and yields a meaningful "triggered" or "not triggered" verdict on smoke alone, because it tests pipeline competence rather than empirical variation.
+
 ### 1. No Repeatable Patterns Across Gait Cycles
 If extracted features show purely random variation between gait cycles within the same trial and participant, with no discernible coordination patterns, then support paths may be theoretical artifacts rather than measurable phenomena.
 
@@ -111,7 +122,7 @@ If the pipeline cannot reliably extract interpretable features from high-quality
 ### 6. No Distinguishable Coordination Signatures
 If feature analysis reveals only continuous variation without discrete organizational types or clusters, then support paths may represent observer bias rather than measurable coordination patterns.
 
-**Falsification threshold:** If 4 or more of these conditions occur during existing-data processing, the construct requires fundamental revision before proceeding with friend data collection.
+**Falsification threshold:** If 4 or more of these conditions are **triggered** during existing-data processing, the construct requires fundamental revision before proceeding with friend data collection. "Not testable" verdicts do **not** count toward the threshold — rationale: a deferred verdict carries no empirical evidence either for or against the construct, so it cannot be used to license a revision decision.
 
 ## Safe claim
 
