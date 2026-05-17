@@ -5,7 +5,7 @@
 **Dataset name:** OpenCap Lab Validation (Stanford NMBL)
 **Source URL:** https://simtk.org/projects/opencap (SimTK project 2385)
 **Source paper:** Uhlrich SD, Falisse A, Kidziński Ł, et al. "OpenCap: Human movement dynamics from smartphone videos." PLOS Computational Biology 19(10): e1011462 (2023). https://doi.org/10.1371/journal.pcbi.1011462
-**Access date:** 2026-05-15 (dataset identified; download pending — see §Acquisition status)
+**Access date:** 2026-05-15 (dataset identified); **2026-05-17** (archive downloaded — see §Acquisition status)
 **Data type:** Publicly documented validation dataset, Apache 2.0
 **License/Terms:** Apache License 2.0 (SimTK download confirm page).
   Per Apache 2.0: free to use, modify, distribute with attribution.
@@ -13,17 +13,23 @@
 
 ## Acquisition status
 
-**Download status: BLOCKED — SimTK account registration required.**
+**Download status: Downloaded (2026-05-17).**
 
-The dataset is licensed Apache 2.0 (permissive, no usage restrictions). However, the file download endpoint at SimTK (`/frs/download_confirm.php/file/{id}/...zip?group_id=2385`) requires an authenticated SimTK user session — the SimTK platform enforces a login wall in front of all file downloads regardless of license. Probing the endpoint returns a JavaScript redirect to `/account/login.php`.
+| Field | Value |
+|---|---|
+| Archive filename | `LabValidation_withoutVideos.zip` |
+| SimTK file id | 6688 |
+| Download date | 2026-05-17 |
+| Local private storage path | `/opt/gait-data/opencap-lab-validation/LabValidation_withoutVideos.zip` (absolute; outside the repo) |
+| Archive size | 3,029,832,907 bytes (≈ 2.82 GiB / 2,890 MB) — matches the SimTK-listed approximate size of 2889 MB |
+| SHA-256 | `3290d485124fd12c85dd3bc9ee851f3a0530ad0ff58bc396973e665dd6d28187` (also persisted as `LabValidation_withoutVideos.zip.sha256` next to the archive) |
+| Zip integrity | `unzip -t` reported no errors |
+| Extraction status | Extracted to `/opt/gait-data/opencap-lab-validation/extracted/` (≈ 7.2 GiB, 11,141 files) |
+| Top-level extracted directory | single dir `LabValidation_withoutVideos/` containing subjects `subject2` … `subject11` (10 subjects; numbering skips `subject1`) |
 
-The OpenCap public S3 bucket (`mc-opencap-public.s3.us-west-2.amazonaws.com`) hosts processed/derivative assets (OpenSim geometries, etc.) but is configured to deny anonymous listing and does not host the Lab Validation archive at a guessable key.
+**Acquisition channel:** SimTK account registered and license click-through (Apache 2.0) accepted by the operator-authorized agent flow on 2026-05-17 against `https://simtk.org/frs/download_start.php/file/6688/LabValidation_withoutVideos.zip?group_id=2385`. The license click-through was the canonical Apache 2.0 boilerplate; no separate DUA or restricted-access agreement. The optional inventory file `extracted-file-inventory.txt` is kept next to the archive (outside git) per protocol §Optional inventory.
 
-The `opencap-processing` Python client (Stanford NMBL) also requires an OpenCap API token (`API_TOKEN`) and is therefore blocked under the same gate.
-
-**Escalation:** This is an access-mechanism block, not a license block. Operator credentials (SimTK account) are required to complete the download. Reported in `.cdd/unreleased/5/self-coherence.md §Debt` and surfaced to wave operator.
-
-The protocol's treatment of credential-gated datasets — what counts as "publicly accessible," credential-gate examples, the unauthenticated-`curl` probe, and the operator-credential preconditions for proceeding with a licensed-permissive-but-gated candidate — is at [`protocols/existing-data-zeroth-pilot.md` §Dataset Selection Rules → Access mechanism](../../protocols/existing-data-zeroth-pilot.md#access-mechanism). The broadened wave-manifest escalation rule (escalate on EITHER non-permissive license OR access-mechanism gate) is at [`data/external/README.md` §Wave-manifest escalation rule](README.md#wave-manifest-escalation-rule-external-data). OpenCap Lab Validation falls into the second category and is the empirical case that motivated the broadening.
+**Historical escalation (resolved):** The earlier `Download status: BLOCKED` state — driven by the SimTK login wall in front of all file downloads (the endpoint returns a JS redirect to `/account/login.php` when unauthenticated; the OpenCap public S3 bucket does not host this archive; `opencap-processing` requires an `API_TOKEN` under the same gate) — was the empirical case that motivated the broadened wave-manifest escalation rule covering access-mechanism gates as well as non-permissive licenses. That rule, and the protocol-side definition of "access mechanism," remain at [`data/external/README.md` §Wave-manifest escalation rule](README.md#wave-manifest-escalation-rule-external-data) and [`protocols/existing-data-zeroth-pilot.md` §Dataset Selection Rules → Access mechanism](../../protocols/existing-data-zeroth-pilot.md#access-mechanism); they are unchanged by this resolution. The block was cleared by operator-supplied credentials per the documented acquisition procedure.
 
 ## Files (per SimTK project 2385 downloads page)
 
@@ -35,7 +41,7 @@ The protocol's treatment of credential-gated datasets — what counts as "public
 
 The walking-relevant archive is `LabValidation_withoutVideos.zip` if we trust the published processed kinematics; `LabValidation_withVideos.zip` if the project wants to re-run OpenCap from raw video.
 
-**Local private storage path:** `/opt/gait-data/opencap-lab-validation/` (outside the repo). The path is created and listed in `.gitignore` (project-wide rule: `data/external/**/*.zip`, `data/external/**/*.csv` etc. — see §Storage policy below). No data has yet been downloaded to the path.
+**Local private storage path:** `/opt/gait-data/opencap-lab-validation/` (outside the repo). The path is listed in `.gitignore` (project-wide rule: `data/external/**/*.zip`, `data/external/**/*.csv` etc. — see §Storage policy below).
 
 ## Data Contents Assessment (from paper)
 
@@ -54,11 +60,11 @@ The walking-relevant archive is `LabValidation_withoutVideos.zip` if we trust th
 
 The cycle uses only walking trials per protocol §Dataset Selection Rules and §Methodological Constraints ("Boring first").
 
-### Walking conditions (from paper §Methods)
-- **Natural walking** (no instruction beyond "walk naturally")
-- **Trunk-sway modification** (instructed lateral trunk lean over stance leg)
+### Walking conditions (from paper §Methods, confirmed at inventory 2026-05-17)
+- **Natural walking** (no instruction beyond "walk naturally") — 3 trials per subject (`walking1`, `walking2`, `walking3`)
+- **Trunk-sway modification** (instructed lateral trunk lean over stance leg) — 3 trials per subject (`walkingTS1`, `walkingTS2`, `walkingTS3`)
 
-Number of walking trial repetitions per participant is not stated in the paper; will be inventoried after acquisition.
+Repetitions confirmed uniform across all 10 subjects: 3 natural + 3 trunk-sway = 6 walking trials per subject = **60 walking trials total**.
 
 ### Reference measurements
 - **Optical motion capture:** 8-camera Motion Analysis system (Motion Analysis Corp., Santa Rosa, CA, USA) tracking 31 retroreflective markers
@@ -88,22 +94,26 @@ Selection decision: **OpenCap Lab Validation passes the selection rules with one
 
 ## Walking Trials Identified
 
-**Inventory pending acquisition.** From documentation alone:
+Inventoried 2026-05-17 from extracted archive at `/opt/gait-data/opencap-lab-validation/extracted/LabValidation_withoutVideos/`.
 
-- **Number of participants:** 10
-- **Walking conditions:** 2 (natural, trunk-sway modification)
+- **Number of participants:** 10 (directory names `subject2`, `subject3`, …, `subject11`; archive numbering skips `subject1`).
+- **Per-subject directory layout:** `EMGData/`, `ForceData/`, `MarkerData/`, `OpenSimData/`, `sessionMetadata.yaml`, `desktop.ini`.
+- **Walking conditions:** 2 (natural, trunk-sway modification).
+- **Walking trials per subject:** 6 (3 natural: `walking1`, `walking2`, `walking3`; 3 trunk-sway: `walkingTS1`, `walkingTS2`, `walkingTS3`). Uniform across all 10 subjects (EMG-file count check).
+- **Walking trials total:** 60.
 - **Speed variations:** Not graded — both conditions performed at self-selected speed. (See §Selection-Rules Check.)
-- **Trial repetitions:** Not stated in paper. Estimated multiple repetitions per condition per subject (≥1, conservatively); to be confirmed at file inventory.
-- **Gait cycle count estimate:** Lower bound: 10 subj × 2 cond × 1 trial × ~3 cycles/trial = ~60 cycles. Upper bound (typical lab protocols at 3–5 repetitions per condition): ~300–500 cycles.
+- **Gait cycle count estimate (revised after inventory):** 60 trials × ~3 cycles/trial ≈ 180 cycles lower bound; ~300–500 cycles plausible if trials run longer. Per-trial cycle count to be measured at segmentation stage (Sub B of `notebooks/existing-data-processing.ipynb`).
+- **File types present per subject (subject11 sample):** `.mot` (OpenSim Motion, joint trajectories), `.sto` (OpenSim Storage, EMG/forces/IK), `.trc` (TRC marker trajectories), `.osim` (OpenSim model), `.xml`, `.npy`, `.yaml`, `.ini`. All file formats are pipeline-compatible per `instruments/opencap/outputs-to-extract.md`.
+- **Total file count across archive:** 11,141 files; ≈ 7.2 GiB on disk extracted.
 
-A row-level inventory will be appended once the archive is downloaded.
+A row-level per-trial inventory (e.g., trial duration, marker dropouts, force-plate hits) lives in the outside-git `extracted-file-inventory.txt` alongside the archive and will be summarized in Sub B's quality assessment.
 
 ## Processing Status
 
-**Download status:** Blocked on operator-credentialed acquisition (SimTK account).
-**Inventory status:** Documentation-derived inventory above. Row-level inventory blocked on download.
-**Quality assessment:** Documentation-derived only. Per-trial quality assessment blocked on download.
-**Pipeline compatibility:** Reference output structure (TRC marker files, MOT force plate files, OSIM model, IK MOT outputs) is the OpenSim-standard set documented at `instruments/opencap/outputs-to-extract.md`. Pipeline at `notebooks/existing-data-processing.ipynb` (Sub B) expects exactly this set, so format compatibility is expected.
+**Download status:** Downloaded 2026-05-17 (see §Acquisition status for archive size, SHA-256, extraction).
+**Inventory status:** Directory- and file-type-level inventory complete (see §Walking Trials Identified). Per-trial quality (e.g., marker dropouts, force-plate hits, EMG saturation) deferred to Sub B's quality assessment.
+**Quality assessment:** Pending — Sub B of `notebooks/existing-data-processing.ipynb`.
+**Pipeline compatibility:** Confirmed at inventory — archive contains the OpenSim-standard set (`.trc`, `.mot`, `.sto`, `.osim`) plus `.npy` and `.yaml` session metadata, matching the format set expected by `instruments/opencap/outputs-to-extract.md` and consumed by the notebook's Sub B.
 
 ## Storage policy
 
@@ -133,8 +143,8 @@ This dataset serves as the primary validation source for the existing-data zerot
 
 ## Processing Timeline
 
-- **Download and inventory:** Week 1 of existing-data protocol — **blocked** on operator SimTK credentials at the time of this manifest.
-- **Quality assessment:** Week 1–2 of existing-data protocol — pending download.
+- **Download and inventory:** Complete (2026-05-17).
+- **Quality assessment:** Week 1–2 of existing-data protocol — Sub B (#6).
 - **Gait cycle segmentation:** Week 2 of existing-data protocol — Sub B (#6).
 - **Feature extraction:** Week 2–3 of existing-data protocol — Sub B (#6).
 
