@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace]
+  completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
 -->
 
 ## Gap
@@ -273,3 +273,53 @@ Section commit chain on this branch:
 - (this commit) — §CDD-Trace
 
 §Review-readiness will be appended as a separate commit after §2.6 pre-review-gate checks pass (§2.7).
+
+## Review-readiness
+
+**Round:** 1
+**Base SHA (origin/main at observation):** `06341a45429a834cd7c4e6e8338e9cc75202caab`
+**Implementation SHA:** `f20949e` (last α implementation commit before the readiness-signal commit; per `cdd/alpha/SKILL.md` §2.6 SHA convention)
+**Branch CI:** **not configured.** This repo carries no `.github/workflows/` directory; `gh run list --branch cycle/12 --limit 5` returns no rows. Per α §2.6 row 10, this is the "local CI unavailable" path — β should not wait for green CI because none can run, and the explicit absence is recorded here so that β can confirm the situation and proceed.
+**Observation time (UTC):** `2026-05-18T13:44:42Z`
+**Verdict:** ready for β.
+
+### Pre-review-gate checklist (α §2.6)
+
+| Row | Item | Status | Evidence |
+|-----|------|--------|----------|
+| 1 | `origin/cycle/12` rebased onto current `origin/main` | ✓ | `git merge-base origin/cycle/12 origin/main` = `06341a4` = current `origin/main` HEAD at observation time |
+| 2 | self-coherence.md carries CDD Trace through step 7 | ✓ | §CDD-Trace above; steps 1–7 each named |
+| 3 | tests present, or explicit reason none apply | ✓ (none) | §CDD-Trace step 4 — docs-only authoring; no executable surface |
+| 4 | every AC has evidence | ✓ | §ACs — AC1 / AC2 / AC4 / AC10-initial each map to grep-level evidence |
+| 5 | known debt explicit | ✓ | §Debt — four debt items named |
+| 6 | schema / shape audit completed when contracts changed | ✓ (N/A) | no contracts changed |
+| 7 | peer enumeration completed when closure claim touches a family of surfaces | ✓ | §Self-check — empirical-state surfaces (4 touchpoints) and seven-family naming (3 expected files; CDR.md correctly absent) |
+| 8 | harness audit completed when schema-bearing contract changed | ✓ (N/A) | no schema-bearing contract changed |
+| 9 | post-patch re-audit completed after any mid-cycle patch | ✓ (N/A) | no patches in this round |
+| 10 | branch CI green on the head commit | ✓ (explicit absence) | no CI configured in repo; reasoning above |
+| 11 | artifact enumeration matches diff | ✓ | §CDD-Trace step 6 lists exactly the 5 files in `git diff --stat origin/main..HEAD` |
+| 12 | caller-path trace for new modules | ✓ (N/A) | no new modules; doc-callers traced in §CDD-Trace step 6 |
+| 13 | test assertion count from runner output | ✓ (N/A) | no tests |
+| 14 | α's commit author email matches canonical pattern | ✓ | all 10 α commits on this branch use `alpha@cph.cdd.cnos`; verified by `git log origin/main..HEAD --pretty=format:'%h %ae %s'` |
+
+### Polyglot re-audit (row 9, supplementary)
+
+Diff languages: Markdown only (5 files). Re-audit checks:
+
+- heading shape: `grep "^## " <file>` returns the expected heading set for each AC2 / AC4 file (reproduced in §ACs above); README question-order verified line-by-line in §ACs.
+- cross-reference check: every internal link in the four new docs resolves to a file on this branch *or* to a wave-pinned forward-reference path (`ROADMAP.md`, `CHANGELOG.md`, `targets/`, `scripts/measure-coherence.sh`); the README §Source of truth caveat sentence makes the forward-reference situation legible in-doc.
+- table-shape check: source-of-truth table is 9 rows × 2 columns, well-formed; the AC1 evidence table in §ACs and the AC10 table in §ACs are well-formed.
+- empirical-state grep — `grep -n "REVISE\|r̄\|18.3%\|2026-05-17" README.md CDR.md docs/concepts/coherence-path-hypothesis.md docs/articles/seven-ways-people-walk.md` returns only references that match `reports/field-report-01-existing-data-zeroth-pilot.md` §Status: 2026-05-17 real-data run, REVISE, r̄ 0.93–0.96 PASS, 18.3% / R-only segmentation. No claim outruns the field report. CDR.md does not carry a numeric or verdict claim and is correctly silent.
+
+### β reviewer entry point
+
+β should read in this order:
+
+1. `.cdd/unreleased/12/self-coherence.md` (this file) — §Gap → §ACs → §Self-check → §Debt.
+2. `README.md` — verify the eight reader questions are answerable from the README cold.
+3. `docs/concepts/coherence-path-hypothesis.md` — verify the 11 required headings and the measured-vs-inferred distinction.
+4. `CDR.md` — verify the required headings and the C_Σ ≠ truth distinction.
+5. `docs/articles/seven-ways-people-walk.md` — verify the bridge framing (observational vocabulary, not core theory) and the seven names.
+6. Spot-check empirical-state language against `reports/field-report-01-existing-data-zeroth-pilot.md` §Status.
+
+β should write findings (or APPROVE) into `.cdd/unreleased/12/beta-review.md`. α is now polling `origin/cycle/12` and `.cdd/unreleased/12/beta-review.md` per α §2.7.
