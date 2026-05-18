@@ -1,4 +1,6 @@
-# gait-support-paths
+# cph
+
+Coherence Path Hypothesis — testing whether walking contains recurring, measurable support-path primitives.
 
 This repo tests the **Coherence Path Hypothesis**: during walking, an active viscoelastic body may rhythmically form temporary whole-body coordination paths around ground contact, and those paths may be inferred from recurring patterns in gait-cycle data.
 
@@ -74,7 +76,7 @@ A: What are the candidate primitives today?
 
 B: Provisional, today nine. Contact anchor — where and when the step organizes around ground contact. Path direction — same-side, diagonal, posterior, axial, spiral, fragmented, multi-path. Stiffness profile — rise time, concentration, hold. Yield profile — ankle, knee, hip, pelvis, spine, trunk, distributed. Segment coupling — whole system or local parts. Phase timing — early, on time, late. Release or transfer — clean dissolution into the next step, or held. Side relation — shared grammar, or one side protecting, avoiding, shortening, overworking. Variability — stable, adaptive, rigid, noisy, context-sensitive.
 
-A: Nine is testable.
+A: Nine gives us a first testing surface.
 
 B: Not final. If measurement collapses some or splits others, the list changes.
 
