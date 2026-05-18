@@ -1,6 +1,6 @@
 <!--
 sections_planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-sections_completed: [Gap, Skills, ACs, Self-check, Debt]
+sections_completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace]
 -->
 
 # self-coherence — cph#14 (Sub C — TSC targets + measure-coherence.sh + CHANGELOG baseline + PROJECT.md repartition)
@@ -205,3 +205,67 @@ Yes. The eight files in the diff (`targets/registry.tsc`, `targets/hypothesis.ts
 - **No Sub A / Sub B file modification.** Verified by `git diff --stat` — `README.md`, `CDR.md`, `ROADMAP.md`, the hypothesis doc, the seven-families article, and the four support-path / concept docs are unchanged.
 - **No Python package install.** None attempted; the diff is shell + TOML + Markdown only.
 - **No raw-data commits.** Diff stat shows no new files under `data/raw/`, `data/external/*.zip`, `data/external/*.csv`, etc.
+
+## CDD-Trace
+
+CDD Trace through step 7 per CDD.md §1.4 and `cdd/alpha/SKILL.md` §2.2.
+
+### Step 1 — Receive
+
+Dispatched as α onto `cycle/14` (Sub C of master cph#11). Wave manifest at `.cdd/waves/cdr-refactor-2026-05-18/manifest.md`. ACs declared: 5, 6, 7, AC-PROJECT. Forward-reference contract pinned in the wave manifest. Standing permissions: push to `cycle/14`, no `requirements.txt` modification, no Python install, mechanical-mode coh best-effort. Budget: α 1500s.
+
+### Step 2 — Design (not required)
+
+Design was not authored as a separate artifact. Justification: the AC-bearing structures — target manifest format string, four-target slicing, script shape, AC-PROJECT field list — are pinned in master cph#11 §"Required changes" items 6–9 and the wave manifest. No impact graph to design. Recorded under §Skills.
+
+### Step 3 — Plan (not required)
+
+Plan was not authored. The eight file touches are mutually independent except for one forward reference (`targets/repo.tsc` references `CHANGELOG.md`, resolved by introducing `CHANGELOG.md` in the same diff). Sequencing was trivial.
+
+### Step 4 — Tests
+
+No automated tests apply. The TSC target manifests are validated structurally (TOML parse + glob resolution); `scripts/measure-coherence.sh` is validated structurally (`bash -n`, executable bit) and behaviorally in the missing-`coh` branch (run once, exit=127, install-instruction block printed). The present-`coh` branch is not exercised — `coh` is not installed — and is named as known debt (§Debt item 2 + 3). CHANGELOG.md and PROJECT.md are documentation, not code; their AC oracles are grep / structural checks against §ACs.
+
+### Step 5 — Code
+
+Implementation commits (in order):
+
+- `39df3d5` — `α #14: targets/*.tsc — TSC target manifests (AC5) + .gitignore .tsc/`
+- `f868caf` — `α #14: scripts/measure-coherence.sh — mechanical TSC measurement entrypoint (AC6)`
+- `1de1ac5` — `α #14: CHANGELOG.md — research coherence ledger baseline (AC7)`
+- `d77aac4` — `α #14: PROJECT.md — repartition to current operational status only (AC-PROJECT, supports AC10)`
+
+Diff stat (`git diff --stat origin/main..d77aac4` — last implementation SHA before the self-coherence sequence began): 9 files changed, 286 insertions(+), 147 deletions(-).
+
+### Step 6 — Docs
+
+Documentation surfaces in this diff:
+
+- `CHANGELOG.md` — new; introduces the research coherence ledger.
+- `PROJECT.md` — repartitioned; carries current-operational-status only.
+- The `targets/*.tsc` comment preambles document each target's role and the `.tsc/**` exclusion.
+- `scripts/measure-coherence.sh` carries an inline comment header describing entrypoint scope, missing-`coh` behavior, and mechanical-mode constraint.
+
+**Caller-path trace.** No new modules or functions added; the diff introduces target manifests (TOML data), one shell entrypoint, two Markdown documents, and one `.gitignore` line. The entrypoint's "caller" is the operator running `scripts/measure-coherence.sh` (or a CI step invoking it) — there is no programmatic non-test caller because the script *is* the entrypoint. Its existence is referenced by `CDR.md` §"Required cadence" (Sub A merged surface, pre-existing) and by the `PROJECT.md` §"Last coherence measurement" pointer.
+
+**Artifact enumeration vs diff.** Every file in `git diff --stat origin/main..HEAD` is mentioned in §ACs / §Self-check / §Debt / this step:
+
+- `.gitignore` — §ACs AC5 evidence (`.tsc/` exclusion); §Skills generation-constraint 1.
+- `CHANGELOG.md` — §ACs AC7.
+- `PROJECT.md` — §ACs AC-PROJECT.
+- `scripts/measure-coherence.sh` — §ACs AC6.
+- `targets/evidence.tsc`, `targets/hypothesis.tsc`, `targets/method.tsc`, `targets/registry.tsc`, `targets/repo.tsc` — §ACs AC5.
+- `.cdd/unreleased/14/self-coherence.md` — this file itself; not part of the diff stat against `origin/main..d77aac4` because it was added after the last implementation commit; will appear in the full diff stat at review-readiness time.
+
+### Step 7 — Self-coherence
+
+Self-coherence written incrementally per `cdd/alpha/SKILL.md` §2.5. Section commits (in order):
+
+- `b5797af` — §Gap
+- `0f3a630` — §Skills
+- `13bfacc` — §ACs
+- `e308685` — §Self-check
+- `370aa20` — §Debt
+- (this commit) — §CDD-Trace
+
+§Review-readiness will be appended as a separate commit after this one, per §2.7.
