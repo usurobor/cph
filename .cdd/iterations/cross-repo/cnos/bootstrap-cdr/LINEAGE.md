@@ -10,13 +10,16 @@
 ## Target
 
 - **Repo:** `usurobor/cnos`
-- **Issue:** TBD (filed by cnos γ; will be the master/tracking issue for the cnos.cdr v0.1 wave)
+- **Issue:** `cnos#376` (filed 2026-05-18 by cnos γ; master/tracking issue for the cnos.cdr v0.1 wave)
+- **Filing commit (cnos branch):** `892a429` on `claude/file-cnos-cdr-issue-fi9Ld`
 - **Wave:** TBD (cnos δ assigns when dispatching subs)
 - **Patches landed:** N/A on this bundle — this is a master-issue scope envelope; implementation lands across sub-issues authored by cnos γ + α.
 
 ## Bilateral trace
 
-This is the source-side lineage at `usurobor/gait-support-paths:.cdd/iterations/cross-repo/cnos/bootstrap-cdr/LINEAGE.md` (filed 2026-05-18). The cnos-side mirror at `usurobor/cnos:.cdd/iterations/cross-repo/gait-support-paths/bootstrap-cdr/LINEAGE.md` is created when the cnos wave lands. Per `cdd/post-release/SKILL.md` Step 5.6b, once the cnos-side mirror exists, this source-side copy may be archived.
+This is the source-side lineage at `usurobor/gait-support-paths:.cdd/iterations/cross-repo/cnos/bootstrap-cdr/LINEAGE.md` (filed 2026-05-18). The cnos-side mirror exists at `usurobor/cnos:.cdd/iterations/cross-repo/gait-support-paths/bootstrap-cdr/LINEAGE.md` on branch `claude/file-cnos-cdr-issue-fi9Ld` (cnos commit `892a429`). Per `cdd/post-release/SKILL.md` Step 5.6b, once the cnos-side mirror lands on cnos main + the cnos.cdr wave closes, this source-side copy may be archived.
+
+cnos γ emitted a `FEEDBACK.patch` (cdd/gamma/SKILL.md §"Cross-repo proposal close-out" option (b)) because the cnos session was scoped to `usurobor/cnos` only. The patch is preserved here at `FEEDBACK-from-cnos.patch` for audit; it appended the `accepted` event to source `STATUS`.
 
 ## Per-sub confirmation
 

@@ -4,7 +4,7 @@
 **Target:** `usurobor/cnos`
 **Slug:** `bootstrap-cdr`
 **Type:** master/tracking issue draft for a new c-d-X protocol package
-**Bundle state:** open
+**Bundle state:** converging (master `cnos#376` filed + accepted; waiting on cnos sub-issues + wave close)
 
 ## Purpose
 
