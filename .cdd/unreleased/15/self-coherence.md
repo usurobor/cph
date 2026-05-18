@@ -134,3 +134,31 @@ OK   targets        (contains: registry.tsc, hypothesis.tsc, method.tsc, evidenc
 - Owner 8 (`reports/`) and owner 4 (`docs/concepts/support-path.md`) are pre-wave surfaces, preserved and referenced.
 
 **AC10 conclusion:** MET. All nine source-of-truth rows resolve to real paths; the mapping is injective; every Sub A/B/C-authored owner file matches its declared row.
+
+## Self-check
+
+**Did α's work push ambiguity onto β?** No. The sweep is a closed verification: oracle expressions are given in the issue body, oracle outputs are pasted verbatim, broader paraphrase greps are written out, and the AC10 row-by-row check is enumerable from `README.md` alone. β does not need to re-derive what was swept or what counts as a violation — every verdict is backed by evidence in the diff or in the swept files.
+
+**Is every claim backed by evidence in the diff?** Yes. The diff at HEAD adds only `.cdd/unreleased/15/self-coherence.md` (this file) on top of the merged A+B+C state. Every verdict in §ACs references either (a) merged content under `git show`-able SHAs (`c3c274a`, `49cd888`, `f6ad183`), (b) tree state under `HEAD` paths, or (c) an oracle whose command is pasted in §ACs so β can re-run it.
+
+**One oracle false-positive disclosed (AC8, `ROADMAP.md:3`):** the regex literal in the issue body matches `Hypothesis is validated` even when the validation verb is the first item in a disjunctive list of outcomes (`validated, revised, or abandoned`). I considered three responses:
+
+1. **Mechanical rephrase of L3 on cycle/15** (e.g., `tested, revised, or abandoned`). Rejected: the dispatch constraint explicitly forbids silent rewrite of A+B+C charter content; the change is *paraphrase*, not typo / table correction. The issue's own §"Definition of done" uses the same `Validate, revise, or abandon` phrasing — rewriting it on a sweep cycle would introduce divergence between the master charter and Sub B's deliverable.
+2. **File as deferred debt and modify nothing.** Chosen for the substantive resolution: the sentence is process language, not a positive empirical claim; AC8 is substantively met; the oracle is a structural approximation and the substantive AC must govern.
+3. **Modify the oracle.** Rejected: the issue's oracle is part of the charter; modifying it on cycle/15 would be silent rewrite of issue-as-spec.
+
+The disclosure pattern follows `alpha/SKILL.md` §2.3 (intra-doc / commit-message peer enumeration) — every occurrence of the oracle's trigger phrase across the swept files was grepped; only `ROADMAP.md:3` produces a string-match without a substantive violation, and the §Debt entry below names it explicitly so any future re-sweep that re-runs the literal oracle has the prior judgment in hand.
+
+**Polyglot re-audit (`alpha/SKILL.md` §2.6 row 9):** the diff at α's HEAD is single-language (Markdown). No shell, YAML, or Go surfaces. The pre-A+B+C diff covered Bash (`scripts/measure-coherence.sh`) and TOML-ish manifests (`targets/*.tsc`); those were audited by Sub C's α and β rounds. Sub D does not re-author them; it grep-sweeps them for AC8 strings (all clean — no matches).
+
+**Peer enumeration applied to AC8:** the issue body names 5 forbidden claim families. Each was swept across the full A+B+C surface:
+
+| Family | Searched terms (case-insensitive) | Hits | Verdict |
+|--------|------------------------------------|------|---------|
+| hypothesis validated/proven/confirmed | `hypothesis is (now )?(validated\|proven\|confirmed)` | 1 (oracle false-positive, ROADMAP.md:3) | substantively clean |
+| seven families validated/proven/confirmed | `seven families (are\|have been) (validated\|proven\|confirmed)` | 0 | clean |
+| AI can classify gait strategies | `AI (can\|is able to) classif` | 0 | clean |
+| support paths directly visible/observed/seen | `support path(s)? (are\|is) (directly )?(visible\|observed\|seen)` | 0 | clean |
+| gait implies identity/personality/diagnosis/pathology | `fascia line\|personality\|diagnos\|...\|body-typ\|typology of people` | 16 across 12 files | all disclaimers (negations); no positive claim |
+
+**Intra-doc repetition check on AC10 owners:** the 9 owners in the table are all referenced elsewhere in `README.md` (§"Where to go next" L113–119 has 7 of the 9; the remaining 2 — `CHANGELOG.md` and `reports/` — are referenced via `PROJECT.md` and the empirical-state pointer). No intra-doc owner-path drift detected.
