@@ -13,7 +13,7 @@ Do not duplicate roadmap content here. Do not duplicate ledger content here. If 
 
 ## Current stage
 
-**R1 — Existing-data zeroth pilot.** R0 (charter and operationalization) is ACTIVE pending the close of master [usurobor/cph#11](https://github.com/usurobor/cph/issues/11); R2–R6 are gated behind R1 and R2. See [`ROADMAP.md`](ROADMAP.md) for each phase's gate and status.
+**R1 — Existing-data zeroth pilot.** R0 (charter and operationalization) is ACTIVE pending the first numeric C_Σ baseline against this branch (the [`scripts/measure-coherence.sh`](scripts/measure-coherence.sh) entrypoint runs once `coh` is on PATH in an operator environment — see §"Last coherence measurement" below); R2–R6 are gated behind R1 and R2. See [`ROADMAP.md`](ROADMAP.md) for each phase's gate and status.
 
 ## Current empirical decision
 
