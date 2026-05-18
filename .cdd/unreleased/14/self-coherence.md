@@ -1,6 +1,6 @@
 <!--
 sections_planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-sections_completed: [Gap, Skills, ACs]
+sections_completed: [Gap, Skills, ACs, Self-check]
 -->
 
 # self-coherence — cph#14 (Sub C — TSC targets + measure-coherence.sh + CHANGELOG baseline + PROJECT.md repartition)
@@ -134,3 +134,52 @@ sections_completed: [Gap, Skills, ACs]
 **Oracle (negative):** PROJECT.md does not duplicate `ROADMAP.md` phase content (no R0/R1/R2/R3/R4/R5/R6 phase blocks); does not duplicate `CHANGELOG.md` ledger content (no ledger table). Verified by inspection.
 
 **Surface:** `PROJECT.md`.
+
+## Self-check
+
+### Did α push ambiguity onto β?
+
+No. Each AC is mapped to a specific oracle and an explicit evidence chain — file path, commit SHA, content claim, verification method. Where the oracle is a glob resolution or a `grep` invariant, the exact resolution / match count is recorded in §ACs so β does not need to re-derive it.
+
+### Is every claim backed by evidence in the diff?
+
+Each claim, line by line:
+
+- "`coh` is not installed in the dispatch environment" — verified by `command -v coh && coh --version 2>&1 || echo "coh-not-installed"` returning `coh-not-installed`; recorded in commit `f868caf`'s message as well.
+- "exit code 127, install-instruction block printed" — verified by running `./scripts/measure-coherence.sh; echo "exit=$?"` and seeing the expected output.
+- "`.tsc/**` does not appear as a canonical source in any target" — verified by `grep -n "\.tsc/" targets/*.tsc` → two matches, both in comment blocks.
+- "`targets/hypothesis.tsc` includes exactly the eight forward-reference paths" — verified by reading the file and by `python3 -c "import tomllib, glob; ..."` resolution.
+- "PROJECT.md contains only the seven AC-PROJECT fields" — verified by reading the file end-to-end; `grep -E "^## " PROJECT.md` returns the seven `##` headings.
+- "Empirical posture preserved" — verified by `grep -i "validated" CHANGELOG.md PROJECT.md` returning no validation claim; the only matches are negations ("not validated", "not be allowed to become a second roadmap surface", "not measured").
+
+### Peer enumeration — done?
+
+The peer family for this diff has three classes:
+
+1. **`targets/*.tsc` file family.** The five target manifests (registry, hypothesis, method, evidence, repo) are peers of each other under the same schema. Enumerated: all five exist; all five parse as TOML; all five exclude `.tsc/**` from canonical sources; `registry.tsc` references each of the other four by exact path; each per-target manifest carries `format = "tsc-target/0.1"`, `name`, `description`, `sources` keys consistently.
+2. **Source-of-truth surfaces.** The wave touches four source-of-truth files at repo root: `README.md`, `ROADMAP.md`, `CHANGELOG.md`, `PROJECT.md`. README.md (Sub A) owns the source-of-truth table; ROADMAP.md (Sub B) owns gates; CHANGELOG.md (this sub) owns the ledger; PROJECT.md (this sub) owns live status. Enumerated: each file points to the others; no two restate each other's owned facts. Cross-checked: `README.md`'s source-of-truth table row for "What changed over time? | `CHANGELOG.md`" now resolves to a real file; row for "What TSC targets are measured? | `targets/`" now resolves to a real directory; row for "What is current operational status? | `PROJECT.md`" still resolves and the file now actually carries that and only that.
+3. **Empirical-state language across surfaces.** README.md, PROJECT.md, ROADMAP.md, CHANGELOG.md all carry an empirical-state phrase. Enumerated: README.md says REVISE per field-report-01 (pre-existing, Sub A); ROADMAP.md says R1 REVISE (Sub B); PROJECT.md says REVISE 2026-05-17 real-data run (this sub, preserving the merged language); CHANGELOG.md says REVISE — unchanged from field-report-01 (this sub). All four agree; all four cite field-report-01 as the source. The phrase `not validated; it is also not refuted` is the canonical hypothesis-status sentence and appears in CHANGELOG.md and PROJECT.md verbatim, consistent with README.md's phrasing.
+
+### Harness audit — done?
+
+This sub's "harness" is the TSC measurement entrypoint. Producers / consumers of the TSC target-manifest shape:
+
+- **Producer:** the five `targets/*.tsc` files. All produce TOML in the same registry-and-target style.
+- **Consumer:** `scripts/measure-coherence.sh`. It reads `targets/registry.tsc` (named via `REGISTRY="targets/registry.tsc"`) and passes the registry to `coh` for every target named in `TARGETS=(repo hypothesis method evidence)`. Audit: the four targets named in the script exactly match the four `[target.*]` blocks in `targets/registry.tsc`.
+- **Consumer (mental):** the wave manifest forward-reference contract. The eight paths the manifest names for `targets/hypothesis.tsc` exactly match the eight `sources` entries.
+- **Generated output:** `.tsc/`. Excluded from `.gitignore` (commit `39df3d5`) so mechanical-mode output does not enter the index; not listed as a canonical source in any target manifest.
+
+No non-primary-language harness drift: there is no shell fixture or CI workflow that produces TSC manifests; the registry is the only producer.
+
+### Polyglot re-audit
+
+The diff touches four languages: TOML (`targets/*.tsc`), Bash (`scripts/measure-coherence.sh`), Markdown (`CHANGELOG.md`, `PROJECT.md`, `self-coherence.md`), and gitignore (`.gitignore`).
+
+- **TOML.** All five `targets/*.tsc` files parse via `python3 -c "import tomllib; tomllib.load(...)"` with no errors.
+- **Bash.** `bash -n scripts/measure-coherence.sh` returns clean. Script runs in the missing-`coh` branch and exits 127 with the expected install-instruction output. `shellcheck` is not available in the dispatch environment; the script is small, uses only `command -v`, `cat <<EOF`, `mkdir -p`, and a `for` loop over a literal array, so the absence of shellcheck is low risk.
+- **Markdown.** All tables and cross-references resolve. Intra-doc grep checks: `grep -c "pending — coh unavailable" CHANGELOG.md` → 6 occurrences (ledger row, §Coherence delta α/β/γ/C_Σ bullets, §Known limits, §Next gate); all six say the same thing (the literal `pending — coh unavailable`, not a variant). No drift between the ledger row's C_Σ cell and the §Coherence delta C_Σ bullet.
+- **gitignore.** New entry `.tsc/` appended to the existing block style; no syntax issue.
+
+### Did α leave β a coherent surface?
+
+Yes. The eight files in the diff (`targets/registry.tsc`, `targets/hypothesis.tsc`, `targets/method.tsc`, `targets/evidence.tsc`, `targets/repo.tsc`, `scripts/measure-coherence.sh`, `CHANGELOG.md`, `PROJECT.md`, plus `.gitignore`) plus the `self-coherence.md` artifact give β a complete, internally consistent surface against four ACs.
