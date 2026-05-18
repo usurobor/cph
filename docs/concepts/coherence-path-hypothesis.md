@@ -81,6 +81,26 @@ The families are *candidate surface expressions* of coherence-path organization.
 2. Asymmetry may be a modifier across families rather than a family of its own. The seventh entry ("Asymmetric Protector") is the most provisional.
 3. AI clustering is not required to preserve the list. Measurement is allowed to destroy, split, merge, or replace the families.
 
+## Basis and lineage
+
+The Coherence Path Hypothesis is not derived from one source. It is a synthesis of gait dynamics, viscoelastic-body modeling, spinal-coupling ideas, myofascial continuity maps, and adaptive-network theory.
+
+The empirical basis is gait-cycle data. A coherence path is only usable in this project if it can be expressed as recurring timing, stiffness, segment-coupling, asymmetry, and condition-response patterns in measured movement data.
+
+Several adjacent literatures make the hypothesis plausible without proving it.
+
+Fryette's spinal mechanics provide a manual-medicine vocabulary for coupled spinal motion: side-bending, rotation, and flexion/extension are not independent in living spinal movement. This project treats Fryette's laws as historical and clinical heuristics, not as sufficient evidence for the hypothesis.
+
+Gracovetsky's spinal-engine theory is a direct ancestor of the trunk-as-participant claim. It challenges the idea that gait is produced by the legs while the trunk is passively carried. The hypothesis keeps that correction while translating it into gait-cycle features.
+
+Anatomy Trains and related myofascial-continuity maps provide observational vocabulary for long-range tissue relationships. The hypothesis does not assume these maps are mechanically final. It asks whether any proposed long-range organization leaves measurable traces in walking data.
+
+The 2018 interstitium findings add anatomical context: living connective tissues include widespread fluid-filled spaces and collagen/elastin-supported networks that are partly lost or distorted in fixed-tissue views. This supports caution against modeling the body as a dry rigid linkage system, but it does not by itself validate coherence paths.
+
+Watson, Levin, and collaborators' work on natural induction and adaptive viscoelastic networks provides a broader theoretical frame: viscoelastic networks subject to repeated perturbation can self-organize and improve their problem-solving behavior over time. The hypothesis uses this as a plausibility model for why repeated ground contact might shape recurring coordination primitives. It is not treated as direct evidence that such primitives exist in human gait.
+
+Therefore the lineage is useful, but measurement decides. The hypothesis survives only if recurring coherence primitives appear in gait-cycle data and survive falsification (see [§Falsification conditions](#falsification-conditions)).
+
 ## Operationalization
 
 The hypothesis becomes testable when each of its terms is bound to something measurable. The current operational chain:
