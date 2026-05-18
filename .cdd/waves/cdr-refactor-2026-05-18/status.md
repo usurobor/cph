@@ -1,14 +1,14 @@
 # Wave Status: CDR refactor (master #11)
 
-**Last updated:** 2026-05-18 by δ (after cycle/13 close)
+**Last updated:** 2026-05-18 by δ (after cycle/14 close + cycle/15 open)
 **Wave manifest:** `.cdd/waves/cdr-refactor-2026-05-18/manifest.md`
 
 | # | Issue | Status | Rounds | Merge commit | Notes |
 |---|-------|--------|--------|--------------|-------|
 | 12 | Sub A — CDR charter docs | ✅ completed | 1 (APPROVE) | `c3c274a` | α/β/α-closeout: $8.72 / ~30 min wall; ACs 1/2/4/10-init met; 0 β findings; cycle/12 deleted post-merge |
 | 13 | Sub B — CDR roadmap | ✅ completed | 1 (APPROVE) | `49cd888` | α/β/α-closeout: $5.80 / ~17 min wall; AC3 met; 0 β findings; cycle/13 deleted post-merge |
-| 14 | Sub C — TSC infra + CHANGELOG + PROJECT.md repartition | 🟢 ready | 0 | — | `cycle/14` from `origin/main` at wave-open; will rebase onto post-#12/#13 main on α intake |
-| 15 | Sub D — CDR refactor conformance sweep | ⏸️ blocked | 0 | — | Cycle branch not yet created — created at A+B+C terminal-state transition |
+| 14 | Sub C — TSC infra + CHANGELOG + PROJECT.md repartition | ✅ completed | 1 (APPROVE) | `f6ad183` | α/β/α-closeout: $8.92 / ~21 min wall; ACs 5/6/7 + AC-PROJECT met; 0 β findings; cycle/14 deleted post-merge |
+| 15 | Sub D — CDR refactor conformance sweep | 🟢 ready | 0 | — | `cycle/15` created from `origin/main` at `e22108b` (post-A+B+C); dispatch incoming |
 
 ## Status legend
 
