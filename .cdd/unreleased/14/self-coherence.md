@@ -1,6 +1,6 @@
 <!--
 sections_planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-sections_completed: [Gap, Skills, ACs, Self-check]
+sections_completed: [Gap, Skills, ACs, Self-check, Debt]
 -->
 
 # self-coherence — cph#14 (Sub C — TSC targets + measure-coherence.sh + CHANGELOG baseline + PROJECT.md repartition)
@@ -183,3 +183,25 @@ The diff touches four languages: TOML (`targets/*.tsc`), Bash (`scripts/measure-
 ### Did α leave β a coherent surface?
 
 Yes. The eight files in the diff (`targets/registry.tsc`, `targets/hypothesis.tsc`, `targets/method.tsc`, `targets/evidence.tsc`, `targets/repo.tsc`, `scripts/measure-coherence.sh`, `CHANGELOG.md`, `PROJECT.md`, plus `.gitignore`) plus the `self-coherence.md` artifact give β a complete, internally consistent surface against four ACs.
+
+## Debt
+
+### Known debt — explicit
+
+1. **`coh` is not installed in the dispatch environment; no numeric C_Σ baseline this wave.** The ledger row and §Coherence delta carry `pending — coh unavailable`. Loaded skill that would have prevented this: none — `coh` install is an environment / standing-permission concern (the wave manifest's `Standing permissions` explicitly says "Run `coh` (TSC CLI) in CI: best-effort"). Tracked debt: the first numeric C_Σ baseline lands the first time `coh` runs against this branch (or a successor of it); when that lands, a follow-up changelog entry replaces the `pending` row with a numeric one.
+
+2. **`coh`'s exact `--target` / `--registry` / `--output` flag spelling is inferred from master cph#11's specification, not verified against the live `coh` CLI.** The script's invocation `coh --mode mechanical --target <name> --registry targets/registry.tsc --output .tsc/` follows the master-issue example verbatim, but the live CLI may use slightly different flag names. The script's missing-`coh` branch is verified; the present-`coh` branch is not. If the CLI's flag names have drifted, the script will fail on first real run and the fix is a one-line patch per flag.
+
+3. **The `tsc-target/0.1` per-target manifest format string is α's choice; master cph#11 only pins the registry format string `tsc-target-registry/0.1`.** The schema (`format`, `name`, `description`, `sources` array of glob strings) is α-chosen but is consistent with the master-issue example structure for the registry. If the live `coh` CLI expects a different per-target schema (e.g. structured `[sources]` sections rather than a flat array), the per-target manifests need a one-pass schema update; the file paths inside the manifests are independent of the schema, so the path-resolution AC content is preserved across any schema fix.
+
+4. **`shellcheck` was not run on `measure-coherence.sh`.** Not installed in the dispatch environment. `bash -n` syntax check is clean; the script is small (≈40 lines of executable shell), uses standard constructs, and was run once in the missing-`coh` branch with the expected output, so the risk of latent shellcheck-level issues is low but nonzero.
+
+5. **`.tsc/` is gitignored, but the existing data exclusions in `.gitignore` (data/raw/, data/external/**/*.zip, etc.) are still scoped to data, not measurement output.** The `.tsc/` addition is the first non-data, non-Python-cache gitignore entry. The pattern is correct (directory prefix); a stricter `.tsc/**` glob would be equivalent given how `git` treats `.tsc/` (any file inside the directory is excluded).
+
+### Debt not introduced
+
+- **No empirical claim.** Verified by grep on the diff — no "validated", "proven", "confirmed", "demonstrated" language for the Coherence Path Hypothesis. The only `validated` matches in the diff are negations (`not validated`).
+- **No `requirements.txt` modification.** Verified by `git diff --stat origin/main..HEAD` showing only the eight files this sub touches.
+- **No Sub A / Sub B file modification.** Verified by `git diff --stat` — `README.md`, `CDR.md`, `ROADMAP.md`, the hypothesis doc, the seven-families article, and the four support-path / concept docs are unchanged.
+- **No Python package install.** None attempted; the diff is shell + TOML + Markdown only.
+- **No raw-data commits.** Diff stat shows no new files under `data/raw/`, `data/external/*.zip`, `data/external/*.csv`, etc.
