@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs, Self-check]
+  completed: [Gap, Skills, ACs, Self-check, Debt]
 -->
 
 ## Gap
@@ -173,3 +173,17 @@ All four touchpoints either name REVISE explicitly or refrain from claiming a ve
 > `support path` is the repo's operational term for the measurable surface of this hypothesis. [docs/concepts/support-path.md](support-path.md) owns the operational definition; this document does not redefine it.
 
 No re-statement of support-path's operational definition appears in any new file; only cross-references.
+
+## Debt
+
+Sub A leaves the following debt explicit. None of it is in-scope for this sub.
+
+**Forward-reference rows in the source-of-truth table.** Three rows — `ROADMAP.md` (Sub B), `CHANGELOG.md` and `targets/` (Sub C) — point to files that do not exist on the cycle/12 branch in isolation. The wave manifest licenses this ("the table is a forward declaration the wave fulfills end-to-end"; AC10 oracle for Sub A allows it explicitly), and README §Source of truth states the situation in-doc, but **Sub D's AC10 final sweep must verify each forward-reference row resolves after Sub B and Sub C merge**. If either Sub B or Sub C is deferred rather than merged, Sub D will need to either rewrite the table to drop the unresolved row or note the deferral in-doc per the wave's scope-adjustment rule.
+
+**PROJECT.md not repartitioned.** PROJECT.md currently carries both operational status and an embedded source-of-truth table (its own, scoped to the pre-CDR file set). Sub C is the issue that will shrink PROJECT.md to operational-status-only and remove its embedded source-of-truth table; until that happens, the README and PROJECT.md will each carry a source-of-truth table. They are not in conflict (README's lists nine canonical questions across the CDR-era doc set; PROJECT.md's lists the pre-CDR file set scoped to friend-pre-pilot work) but they will need reconciliation in Sub C. This is named in the wave manifest's pinned-paths table and is **not Sub A's job**.
+
+**Empirical-state language re-sync if the field report is republished.** The REVISE posture and the four facts cited from `field-report-01-existing-data-zeroth-pilot.md` (PASS at r̄ 0.93–0.96, 18.3% / R-only, bounded fix to `detect_heel_strikes`, hypothesis not yet testable) are duplicated across README.md and `coherence-path-hypothesis.md` by necessity — both files need to state empirical state to do their jobs. If the field report is amended or superseded by a later merged report, both touchpoints (and CDR.md §Required cadence, which lists the trigger conditions but not the verdict) will need updating together. The CDR β-axis (evidence relation coherence) is designed to catch this drift; Sub C's TSC measurement will be the first surface to surface it mechanically.
+
+**No `eng/markdown` skill loaded.** The wave manifest names this as conditional ("plus any cph-local eng/markdown skill if present"). Neither cph nor cnos carries a markdown skill at the loaded tier. Heading conventions, link discipline, and table syntax were enforced from the `write` skill's rules and from existing-doc patterns (mirroring `support-path.md`'s heading style). If a future cycle authors `eng/markdown`, the four files this sub created are candidates for retroactive linting; this is not blocking and the diff is small.
+
+**Closure-overclaim self-check fired clean.** AC1, AC2, AC4, and AC10-initial all map to grep-level evidence reproduced above. The closure claims are bounded: AC10 is *initial*, not final (the wave manifest assigns the *final* sweep to Sub D). No "all empirical surfaces are now consistent" claim is made — that is Sub D's job.
