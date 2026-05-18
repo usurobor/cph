@@ -1,6 +1,6 @@
 <!--
 sections_planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-sections_completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace]
+sections_completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
 -->
 
 # self-coherence — cph#14 (Sub C — TSC targets + measure-coherence.sh + CHANGELOG baseline + PROJECT.md repartition)
@@ -269,3 +269,57 @@ Self-coherence written incrementally per `cdd/alpha/SKILL.md` §2.5. Section com
 - (this commit) — §CDD-Trace
 
 §Review-readiness will be appended as a separate commit after this one, per §2.7.
+
+## Review-readiness | round 1
+
+**Status:** ready for β.
+
+### Pre-review gate (α SKILL.md §2.6)
+
+| # | Row | State |
+|---|---|---|
+| 1 | Cycle branch rebased onto current `origin/main` (transient) | Verified at signal time: `git merge-base origin/main HEAD` = `f13164d0c7d6ee5be28c8abd9ec725fb80504c80` = `origin/main` tip. Cycle/14 is 10 implementation/process commits + 1 readiness-signal commit ahead; nothing behind. Observation time: 2026-05-18 cycle-14 dispatch window. |
+| 2 | `self-coherence.md` carries CDD Trace through step 7 | ✓ §CDD-Trace steps 1–7 above. |
+| 3 | Tests present, or explicit reason none apply | ✓ §CDD-Trace step 4: no automated tests apply; structural validation via `tomllib`, `bash -n`, glob resolution, run-the-missing-`coh`-branch-once. |
+| 4 | Every AC has evidence | ✓ §ACs maps AC5, AC6, AC7, AC-PROJECT each to a positive oracle, a negative oracle, evidence, and surface. |
+| 5 | Known debt explicit | ✓ §Debt — five items declared (no numeric C_Σ; coh flag verification; per-target schema choice; shellcheck not run; gitignore convention). |
+| 6 | Schema / shape audit when contracts changed | ✓ §Self-check "Harness audit"; all five `targets/*.tsc` follow the same schema (`format`, `name`, `description`, `sources`); registry's `[target.*]` blocks match the script's `TARGETS=()` array. |
+| 7 | Peer enumeration when closure claim touches a family | ✓ §Self-check "Peer enumeration" — three peer classes enumerated: `targets/*.tsc` file family, source-of-truth surfaces, empirical-state language across surfaces. |
+| 8 | Harness audit when schema-bearing contract changed | ✓ §Self-check "Harness audit"; producer = `targets/*.tsc`; consumer = `scripts/measure-coherence.sh`; no non-primary-language harness drift. |
+| 9 | Polyglot re-audit | ✓ §Self-check "Polyglot re-audit" — TOML (parse), Bash (syntax + run missing-`coh` branch), Markdown (cross-refs + grep counts), gitignore (syntax). |
+| 10 | Branch CI green (transient) | **No CI configured for this repo.** Verified by `ls .github/workflows/` returning "no such file or directory". The artifact set is purely structural (TOML, shell, Markdown); structural validation was performed via local toolchain. β should treat this as "no CI to wait for"; the standing-permission line in the wave manifest allows merge without green CI for this sub. |
+| 11 | Artifact enumeration matches diff | ✓ §CDD-Trace step 6 — every file in `git diff --stat origin/main..HEAD` is mentioned (`.gitignore`, `CHANGELOG.md`, `PROJECT.md`, `scripts/measure-coherence.sh`, `targets/{evidence,hypothesis,method,registry,repo}.tsc`, `self-coherence.md` itself). |
+| 12 | Caller-path trace for new modules | ✓ §CDD-Trace step 6 — no new modules/functions; entrypoint script has no programmatic caller (it *is* the caller-entry-point), referenced by `CDR.md` §"Required cadence" (pre-existing) and `PROJECT.md` §"Last coherence measurement" (this sub). |
+| 13 | Test assertion count from runner output | N/A — no automated tests in diff. |
+| 14 | α commit author email matches canonical role pattern | ✓ Verified by `git log --format='%h %ae' origin/main..HEAD` — all 11 commits (10 implementation + process + 1 grep-count correction) authored by `alpha@cph.cdd.cnos`, matching the canonical pattern `alpha@cph.cdd.cnos` per dispatch-prompt git-identity stanza. |
+
+### Diff summary
+
+`git diff --stat origin/main..HEAD` (at implementation SHA `d77aac4`):
+
+```
+ .gitignore                   |   5 ++
+ CHANGELOG.md                 |  54 ++++++++++++++
+ PROJECT.md                   | 172 +++++++------------------------------------
+ scripts/measure-coherence.sh |  65 ++++++++++++++++
+ targets/evidence.tsc         |  24 ++++++
+ targets/hypothesis.tsc       |  26 +++++++
+ targets/method.tsc           |  24 ++++++
+ targets/registry.tsc         |  28 +++++++
+ targets/repo.tsc             |  35 +++++++++
+ 9 files changed, 286 insertions(+), 147 deletions(-)
+```
+
+`self-coherence.md` is added on top of the implementation SHA as the α-process artifact for this cycle.
+
+### SHA convention
+
+**Implementation SHA:** `d77aac4` (last implementation commit before the self-coherence sequence; PROJECT.md repartition). β polls `origin/cycle/14` HEAD for the current artifact state; the implementation SHA above is stable for cross-reference.
+
+### Boundary held
+
+- No empirical claim. No clustering. No `requirements.txt` modification. No Sub A / Sub B file modification. Mechanical-mode coh runs were attempted (`coh` not installed; missing-tool branch verified). `.tsc/**` excluded from every target manifest's canonical sources.
+
+### Ready for β
+
+cycle/14 is ready for β review. The artifact thread continues at `.cdd/unreleased/14/beta-review.md`.
