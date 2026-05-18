@@ -16,3 +16,7 @@ data/private/
 opencap_exports/
 participants/
 consent/
+
+# Python compile cache
+__pycache__/
+*.pyc
