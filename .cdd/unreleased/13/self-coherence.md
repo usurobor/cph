@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs, Self-check]
+  completed: [Gap, Skills, ACs, Self-check, Debt]
 -->
 
 ## Gap
@@ -166,3 +166,19 @@ None known. The two surfaces β might push back on:
 2. The "Sub C deliverable" forward references in R0 — defensible against the wave manifest; if β prefers the references be silent until Sub C merges, the fix is one paragraph rewrite, not a structural change.
 
 Both are visible-and-resolved, not hidden.
+
+## Debt
+
+Known debt entering review:
+
+1. **Forward-referenced Sub C deliverables.** R0 §Owning files names `CHANGELOG.md`, `targets/*.tsc`, and `scripts/measure-coherence.sh` as files owned by phase R0, each tagged `(pending Sub C)`. If Sub C (usurobor/cph#14) does not merge before this wave closes, those references will resolve to non-existent files. Mitigation: tags are explicit; the wave manifest pins the paths; Sub D's AC8/AC9/AC10 sweep is the structural backstop. No fix is needed on this branch.
+
+2. **R3 status judgment call.** R3 is marked NOT STARTED. An equally defensible reading is ACTIVE on the basis of Hypothesis 1's partial evaluability from existing comparison data. The conservative call is documented in §Self-check; β may flip the call to ACTIVE if the partial evaluation counts as cycle activity. The fix is a one-line status change.
+
+3. **No coherence measurement embedded in ROADMAP.** Per `CDR.md`, C_Σ is measured after meaningful research waves; the cadence does not require per-phase scores in ROADMAP.md itself. The CHANGELOG.md (Sub C deliverable) is the surface that carries dated α/β/γ/C_Σ rows. ROADMAP.md links to CHANGELOG.md but does not duplicate that ledger. This is a deliberate split per the source-of-truth table in Sub A's README and the dispatch constraint "ROADMAP is gate-based, not measurement-based."
+
+4. **Seven-gait-families article path.** Sub A used the wave-preferred path `docs/articles/seven-ways-people-walk.md` rather than the alternative `docs/references/seven-gait-families.md`. ROADMAP.md cites the merged path. No drift.
+
+5. **`origin/cycle/segmentation-real-data-fix` (tip `a95415c`).** R2 §Current evidence names this branch as the unmerged work targeting the R2 gate. Per the wave manifest "Known constraints" section, merging this branch is an orthogonal operator decision and out of this wave's scope. ROADMAP cites the branch by SHA so the next R2 cycle inherits the named state.
+
+No debt requires β to do α-side authoring. No debt blocks the AC3 oracles.
