@@ -194,3 +194,38 @@ Per `CDD.md` §5.2 (canonical artifact order). Sub D is verification-only; sever
 5. **Code** — *not required.* No code authored; the sweep modifies no swept file. `scripts/measure-coherence.sh` is referenced as a swept surface, not edited.
 6. **Docs** — only `.cdd/unreleased/15/self-coherence.md` is authored on cycle/15. Per `alpha/SKILL.md` §2.6 row 11 (artifact enumeration matches diff): `git diff --stat origin/main..HEAD` returns one file, `.cdd/unreleased/15/self-coherence.md`, and that file is the entire α surface for this cycle. No new modules, no new functions, no new callers — row 12 (caller-path trace) is vacuous and met.
 7. **Self-coherence** — this file. The CDD Trace lands here; the file is published incrementally to `origin/cycle/15` one section per commit per `alpha/SKILL.md` §2.5; the §Review-readiness section will be appended as a separate commit after the pre-review gate (§2.6) passes against HEAD.
+
+## Review-readiness
+
+**Round:** 1.
+**Base SHA:** `cf240e1` (origin/main HEAD; re-verified at signal time — `git log --oneline HEAD..origin/main` empty).
+**Implementation SHA:** `627191e` (last α commit before this readiness-signal commit; per `alpha/SKILL.md` §2.6 SHA convention "name the implementation SHA, not the readiness-signal HEAD").
+**Branch CI:** not configured in this repo (`.github/workflows/` does not exist). Local sweep ran clean against the merged A+B+C state; oracles pasted in §ACs for β re-run.
+**Author email:** `alpha@cph.cdd.cnos` on all 7 α commits (`git log --format='%h %ae' origin/main..HEAD` audited — uniform).
+**Branch rebase status:** `cycle/15` rebased onto `origin/main` at intake (`e22108b → cf240e1` fast-forward), re-verified at signal time.
+
+**Pre-review gate (`alpha/SKILL.md` §2.6):**
+
+1. Cycle branch rebased onto current `origin/main` — ✅ (verified at intake and at signal).
+2. CDD Trace through step 7 — ✅ (§CDD-Trace above).
+3. Tests present — ✅ (oracles pasted verbatim in §ACs; sweep mode does not produce a test runner artifact).
+4. Every AC has evidence — ✅ (AC8 oracle output + paraphrase greps; AC9 diff command + adjacent checks; AC10 path-existence loop + injectivity check).
+5. Known debt explicit — ✅ (§Debt F1 + named adjacent items).
+6. Schema/shape audit — N/A (no contract change; sweep does not touch parsers, manifests, or runtime types).
+7. Peer enumeration — ✅ (§Self-check table enumerates the 5 AC8 claim families against the full A+B+C surface).
+8. Harness audit — N/A (no schema-bearing contract changed).
+9. Post-patch re-audit — ✅ (one mid-cycle correction at commit `6a430a3` to the §Self-check intra-doc owner-reference count; re-audited; single-language Markdown diff).
+10. Branch CI green on head commit — N/A (no CI workflow; declared explicitly above; β may merge without waiting).
+11. Artifact enumeration matches diff — ✅ (`git diff --stat origin/main..HEAD` → 1 file; named in §Gap, §CDD-Trace step 6, and §Debt; matches exactly).
+12. Caller-path trace for new modules — N/A (no new modules; sweep authors no code).
+13. Test assertion count from runner output — N/A (sweep does not produce runner output; oracle outputs pasted verbatim in §ACs).
+14. Author email canonical — ✅ (all 7 α commits authored as `alpha@cph.cdd.cnos`).
+
+**Transient row re-validation (§2.7):**
+
+- Row 1 (rebase) observed at signal time: HEAD = `627191e`, origin/main = `cf240e1`, `HEAD..origin/main` empty. No drift since pre-review gate write.
+- Row 10 (CI) declared N/A at write time; state cannot drift between write and signal.
+
+**Verdict:** ready for β review.
+
+Polling for β response begins immediately, every 60s, on `.cdd/unreleased/15/beta-review.md` and the issue per `alpha/SKILL.md` §Tracking.
