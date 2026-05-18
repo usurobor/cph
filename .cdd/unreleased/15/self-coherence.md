@@ -21,3 +21,15 @@ Pre-wave baseline = `317779c^1` = `d30aa4a` (last `main` commit before δ opened
 - AC10 (final) — every source-of-truth row in `README.md` resolves; the question→owner mapping is injective; Sub A/B/C-authored files match their declared owners.
 
 **Out of scope:** authoring new charter / roadmap / infra content (Subs A/B/C did that); running `scripts/measure-coherence.sh` (operator gate); modifying empirical state.
+
+## Skills
+
+**Tier 1 (CDD core):**
+- `cdd/CDD.md` — canonical lifecycle and role contract.
+- `cdd/alpha/SKILL.md` — α role surface; this cycle exercises §2.6 (pre-review gate) and §2.7 (review-readiness), with the additional sweep-specific load order in the dispatch (verification, not authoring).
+
+**Tier 3 (issue-specific):**
+- `cnos.core/skills/write/SKILL.md` — self-coherence is a short prose artifact: one governing question per section, stable facts pointed to once, sweep verdicts stated positively (state what passes, not just what was checked).
+- `eng/bash` is named in the issue but is not present as a discrete skill in the local tree; the sweep oracles are short one-liners (`git grep`, `git diff --name-only`, path-existence loop) and do not require a dedicated skill load.
+
+**Not loaded (out of scope for sweep):** `cdd/design/SKILL.md`, `cdd/plan/SKILL.md` — no design or planning artifact required; the sweep is a verification with all rules supplied by the issue body. β and γ role skills are explicitly excluded by §2.1 step 6.
