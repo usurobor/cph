@@ -162,3 +162,19 @@ The disclosure pattern follows `alpha/SKILL.md` §2.3 (intra-doc / commit-messag
 | gait implies identity/personality/diagnosis/pathology | `fascia line\|personality\|diagnos\|...\|body-typ\|typology of people` | 16 across 12 files | all disclaimers (negations); no positive claim |
 
 **Intra-doc repetition check on AC10 owners:** the 9 owners in the table are all referenced elsewhere in `README.md`. §"Where to go next" L113–119 explicitly links 5 owners (`coherence-path-hypothesis.md`, `support-path.md`, `CDR.md`, `PROJECT.md`, `reports/field-report-01-...`). The remaining 4 are: `README.md` itself (self-referential); `ROADMAP.md`, `CHANGELOG.md`, and `targets/` each explicitly named in `README.md:109` (`ROADMAP.md, CHANGELOG.md, and targets/ are delivered by sibling sub-issues in the same wave`). No owner is mentioned only in the table; no intra-doc owner-path drift detected.
+
+## Debt
+
+**No deferred debt blocking AC8, AC9, or AC10 closure.** The sweep finds the substantive invariants intact and the structural invariants intact.
+
+**Disclosed structural finding (non-blocking, AC8):**
+
+- **F1 — AC8 oracle false-positive on `ROADMAP.md:3`.** The issue's verbatim oracle (`hypothesis is (now )?(validated|proven|confirmed)`) matches `the gates by which the Coherence Path Hypothesis is validated, revised, or abandoned`. Substantive verdict: not a violation — disjunctive process language. Cross-reference: `ROADMAP.md:3` (file path + line), merged in commit `49cd888` (Sub B merge). The same phrasing appears in master `cph#11` §"Definition of done" (`Validate, revise, or abandon the Coherence Path Hypothesis`) and `ROADMAP.md:9`, so the phrasing is inherited from the master charter, not a Sub B drift. **Not fixed on cycle/15** per dispatch constraint *do not silently rewrite charter content*. Recommended future handling (γ disposition decision; α does not recommend): either (a) leave as-is and let a future re-sweep apply the same substantive judgment, or (b) tighten the issue's regex to require `\bis (now )?validated\b(?!.*\bor\b)` so it does not match disjunctive lists. Option (b) is a wave-management edit to the spec, not a charter edit.
+
+**Adjacent items (not in scope; named for completeness so γ can carry them forward):**
+
+- The cnos cross-repo bundle path under `cnos:.cdd/iterations/cross-repo/gait-support-paths/bootstrap-cdr/` still uses the pre-rename name (per wave manifest §"Out-of-scope follow-ups"). Sub D does not touch cnos; this is downstream cross-repo work.
+- The orthogonal `origin/cycle/segmentation-real-data-fix` branch (tip `a95415c`) is unmerged. Independent of this wave; named in `ROADMAP.md` Phase R2 as the planned next bounded cycle.
+- The TSC mechanical baseline run via `scripts/measure-coherence.sh` is an operator gate (per master `cph#11` AC6 / wave manifest standing permissions). Sub D does not execute it.
+
+**Self-check on debt completeness:** none of the items above blocks Sub D's closure. The sweep does not find empirical, data-policy, or source-of-truth violations. The single structural finding is named with file + line + merge SHA + substantive disposition, so β can verify the finding's framing against the merged ROADMAP.md content without re-deriving the sweep.
