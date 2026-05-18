@@ -66,7 +66,7 @@ Complete ethics protocols are in [docs/ethics/](docs/ethics/).
 ## Repository Structure
 
 ```txt
-gait-support-paths/
+cph/                           # repo (renamed from gait-support-paths; full rewrite tracked in #11)
   README.md                    # What the repo is, core claim, status overview
   PROJECT.md                   # Current stage, implementation status, next steps
   docs/

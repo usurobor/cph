@@ -1,6 +1,6 @@
 # Cross-repo proposal: Bootstrap cnos.cdr
 
-**Source:** `usurobor/gait-support-paths`
+**Source:** `usurobor/cph` (renamed 2026-05-18 from `usurobor/gait-support-paths`; bundle authored under the prior name at commit `774427b`)
 **Target:** `usurobor/cnos`
 **Slug:** `bootstrap-cdr`
 **Type:** master/tracking issue draft for a new c-d-X protocol package
@@ -18,7 +18,7 @@ Propose creation of `cnos.cdr` — the research-protocol sibling to `cnos.cdd` �
 
 ## Why source-proposal rather than direct file
 
-`usurobor/gait-support-paths` is the empirical research project that surfaced the gap: it has been operating under cdd-with-overrides (load-bearing claims like hypothesis pre-registration, falsifiability hooks, diagnostic-oracle pattern, GO/REVISE/NO-GO closeout, dataset datasheet, manifest-hash-pinned external data) because no research-protocol instantiation exists. `cnos.cdr` is the upstream fix. Per `cdd/gamma/SKILL.md §"Cross-repo proposal close-out"`, the correct transport is a cross-repo bundle authored in the source repo; the target repo's γ picks it up and files the target issue with a `## Source Proposal` block citing this bundle.
+`usurobor/cph` (the repo formerly named `gait-support-paths`) is the empirical research project that surfaced the gap: it has been operating under cdd-with-overrides (load-bearing claims like hypothesis pre-registration, falsifiability hooks, diagnostic-oracle pattern, GO/REVISE/NO-GO closeout, dataset datasheet, manifest-hash-pinned external data) because no research-protocol instantiation exists. `cnos.cdr` is the upstream fix. Per `cdd/gamma/SKILL.md §"Cross-repo proposal close-out"`, the correct transport is a cross-repo bundle authored in the source repo; the target repo's γ picks it up and files the target issue with a `## Source Proposal` block citing this bundle.
 
 The session-time alternative — having the operator paste the issue body from a virtual-box-local file — bypasses the lineage trace and produces an issue with no provenance back to its empirical anchor. The bundle is the correct durable artifact.
 
@@ -30,7 +30,7 @@ This proposal originates from the 2026-05-18 session that scoped `cnos.cdr` agai
 - `ROLES.md §3` (6-field instantiation contract every c-d-X must declare)
 - `src/packages/cnos.cdd/skills/cdd/COHERENCE-CELL.md` (in-flight cdd refactor doctrine; cdr design must be consistent with its structural prediction)
 - `src/packages/cnos.cdd/skills/cdd/issue/SKILL.md` (issue authoring standard the master issue conforms to)
-- Empirical anchor: `usurobor/gait-support-paths` zeroth-pilot wave (2026-05-15) + segmentation-fix cycle (2026-05-17)
+- Empirical anchor: `usurobor/cph` (then `gait-support-paths`) zeroth-pilot wave (2026-05-15) + segmentation-fix cycle (2026-05-17)
 
 ## Next action
 
@@ -38,4 +38,4 @@ This proposal originates from the 2026-05-18 session that scoped `cnos.cdr` agai
 
 If `usurobor/cnos` γ cannot write back to this repo, the cnos cycle should emit a feedback patch that updates `STATUS` (per `cdd/gamma/SKILL.md §"Cross-repo proposal close-out"`).
 
-Once the cnos wave lands, the cnos-side mirror at `cnos:.cdd/iterations/cross-repo/gait-support-paths/bootstrap-cdr/LINEAGE.md` is the trigger to archive the source-side copy here (per `cdd/post-release/SKILL.md` Step 5.6b).
+Once the cnos wave lands, the cnos-side mirror at `cnos:.cdd/iterations/cross-repo/cph/bootstrap-cdr/LINEAGE.md` is the trigger to archive the source-side copy here (per `cdd/post-release/SKILL.md` Step 5.6b). The cnos agent's branch `claude/file-cnos-cdr-issue-fi9Ld` currently has the mirror at the pre-rename path `cnos:.cdd/iterations/cross-repo/gait-support-paths/bootstrap-cdr/`; that path will be moved to `cph/` when the cnos branch lands or is amended (see `FEEDBACK-from-cnos.patch` context).
