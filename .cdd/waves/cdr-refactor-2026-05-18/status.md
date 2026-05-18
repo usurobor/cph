@@ -5,10 +5,10 @@
 
 | # | Issue | Status | Rounds | Branch | Tag | Notes |
 |---|-------|--------|--------|--------|-----|-------|
-| 12 | Sub A — CDR charter docs | 🔄 dispatched | 0 | `cycle/12` | — | α/β prompts emitted by δ at wave open |
-| 13 | Sub B — CDR roadmap | 🔄 dispatched | 0 | `cycle/13` | — | α/β prompts emitted by δ at wave open |
-| 14 | Sub C — TSC infra + CHANGELOG + PROJECT.md repartition | 🔄 dispatched | 0 | `cycle/14` | — | α/β prompts emitted by δ at wave open |
-| 15 | Sub D — CDR refactor conformance sweep | ⏸️ blocked | 0 | (pending A+B+C close) | — | Blocked on #12, #13, #14 |
+| 12 | Sub A — CDR charter docs | 🟢 ready | 0 | `cycle/12` | — | Cycle branch created from `origin/main`; α/β dispatch prompts emitted; awaiting `claude -p` invocation by operator |
+| 13 | Sub B — CDR roadmap | 🟢 ready | 0 | `cycle/13` | — | Cycle branch created from `origin/main`; α/β dispatch prompts emitted; awaiting `claude -p` invocation by operator |
+| 14 | Sub C — TSC infra + CHANGELOG + PROJECT.md repartition | 🟢 ready | 0 | `cycle/14` | — | Cycle branch created from `origin/main`; α/β dispatch prompts emitted; awaiting `claude -p` invocation by operator |
+| 15 | Sub D — CDR refactor conformance sweep | ⏸️ blocked | 0 | (pending A+B+C close) | — | Cycle branch not yet created — created at A+B+C terminal-state transition |
 
 ## Status legend
 
