@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs]
+  completed: [Gap, Skills, ACs, Self-check]
 -->
 
 ## Gap
@@ -109,3 +109,60 @@ R6 §Goal frames AI classification as conditional on stable feature surfaces fro
 | R6 status is "Not started" | R6 line 94 | Verbatim match (with trailing period for sentence form) |
 | Coherence risk is project-coherence, not empirical | every phase | Each §Coherence risk names a project-coherence failure mode (terminology drift, source-of-truth drift, claim-inflation, identity erosion); none name an empirical risk (data-collection failure, instrument error, etc., which would be empirical) |
 | No empirical overclaim | every phase | No phase claims the Coherence Path Hypothesis is supported. R4 explicitly states "neither validated nor refuted." R3 explicitly states "empirical claim is held in reserve." R1 cites the comparison passing but flags it as the *technology stack*, not the construct. |
+
+## Self-check
+
+α-role failure mode for this cycle: pushing ambiguity onto β by making status-field calls that the field report doesn't cleanly support, or by writing forward-references that β has to chase across sibling cycles.
+
+### Status-call defensibility
+
+The four phases whose status flows from the field report are R1, R2, R3, R4. Each call is defensible against the field-report-01 text:
+
+| Phase | Status | Field-report evidence |
+|---|---|---|
+| R1 | REVISE | `field-report-01-existing-data-zeroth-pilot.md` §Overview ("Decision: REVISE") and §Recommendation (verbatim "REVISE") |
+| R2 | REVISE | Same report §Segmentation Status (18.3% R, 0% L) + §Recommendation §Recommended revision (bounded, one cycle, named target). The report names the segmenter as the load-bearing blocker; phase R2's gate is segmentation reliability; REVISE matches |
+| R3 | NOT STARTED | Same report §Support-Path Inference (Hypothesis 2 "Not testable", Hypothesis 3 "Not testable", Hypothesis 1 "Partially evaluable" but "empirical claim is held in reserve until the segmenter is fixed"). Subject-level condition-response analysis has not begun at adequate n |
+| R4 | NOT STARTED | Same report §Falsification Assessment (0 of 6 cleanly triggered; 4 of 6 not testable). The falsification table cannot be evaluated at current cycle counts. The hypothesis is "neither validated nor refuted" |
+
+**Edge case** — R3 could arguably be ACTIVE on the basis of Hypothesis 1's partial evaluability. NOT STARTED is the more conservative call because:
+
+- the field report itself frames the partial evaluation as "held in reserve until the segmenter is fixed"
+- ACTIVE would imply the R3 gate (subject-level condition-response analysis without pseudoreplication) is being worked on, and no current cycle targets it
+- the next-action chain (R2 closes → R3 work begins → R4 work begins) is consistent with NOT STARTED for R3
+
+β should verify the conservative call is acceptable; if β reads R3 as ACTIVE because Hypothesis 1 work has begun, the fix is a one-line status change. The conservative call avoids the "phase claims GO/ACTIVE without citing concrete cycle activity" failure on the AC3 negative-oracle side.
+
+### Forward-reference handling
+
+R0 §Owning files names three Sub C deliverables — `CHANGELOG.md`, `targets/*.tsc`, `scripts/measure-coherence.sh` — that do not exist on this branch. Each is explicitly tagged `(pending Sub C)`. R0 §Next action names the wave-level dependency: "Sub B (this), Sub C, Sub D merge." The forward reference matches the wave manifest's `## Pinned file paths` contract; β can verify against `.cdd/waves/cdr-refactor-2026-05-18/manifest.md` without a cross-cycle chase.
+
+The wave manifest's source-of-truth-table forward-declaration (named in issue #13 §Source of truth: "Sub A's source-of-truth table will reference ROADMAP.md") is fulfilled: Sub A's merged `README.md` source-of-truth table (`origin/main:README.md` lines 97–108) carries the row `Where are research gates tracked? | ROADMAP.md`. ROADMAP.md fulfills that row.
+
+### Empirical-overclaim check
+
+Searched the file for the failure-mode strings the master + Sub D AC8 names:
+
+```text
+$ grep -niE '(validated|proven|confirms|supports the hypothesis|gait type|diagnosis)' ROADMAP.md
+70:- **Goal:** Determine whether the coordination signatures from R3 justify the inference to a support/coherence path, distinct from measured data alone.
+72:- **Gate:** ... clustering output is reported as candidate structure, not as confirmation of the seven gait families or the Coherence Path Hypothesis.
+90:- **Goal:** Apply unsupervised or self-supervised structure-finding to per-cycle feature tables only after stable feature surfaces exist and survive confound checks.
+91:- **Current evidence:** No clustering has been run...
+92:- **Gate:** ... clustering output is reported as candidate structure, not as confirmation of the seven gait families or the Coherence Path Hypothesis...
+```
+
+Two hits on `validated` are in the file's purpose statement ("validate, revise, or abandon") and in R0 §Goal ("Make the Coherence Path Hypothesis explicit, bound its operational terms") — both are framing, not empirical claims. The two hits on `confirms`/`confirmation` are explicit negations ("not as confirmation"). No file claim asserts the hypothesis is validated, the seven families are proven, or AI can classify gait.
+
+### Voice / role-boundary check
+
+ROADMAP.md does not recommend a disposition for any cycle (no "should be opened next" / "operator decision needed"). Each phase's §Next action names a concrete next step ("after R2 closes, plan and execute...", "Hold. Do not run clustering...") but does not assign that step to a role — that assignment is δ's job at wave-close time. α voice stays factual.
+
+### Ambiguity passed to β
+
+None known. The two surfaces β might push back on:
+
+1. R3 NOT STARTED vs ACTIVE — defended above; both readings are evidence-traceable; the conservative call avoids the AC3 negative oracle.
+2. The "Sub C deliverable" forward references in R0 — defensible against the wave manifest; if β prefers the references be silent until Sub C merges, the fix is one paragraph rewrite, not a structural change.
+
+Both are visible-and-resolved, not hidden.
