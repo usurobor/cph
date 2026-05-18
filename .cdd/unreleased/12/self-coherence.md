@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs, Self-check, Debt]
+  completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace]
 -->
 
 ## Gap
@@ -187,3 +187,89 @@ Sub A leaves the following debt explicit. None of it is in-scope for this sub.
 **No `eng/markdown` skill loaded.** The wave manifest names this as conditional ("plus any cph-local eng/markdown skill if present"). Neither cph nor cnos carries a markdown skill at the loaded tier. Heading conventions, link discipline, and table syntax were enforced from the `write` skill's rules and from existing-doc patterns (mirroring `support-path.md`'s heading style). If a future cycle authors `eng/markdown`, the four files this sub created are candidates for retroactive linting; this is not blocking and the diff is small.
 
 **Closure-overclaim self-check fired clean.** AC1, AC2, AC4, and AC10-initial all map to grep-level evidence reproduced above. The closure claims are bounded: AC10 is *initial*, not final (the wave manifest assigns the *final* sweep to Sub D). No "all empirical surfaces are now consistent" claim is made — that is Sub D's job.
+
+## CDD-Trace
+
+CDD canonical artifact order per `cdd/CDD.md` §5.2, traced through step 7.
+
+### 1. Design
+
+Not required for Sub A. The design is carried by master #11 and the Sub-A issue body (cph#12): the eight reader questions for README, the 11 required headings for the hypothesis doc, the required sections for CDR.md, the seven-families article framing, and the nine-row source-of-truth table are all pre-specified in the issues. The wave manifest also pins the file paths in advance to make A/B/C parallelism work.
+
+Mode is `design-and-build`, but the *design* phase ran at sub-issue authoring time, not during this α dispatch. α's job was to render the pre-specified shape into prose.
+
+### 2. Coherence contract
+
+§Gap above. Issue scope, mode, and the empirical-state constraint (REVISE per the latest merged field report) are stated.
+
+### 3. Plan
+
+Not required for Sub A. Implementation sequencing is dependency-driven and trivial:
+
+1. hypothesis doc (no dependencies; later docs cite it)
+2. seven-families article (cites the hypothesis doc)
+3. CDR.md (cites the hypothesis doc; defines C_Σ ≠ truth)
+4. README rewrite (cites all of the above; carries the source-of-truth table)
+5. self-coherence (this file, incremental per α §2.5)
+
+Each step depended only on its predecessors. No branch-points, no contention, no parallel work that needed scheduling.
+
+### 4. Tests
+
+Not applicable. Sub A is docs-only authoring; there is no executable surface, no schema, no parser, no CLI. The AC oracles per master #11 / sub-issue body are grep-based heading checks; those are reproduced in §ACs above as evidence rather than packaged as tests. (If the wave wanted these as CI checks, that would be Sub C / Sub D scope — `targets/hypothesis.tsc` will reference these files mechanically.)
+
+### 5. Code
+
+Not applicable. No code touched.
+
+### 6. Docs
+
+Four files authored or rewritten:
+
+| File | Action | AC | Implementation SHA |
+|------|--------|----|--------------------|
+| `docs/concepts/coherence-path-hypothesis.md` | new (144 lines) | AC2 | 753092d |
+| `docs/articles/seven-ways-people-walk.md` | new (59 lines) | AC1 (Q5 support), AC10 (article cited but not a table row) | 036bcd0 |
+| `CDR.md` | new (89 lines) | AC4 | 5193877 |
+| `README.md` | rewrite (+88 / −60 lines) | AC1, AC10 (table) | 32defc5 |
+
+Plus the artifact tracking the cycle:
+
+| File | Action | Purpose |
+|------|--------|---------|
+| `.cdd/unreleased/12/self-coherence.md` | new (incremental, this file) | α tracking artifact per `cdd/alpha/SKILL.md` §2.5 |
+
+`git diff --stat origin/main..HEAD` returns exactly these five files — every file in the diff is enumerated above (pre-review gate row 11 satisfied):
+
+```
+ .cdd/unreleased/12/self-coherence.md       | 189 +++++++++++++++++++++++++++++
+ CDR.md                                     |  89 ++++++++++++++
+ README.md                                  | 148 +++++++++++++---------
+ docs/articles/seven-ways-people-walk.md    |  59 +++++++++
+ docs/concepts/coherence-path-hypothesis.md | 144 ++++++++++++++++++++++
+ 5 files changed, 569 insertions(+), 60 deletions(-)
+```
+
+(The 189-line count for `self-coherence.md` predates this CDD-Trace section's append; the file will be larger by the time β reads it. This is expected per α §2.5 incremental authoring — the self-coherence file is the only artifact that grows across self-coherence commits.)
+
+**Caller-path trace for new modules (pre-review gate row 12).** Not applicable — no new modules or functions. The new docs are referenced from existing surfaces:
+
+- `coherence-path-hypothesis.md` — linked from `README.md` §What is the hypothesis? + §Where to go next; linked from `CDR.md` opening; linked from `docs/articles/seven-ways-people-walk.md` §Why this list exists.
+- `docs/articles/seven-ways-people-walk.md` — linked from `README.md` §How does this connect to the seven gait families? + §Where to go next; linked from `coherence-path-hypothesis.md` §Relationship to the seven gait families.
+- `CDR.md` — linked from `README.md` §How CDR works + §Where to go next; linked from `coherence-path-hypothesis.md` §What does not count as evidence (the C_Σ ≠ evidence sentence).
+
+Every new doc has at least one non-self caller; no orphaned-doc state.
+
+### 7. Self-coherence
+
+This file (`.cdd/unreleased/12/self-coherence.md`), committed incrementally per α §2.5: one section per commit, pushed to `origin/cycle/12` so that a stream timeout cannot lose partial work.
+
+Section commit chain on this branch:
+- `f39715d` — §Gap
+- `d02f00e` — §Skills
+- `d452516` — §ACs
+- `7562d01` — §Self-check
+- `c985141` — §Debt
+- (this commit) — §CDD-Trace
+
+§Review-readiness will be appended as a separate commit after §2.6 pre-review-gate checks pass (§2.7).
