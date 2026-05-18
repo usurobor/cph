@@ -178,3 +178,19 @@ The disclosure pattern follows `alpha/SKILL.md` §2.3 (intra-doc / commit-messag
 - The TSC mechanical baseline run via `scripts/measure-coherence.sh` is an operator gate (per master `cph#11` AC6 / wave manifest standing permissions). Sub D does not execute it.
 
 **Self-check on debt completeness:** none of the items above blocks Sub D's closure. The sweep does not find empirical, data-policy, or source-of-truth violations. The single structural finding is named with file + line + merge SHA + substantive disposition, so β can verify the finding's framing against the merged ROADMAP.md content without re-deriving the sweep.
+
+## CDD-Trace
+
+Per `CDD.md` §5.2 (canonical artifact order). Sub D is verification-only; several steps are explicitly `not required` with reason.
+
+1. **Design** — *not required.* The sweep's rules are pre-specified in `cph#11` ACs 8/9/10 (oracles, surfaces, invariants). No design space to explore; no impact graph to map; the work is a closed verification against a fixed checklist.
+2. **Coherence contract** — `.cdd/unreleased/15/self-coherence.md` §Gap (above). The contract is *the swept surface = the non-`.cdd/` diff between pre-wave baseline `317779c^1` and `cf240e1` (post-A+B+C+δ status), under the three ACs*.
+3. **Plan** — *not required.* The oracle commands in the issue body provide ordering; the AC10 row-by-row check is enumerable from `README.md` L97–107.
+4. **Tests** — the sweep oracles are the tests. They are pasted verbatim in §ACs (one literal oracle per AC, plus paraphrase-broadening greps), so β can re-run them at HEAD:
+   - AC8 literal oracle (issue body) → 1 hit (`ROADMAP.md:3`), substantively non-violating; analyzed.
+   - AC8 paraphrase greps (identity/personality/diagnosis/typology; validation-claim verbs) → all hits are disclaimers or risk-naming; analyzed.
+   - AC9 oracle (`git diff` over data-file globs) → empty; adjacent checks (`data/`, `*.ipynb`, `data/external/` tracked tree) → all consistent with policy.
+   - AC10 path-existence loop over the 9 owners → all `OK`; injectivity check by inspection → 9 distinct questions, 9 distinct owners.
+5. **Code** — *not required.* No code authored; the sweep modifies no swept file. `scripts/measure-coherence.sh` is referenced as a swept surface, not edited.
+6. **Docs** — only `.cdd/unreleased/15/self-coherence.md` is authored on cycle/15. Per `alpha/SKILL.md` §2.6 row 11 (artifact enumeration matches diff): `git diff --stat origin/main..HEAD` returns one file, `.cdd/unreleased/15/self-coherence.md`, and that file is the entire α surface for this cycle. No new modules, no new functions, no new callers — row 12 (caller-path trace) is vacuous and met.
+7. **Self-coherence** — this file. The CDD Trace lands here; the file is published incrementally to `origin/cycle/15` one section per commit per `alpha/SKILL.md` §2.5; the §Review-readiness section will be appended as a separate commit after the pre-review gate (§2.6) passes against HEAD.
