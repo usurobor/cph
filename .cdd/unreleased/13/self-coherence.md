@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs, Self-check, Debt]
+  completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace]
 -->
 
 ## Gap
@@ -182,3 +182,52 @@ Known debt entering review:
 5. **`origin/cycle/segmentation-real-data-fix` (tip `a95415c`).** R2 §Current evidence names this branch as the unmerged work targeting the R2 gate. Per the wave manifest "Known constraints" section, merging this branch is an orthogonal operator decision and out of this wave's scope. ROADMAP cites the branch by SHA so the next R2 cycle inherits the named state.
 
 No debt requires β to do α-side authoring. No debt blocks the AC3 oracles.
+
+## CDD-Trace
+
+Trace through the α canonical artifact order (`cdd/alpha/SKILL.md` §2.2):
+
+### Step 1 — Design artifact
+
+**Not required.** Single-file docs cycle; the design surface is the issue body of usurobor/cph#13 itself, which names the file path, the seven required fields per phase, and the seven phases. No impact graph beyond the single file. The wave manifest (`.cdd/waves/cdr-refactor-2026-05-18/manifest.md`) carries the cross-sub design context (file-disjointness check, forward-reference contract, pinned paths).
+
+### Step 2 — Coherence contract
+
+Carried in §Gap above. The contract is: ROADMAP.md exists, carries phases R0–R6, each with the seven required fields, with status fields grounded in the latest merged field report and the binding dispatch constraints.
+
+### Step 3 — Plan
+
+**Not required.** Implementation sequence is trivially linear: read field report and Sub A docs → draft ROADMAP.md → verify AC3 oracles → write self-coherence → pre-review. No multi-step ordering risk; no dependency graph beyond reading-before-authoring.
+
+### Step 4 — Tests
+
+**Not required as code.** The AC3 oracles are structural grep checks against the authored ROADMAP.md; they are documented in §ACs above and re-runnable via `grep` commands in that section. There is no test runner output to paste; the grep oracle outputs serve the same role.
+
+### Step 5 — Code
+
+**Not applicable.** Sub B is docs-only authoring of one Markdown file (`ROADMAP.md`). No code, no scripts, no schema, no harness.
+
+### Step 6 — Docs
+
+`ROADMAP.md` (new, 97 lines) — the file Sub B delivers.
+
+`git diff --stat origin/main..HEAD` accounting (artifact-enumeration row 11 of `cdd/alpha/SKILL.md` §2.6):
+
+```text
+ROADMAP.md                                |  97 ++++++++
+.cdd/unreleased/13/self-coherence.md      | (this file, accumulating)
+```
+
+Two files in the diff against `origin/main`:
+
+1. **`ROADMAP.md`** — the AC3 deliverable. Authored from scratch. 97 lines, 7 phases × 7 fields plus header / current-state / how-to-read framing.
+
+2. **`.cdd/unreleased/13/self-coherence.md`** — this file. The α-side cycle artifact per `cdd/alpha/SKILL.md` §2.5 and the artifact-location matrix.
+
+No other files in the diff. No caller-path trace needed (row 12) — ROADMAP.md is a doc, not a callable module; the "caller" is human readers and the wave manifest's source-of-truth contract.
+
+### Step 7 — Self-coherence
+
+This file. Section manifest tracked in the HTML comment at the top of the file. Sections written one-per-commit per `cdd/alpha/SKILL.md` §2.5.
+
+Trace status: steps 1–7 covered. Pre-review gate (§2.6) is the next operation; the Review-readiness section is appended after the gate passes.
