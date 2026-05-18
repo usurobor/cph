@@ -26,6 +26,10 @@ __pycache__/
 # source themselves; see `targets/*.tsc` exclusions.
 .tsc/
 
+# Claude Code harness scaffolding (worktrees, session metadata).
+# Ephemeral container state, not project source.
+.claude/
+
 # External datasets — manifests stay in git, raw payloads do not
 data/external/**/*.zip
 data/external/**/*.tar.gz
