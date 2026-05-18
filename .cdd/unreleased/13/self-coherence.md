@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace]
+  completed: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
 -->
 
 ## Gap
@@ -231,3 +231,33 @@ No other files in the diff. No caller-path trace needed (row 12) — ROADMAP.md 
 This file. Section manifest tracked in the HTML comment at the top of the file. Sections written one-per-commit per `cdd/alpha/SKILL.md` §2.5.
 
 Trace status: steps 1–7 covered. Pre-review gate (§2.6) is the next operation; the Review-readiness section is appended after the gate passes.
+
+## Review-readiness | round 1 | implementation SHA: c05ac24 | branch CI: N/A (no CI configured in repo) | ready for β
+
+Pre-review gate (`cdd/alpha/SKILL.md` §2.6), row-by-row:
+
+| # | Row | Status | Evidence |
+|---|---|---|---|
+| 1 | cycle/13 rebased onto current `origin/main` | ✅ | `git merge-base HEAD origin/main` = `0a8412f` = `git rev-parse origin/main` at 2026-05-18 14:11 UTC. Cycle branch is at `origin/main` tip with α work on top |
+| 2 | self-coherence.md carries CDD Trace through step 7 | ✅ | §CDD-Trace above; steps 1–7 covered |
+| 3 | Tests present or explicit "none apply" | ✅ | Step 4 of CDD-Trace names "not required as code"; AC3 oracle is structural grep, output captured in §ACs |
+| 4 | Every AC has evidence | ✅ | AC3 covered in §ACs with four oracle blocks (structural × 2, positive × 2, negative × 2) |
+| 5 | Known debt is explicit | ✅ | §Debt enumerates 5 items |
+| 6 | Schema / shape audit completed when contracts changed | N/A | No schemas or contracts changed; ROADMAP.md is human-readable docs |
+| 7 | Peer enumeration when closure claim touches a family | ✅ | Phase peer set = {R0, R1, R2, R3, R4, R5, R6}. All 7 phases verified to carry the 7 required fields uniformly (49/49 field instances, per §ACs structural oracle 2). All 7 status fields are evidence-traced (R1/R2/R3/R4 → field-report-01; R0 → wave-in-flight; R5/R6 → master-mandated phrasings) |
+| 8 | Harness audit when schema-bearing contract changed | N/A | No schema-bearing contract; no harness |
+| 9 | Post-patch re-audit | N/A | No mid-cycle patch; this is round 1, single straight authoring pass |
+| 10 | Branch CI green on head commit | N/A | No CI configured in the cph repo (no `.github/workflows/`, no other CI config). Per §2.6 row 10 explicit clause, this section says so and β proceeds without a CI wait |
+| 11 | Artifact enumeration matches diff | ✅ | `git diff --stat origin/main..HEAD` lists `ROADMAP.md` (97 lines, AC3 deliverable) + `.cdd/unreleased/13/self-coherence.md` (this file). Both named in §CDD-Trace step 6 |
+| 12 | Caller-path trace for new modules | N/A | No new modules / functions; ROADMAP.md is a doc, not callable |
+| 13 | Test assertion count from runner output | N/A | No test runner; AC3 oracle outputs are captured verbatim in §ACs (`grep` results inline) |
+| 14 | α commit author email matches canonical pattern | ✅ | All 7 α commits in `origin/main..HEAD` use `alpha@cph.cdd.cnos`, matching `alpha@{project}.cdd.cnos` per `cdd/operator/SKILL.md` §Git identity for role actors. Verified at 2026-05-18 14:11 UTC via `git log origin/main..HEAD --format='%h %ae'` |
+
+**Transient row re-validation at signal time (2026-05-18 14:11 UTC):**
+
+- Row 1 (rebased): re-checked; `origin/main` is at `0a8412f`; `git merge-base HEAD origin/main` = `0a8412f`. Stable.
+- Row 10 (CI green): re-checked; no CI configuration exists in the repo at `0a8412f` or in this branch. The "N/A" call is durable for this branch.
+
+**Implementation SHA** = `c05ac24` — last α implementation commit before this readiness-signal commit. Stable per `cdd/alpha/SKILL.md` §2.6 "SHA convention for readiness signal."
+
+**Polling begins.** Polling `.cdd/unreleased/13/beta-review.md` and issue usurobor/cph#13 every 60s per α/SKILL.md §2.7.
