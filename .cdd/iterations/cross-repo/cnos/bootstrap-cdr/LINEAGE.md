@@ -4,7 +4,7 @@
 
 - **Repo:** `usurobor/gait-support-paths`
 - **Branch:** `claude/acquire-test-set-model-60jZ2`
-- **Commit:** TBD (this bundle's authoring commit; filled in after commit lands on the source branch)
+- **Commit:** `774427b` (authoring commit that landed the bundle; this SHA fill-in lands in the immediate follow-up commit)
 - **Path:** `.cdd/iterations/cross-repo/cnos/bootstrap-cdr/`
 
 ## Target
