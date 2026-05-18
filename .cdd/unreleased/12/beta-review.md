@@ -2,8 +2,8 @@
 
 <!--
 section-manifest:
-  planned: [Round 1 Header, §2.0.0 Contract Integrity, §2.0 Issue Contract, §2.1 Diff Context, §2.2 Architecture, §3.10 CI status, §3.11b Artifact completeness, Findings, Notes, Merge instruction]
-  completed: [Round 1 Header, §2.0.0 Contract Integrity, §2.0 Issue Contract, §2.1 Diff Context, §2.2 Architecture]
+  planned: [Round 1 Header, §2.0.0 Contract Integrity, §2.0 Issue Contract, §2.1 Diff Context, §2.2 Architecture, §3.10 CI status, §3.11b Artifact completeness, Sub D preview, Findings, Notes, Verdict, Merge instruction]
+  completed: [Round 1 Header, §2.0.0 Contract Integrity, §2.0 Issue Contract, §2.1 Diff Context, §2.2 Architecture, §3.10 CI status, §3.11b Artifact completeness, Sub D preview, Findings, Notes, Verdict, Merge instruction]
 -->
 
 ## Round 1
@@ -123,3 +123,83 @@ ACs 3, 5–9 are out of scope for Sub A (Sub B owns AC3; Sub C owns AC5–7; Sub
 | Degraded paths visible and testable | n/a | Docs-only. |
 
 Architecture skill not active for this diff (no package boundaries, command/provider/orchestrator/skill separation, registry, etc.). Phase 2c trivially N/A.
+
+## §3.10 CI status
+
+No `.github/workflows/` directory exists in the repo. `gh run list --branch cycle/12 --limit 5` would return zero rows. Per rule 3.10 fallback ("every workflow that runs on cycle branch" if no protection rules configured), no workflow runs at all — the gate is vacuous. Documented per rule 3.10 citation requirement: branch CI green check is N/A because no required workflow exists.
+
+This matches α's review-readiness signal (§Review-readiness, row 10: "branch CI green on the head commit | ✓ (explicit absence) | no CI configured in repo").
+
+## §3.11b Artifact completeness
+
+`.cdd/unreleased/12/gamma-scaffold.md` is **absent** at the canonical sub-scoped path rule 3.11b literally names. The substantive γ coordination artifact for this cycle is `.cdd/waves/cdr-refactor-2026-05-18/manifest.md`, which is on `origin/cycle/12` and carries:
+
+- the dispatched-with-AC table for Sub A (Issues §, row 1: ACs 1, 2, 4, 10-initial)
+- the pinned authoritative paths the sub must use (Pinned file paths §, Sub A rows)
+- timeout budgets (Timeout budgets §, Sub A column: γ 1200s / α 1500s / β 900s)
+- standing permissions (Standing permissions §)
+- resumption protocol (Resumption / failure handling §)
+- known constraints (Known constraints §: empirical REVISE posture, rename, segmentation branch, cross-repo bundles, identity-isolation invariant)
+- out-of-scope follow-ups (named explicitly)
+
+The dispatch prompt γ-as-δ delivered to β explicitly names this manifest as the authority for standing permissions ("Standing permissions: as wave manifest") and includes a `cat .cdd/waves/cdr-refactor-2026-05-18/manifest.md` step in β's intake. Under `operator/SKILL.md §5.2` (γ=δ permitted at this scale per `cdd/operator/SKILL.md`), the wave-level scaffold serves the structural intent rule 3.11b protects (preventing γ-bypass).
+
+**Reading.** I am marking 3.11b satisfied substantively rather than firing it as a D-severity finding. Reasoning:
+
+1. **Rationale check.** Rule 3.11b's stated rationale is "Prevents protocol bypass where δ dispatches α→β directly without γ coordination. Missing γ artifacts indicate the cycle did not follow the canonical CDD.md §1.4 triadic protocol." γ coordination demonstrably occurred (wave manifest on the cycle branch, comprehensive content), and the canonical CDD.md §1.4 triadic protocol was followed at the wave level. The bypass the rule guards against did not occur.
+2. **Phantom-blocker check (rule 3.5).** "Only block on incoherence you can demonstrate." The only demonstrable incoherence is the path/filename — not the substance.
+3. **Operator scope.** Under §5.2, γ-as-δ is the same actor as the wave dispatcher. The choice to express γ coordination at the wave level rather than per-sub is itself a γ-coordination decision, documented in the wave manifest.
+
+**Observability for γ (non-binding).** This is the first wave-mode dispatch under cph and the first multi-sub wave I have reviewed. The path divergence between rule 3.11b (per-sub `gamma-scaffold.md`) and the wave-mode pattern (`waves/{slug}/manifest.md`) is worth canonicalizing in the next γ patch:
+
+- Option A: rule 3.11b accepts a per-cycle `gamma-scaffold.md` stub that points at the wave manifest as authority.
+- Option B: rule 3.11b explicitly recognizes `.cdd/waves/{slug}/manifest.md` as a valid γ artifact when the cycle branch is dispatched as part of a wave.
+
+This is a γ-skill patch decision per rule 3.12 (review divergence is a skill gap), not a β verdict. I'm naming it as a Note (non-binding) and proceeding.
+
+## §Sub D preview checks (AC8 + AC9)
+
+The cycle prompt names two preview checks beyond the AC ledger: no empirical overclaim (AC8 of master #11) and no committed raw data (AC9 of master #11). Both checked here so the wave can carry the evidence forward to Sub D's sweep.
+
+**AC8 preview — no empirical overclaim.** Grep across the four authored files for prohibited phrasings:
+
+```
+grep -inE "(your gait type|hypothesis is (validated|proven|confirmed)|seven (families|gait families) (are|is) (proven|validated|confirmed)|directly (visible|measured)|gait implies (identity|personality|diagnosis|pathology))" README.md CDR.md docs/concepts/coherence-path-hypothesis.md docs/articles/seven-ways-people-walk.md
+```
+
+Returns zero hits. Each potential failure mode named in master #11 AC8 has been explicitly negated in-doc:
+
+- "coherence path hypothesis is validated" — README §Current empirical state names REVISE + segmentation blocker + "not validated. It is also not refuted."; hypothesis doc §Current empirical status uses the same posture.
+- "seven gait families are proven" — README §How does this connect... states "If measurement supports three families, twelve, or none, the hypothesis can still survive"; seven-families article §What the list is not states "The list is not validated. None of the seven has been tested against gait-cycle data as of the current empirical posture (REVISE)."
+- "AI can classify gait strategies yet" — README §How CDR works names AI/analysis as "sorts" (proposes) in the working sequence; measurement decides; no claim AI does classification work yet.
+- "support paths are directly visible" — hypothesis doc §Definition opens "A coherence path is an *inferred* coordination pattern"; §What does not count as evidence lists "a memorable visual impression of a person's walk" / "a still-frame posture" / "one unusually clear step" as the proposal side, not evidence.
+- "gait implies identity, personality, diagnosis, or pathology" — README §What is not being claimed lists "not diagnosis / not personality inference / not 'you are this gait type'"; §Safety boundary forbids "this is who you are."
+
+**AC9 preview — no committed raw data.** `git ls-files | grep -iE '\\.(csv|trc|mot|sto|c3d|osim|mp4|mov|mkv|webm|png|jpg|jpeg|pkl|npz|h5|hdf5|parquet|feather)$'` returns zero hits across the whole tracked tree. The only files under `data/` are `data/README.md` and `data/external/{README.md, opencap-lab-validation.md}` — all documentation pointers, no payload. No participant traces, archive contents, notebooks with outputs, or video. AC9 preview clean.
+
+These two checks are wave-forward evidence for Sub D's sweep, not the AC verdicts themselves — Sub D owns final AC8 / AC9 status after all four subs merge.
+
+## Findings
+
+| # | Finding | Evidence | Severity | Type |
+|---|---------|----------|----------|------|
+
+No findings at any severity. The two observability items named in §3.11b and §Notes are non-binding; they are skill-patch suggestions, not unresolved findings against this cycle.
+
+## Notes
+
+1. **Wave-mode γ scaffold pattern.** First wave-mode dispatch I've reviewed in cph. The wave manifest at `.cdd/waves/cdr-refactor-2026-05-18/manifest.md` is comprehensive and substantively serves the role rule 3.11b protects. The next γ-skill patch should canonicalize whether wave-mode requires per-sub stubs or whether the wave manifest's existence on the cycle branch satisfies the gate directly. β's read in §3.11b is the second option (substantive); the patch decision rests with γ.
+2. **PROJECT.md source-of-truth table.** PROJECT.md retains its own (different-scope, pre-CDR) source-of-truth table. The two tables are not in conflict — README's covers the nine canonical CDR-era charter questions; PROJECT.md's covers the pre-CDR friend-pre-pilot file set. Sub C is scoped to repartition PROJECT.md and shrink it to operational-status-only; the dual-table state is a transient between Sub A merge and Sub C merge. Named in α's §Debt and in the wave manifest; not a Sub-A finding.
+3. **Heading 4 punctuation.** README heading 4 reads `## What is not being claimed` (no trailing `?`). Master #11 phrases the question with a `?`. The heading omits it because the section answers as a list; this is a common Markdown convention and the AC1 oracle (reader can answer the question from README alone) is satisfied. Non-finding, called out for transparency.
+4. **PROJECT.md realization-file references.** PROJECT.md cites `docs/realizations/04-existing-data-comes-first.md` and `docs/realizations/06-what-broke.md`; the actual filesystem has `04-friends-are-a-pre-pilot.md` and `05-what-broke.md`. This is pre-existing tech debt on PROJECT.md, unrelated to this sub's diff and outside Sub A's scope (Sub C repartitions PROJECT.md). Named here so Sub C's reviewer doesn't miss it.
+
+## Verdict
+
+**Verdict:** APPROVED
+
+**Round:** 1
+**Fixed this round:** n/a (no prior round)
+**Branch CI state:** vacuous (no CI configured in repo; rule 3.10 §3.10 above)
+**Search-space closure:** No remaining D, C, B, or A findings in the four ACs Sub A owns (1, 2, 4, 10-initial), no remaining findings in §2.0.0 contract integrity, no remaining findings in §2.1 diff/context, no architecture findings (skill N/A), no honest-claim findings (3.13 sub-checks all clean), no Sub D preview violations. The wave-mode γ scaffold pattern (§3.11b) is a non-binding skill-patch observation, not a finding.
+
+**Merge instruction:** `git merge --no-ff cycle/12` into `main`, with `Closes #12` in the merge commit message. Push to `origin main`. Delete `origin/cycle/12` after merge per `release/SKILL.md` §2.6a (mechanical cleanup). β does **not** tag, version-bump, write CHANGELOG release notes, or move the cycle directory — this is a sub of a multi-sub wave; the cycle directory remains under `.cdd/unreleased/12/` until Sub D closes and δ runs the disconnect at wave terminal state per `release/SKILL.md` §2.5b (docs-only disconnect — no version bump on this wave). β will write `.cdd/unreleased/12/beta-closeout.md` after merge.
