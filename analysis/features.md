@@ -18,102 +18,131 @@ Do not use labels from visual type lists as ground truth.
 
 Every feature row should include:
 
-- participant code
-- session
-- trial id
-- condition
-- side
-- cycle number
-- quality flag
-- exclusion flag
+- subject (anonymous subject identifier; column `subject`)
+- session (column `session`; currently hardcoded to `"S01"` per `analysis/feature-table-schema.md` §"Single-session note")
+- trial id (column `trial_id`)
+- condition (column `condition`)
+- side (column `side`; values `L`/`R`)
+- cycle number (column `cycle_number`)
+- quality flag (column `quality_flag`; values `ok`/`short`/`low_contact_gap` per `analysis/feature-table-schema.md` §"quality_flag")
+- exclusion flag (column `exclusion_flag`; derived as `quality_flag != "ok"`)
 
-Without this indexing, feature values cannot be interpreted.
+Column names match what `scripts/features.py::extract_features` emits and what `analysis/feature-table-schema.md` §"Identification" prescribes. Without this indexing, feature values cannot be interpreted.
 
-## Timing features
+## First-pass set (currently implemented)
 
-Candidate timing features:
+The realized feature set emitted by `scripts/features.py::extract_features`. Each item below names the function in `scripts/features.py` that produces it. Reproduce the list with:
 
-- gait-cycle duration
-- stance duration
-- swing duration
-- stance percentage of cycle
-- step-to-step timing variability
-- right-left duration difference
-- timing of peak hip extension
-- timing of peak knee flexion
-- timing of peak ankle plantarflexion
-- timing of pelvis rotation extrema
+```bash
+grep -nE '^\s+out\["[a-z_]+\.?[a-z_]*"\]|^def extract_' scripts/features.py
+```
 
-Keep original durations as well as normalized timing.
+### Timing — `extract_timing`
 
-## Range and amplitude features
+- `cycle_duration_s` — gait-cycle duration in seconds (from `Cycle.duration_s`)
+- `stance_duration_s` — stance phase duration (estimated from contralateral heel minimum, or fallback 60% of cycle)
+- `swing_duration_s` — swing phase duration (complement of stance)
+- `stance_pct_cycle` — stance as percentage of cycle
+- `timing_estimate_method` — `contralateral_HS` (when contralateral heel is in the dataframe) or `fallback_60pct` (population-mean estimate)
+- `peak_knee_flexion_phase` — timing (% of cycle) of peak knee flexion on the cycle's side
 
-Candidate waveform summary features:
+### Range / amplitude — `extract_range`
 
-- pelvis rotation range
-- pelvis list range
-- trunk rotation range, if available
-- hip flexion-extension range
-- hip adduction-abduction range
-- knee flexion-extension range
-- ankle plantarflexion-dorsiflexion range
-- peak values and their timing
-- stance-phase range for each major joint
+For each joint with available columns (`hip_flexion_{side}`, `knee_angle_{side}`, `ankle_angle_{side}`):
+- `{joint}_range_deg` — max − min over the cycle
+- `{joint}_peak_deg` — max
+- `{joint}_min_deg` — min
 
-Use these features carefully. Range alone can miss sequencing.
+For each pelvis axis present (`pelvis_tilt`, `pelvis_list`, `pelvis_rotation`):
+- `{axis}_range_deg` — max − min over the cycle
 
-## Shape features
+### Shape — `extract_shape`
 
-Candidate curve-shape features:
+- `normalized_curve_available` — boolean placeholder; the actual 101-point time-normalized curves are persisted to a private parquet outside the repo and consumed by the notebook's aggregate PCA cell (see notebook §7 "Known debt" for the PCA-on-curves status)
 
-- normalized waveform samples across 0-100% gait cycle
-- stance-only normalized waveform samples
-- first derivative summaries, if noise allows
-- smoothness or jerk-like measures, if stable
-- curve correlation between cycles
-- dynamic time warping distance, if used transparently
-- principal component scores from waveform sets
+### Coordination — `extract_coordination`
 
-Shape features should remain inspectable through plots.
+- `hip_knee_lag_samples` — integer lag (samples) of the cross-correlation peak between hip and knee flexion on the cycle's side
+- `hip_knee_lag_pct_cycle` — same lag, expressed as percentage of cycle length
 
-## Coordination features
+### Derived (aggregate phase) — `lr_asymmetry`
 
-Candidate coordination features:
+`scripts/features.py::lr_asymmetry` produces left/right difference columns by pivoting the wide feature table on `side` and subtracting `R − L` for each requested feature in `key_cols`. The emitted columns are named `{feature}_lr_diff`. This is a derived view over the first-pass table, not a per-cycle extraction.
 
-- pelvis-trunk phase relationship
-- hip-knee timing offset
-- knee-ankle timing offset
-- pelvis rotation relative to stance side
-- contralateral arm or trunk relation, if available and reliable
-- cross-correlation between segment curves
-- side-specific coupling differences
+## Candidate set (not yet implemented)
 
-These features are closest to the support-path hypothesis, but they are also easier to overinterpret.
+The features below appear in earlier drafts and operator notes as desirable but are not realized in code yet. Each item names a near-term gating constraint. The notebook §7 "Known debt" cell (per `scripts/build_notebook.py:400` / `notebooks/existing-data-processing.ipynb` §7) acknowledges a subset of these; this section is the union with full traceability to the gating constraint.
 
-## Asymmetry features
+### Candidate timing features (not implemented)
 
-Candidate asymmetry features:
+- step-to-step timing variability — requires multi-cycle per trial; blocked by segmentation reliability (only 11 of 60 trials currently segment, R-side only, per `reports/field-report-01-existing-data-zeroth-pilot.md` §Segmentation Status)
+- right-left duration difference per trial — blocked by the same segmentation reliability (0 L-side cycles)
+- timing of peak hip extension — requires extraction parallel to `peak_knee_flexion_phase`; trivial extension
+- timing of peak ankle plantarflexion — same; trivial extension
+- timing of pelvis rotation extrema — same; trivial extension
 
-- right-left stance duration difference
-- right-left waveform difference
-- right-left peak timing difference
-- right-left range difference
-- right-left coordination difference
-- within-participant side consistency across conditions
+### Candidate range/amplitude features (not implemented)
 
-The method is defined in [Left Right Comparison](left-right-comparison.md).
+- hip adduction-abduction range — requires `hip_adduction_{side}` columns from the source data (not currently in the synthetic schema; OpenCap IK output may or may not include depending on backbone)
+- trunk rotation range — requires trunk segment data; not in the Lab Validation archive's marker set
+- stance-phase-only range for each joint — requires the stance-end timestamp from `extract_timing` to subset; gated on multi-cycle segmentation
+- peak values *and* their timing as a joint emission — currently `*_peak_deg` and `peak_knee_flexion_phase` are emitted but not paired in a single timing-and-magnitude shape; gated on a downstream consumer requiring the pair
 
-## Condition-response features
+### Candidate shape features (not implemented)
 
-Candidate condition-response features:
+- normalized waveform samples (101-point) as columns — currently `normalized_curve_available` is a boolean; the curves themselves live outside the table. Materialization as in-table columns would multiply the row width by ~300 and is intentionally deferred until the segmenter produces enough cycles to make PCA meaningful
+- first-derivative summaries — gated on segmenter producing enough cycles for derivative noise to be characterizable
+- jerk-like / smoothness measures — same
+- curve correlation between cycles within a trial — gated on multi-cycle segmentation
+- dynamic time warping distance — gated on multi-cycle segmentation
+- principal component scores from waveform sets — notebook §7 "Known debt" names this as the aggregate PCA cell; gated on n_cycles ≥ ~30 per condition
 
-- normal-to-slow change
-- normal-to-fast change
-- shod-to-barefoot change
-- first-to-repeat trial change
-- first-session to repeat-session change, if available
+### Candidate coordination features (not implemented)
 
-These features ask whether a candidate pattern is stable, speed-dependent, footwear-dependent, or session-dependent.
+- pelvis-trunk phase relationship — requires trunk data not in the Lab Validation archive
+- knee-ankle timing offset — parallel to `hip_knee_lag_*`; trivial extension once a downstream consumer is named
+- pelvis rotation relative to stance side — requires both pelvis_rotation and a stance-side phase column
+- contralateral arm or trunk relation — requires arm/trunk marker data
+- side-specific coupling differences — gated on L-side cycle availability (currently 0)
+
+### Candidate asymmetry features (not implemented in per-cycle extraction; partly available in aggregate)
+
+`lr_asymmetry` (above) is the only L-R derivation currently emitted, and it operates on pre-existing per-cycle features. The following are not yet implemented:
+
+- right-left waveform difference (point-by-point or summary) — gated on shape-feature materialization
+- right-left peak timing difference — gated on `timing of peak {joint}` features being emitted for both sides
+- right-left coordination difference — gated on side-specific coordination features (above)
+- within-participant side consistency across conditions — gated on multi-trial aggregation; notebook §7 "Known debt" names this as the missing condition-response analysis
+
+### Candidate condition-response features (not implemented)
+
+The notebook §7 "Known debt" cell explicitly names these as "asymmetry shape-correlation, condition-response deltas — require multi-trial aggregation that lives in Sub C's analysis, not Sub B's per-cycle extraction":
+
+- normal-to-slow change — requires multiple speed conditions per subject; the Lab Validation archive currently has only `walking` and `walkingTS` conditions
+- normal-to-fast change — same
+- shod-to-barefoot change — same; Lab Validation archive does not vary footwear
+- first-to-repeat trial change — requires repeat trials per condition per subject
+- first-session to repeat-session change — gated on multi-session capture (the same gate as the schema's `session` column widening)
+
+### Indexing widening (not implemented)
+
+The following indexing columns are named in `analysis/feature-table-schema.md` but not realized in code:
+
+- `cycle_start_frame` / `cycle_end_frame` — `Cycle` carries `start_time`/`end_time` in seconds; frame-index columns need a `sample_rate_hz` round-trip
+- `exclusion_reason` — currently implicit in `quality_flag` values (`short`, `low_contact_gap`); materializing as a dedicated string column is a small ergonomic improvement
+- `source_file` — the trial's source `.mot` filename; not currently propagated through `Cycle`
+
+### Quality-flag widening (not implemented)
+
+The schema doc originally listed `good` / `fair` / `poor` / `unusable`; the code emits `ok` / `short` / `low_contact_gap`. Aligning to the longer label set requires segmenter changes and is deferred until a downstream consumer needs the granularity.
+
+### Long-format alternative (not implemented)
+
+The schema's earlier draft described a long-format table (one row per `(cycle, feature)` pair, with `feature_name`/`feature_value`/`feature_unit`/`feature_method` columns). The realized table is wide-format (one row per cycle, one column per feature). Long-format is preferable if a future cycle materializes per-feature metadata (units, method) as separate columns; the conversion is a `pd.melt` away.
+
+### Multi-session widening (not implemented)
+
+`session` is currently hardcoded to `"S01"` in `scripts/features.py::extract_features` because the existing-data zeroth pilot is single-session. When R5 begins (per `ROADMAP.md` §Phase R5), the column needs to be derived from trial metadata and the hardcoded literal removed.
 
 ## Features to avoid at first
 
@@ -134,4 +163,6 @@ The feature table should support three questions:
 - Do right and left sides differ in interpretable ways?
 - Do unsupervised structures remain after accounting for speed, footwear, and capture notes?
 
-If the table cannot answer those questions, revise extraction before modeling.
+If the table cannot answer those questions, revise extraction before modeling. The first-pass set is sufficient to support question 2 *when segmentation produces both sides* (currently it does not — see `reports/field-report-01-existing-data-zeroth-pilot.md` §Segmentation Status and `ROADMAP.md` §Phase R2). Questions 1 and 3 are gated on candidate-set features that depend on segmenter throughput; their gating constraints are named per-candidate above.
+
+The method for side-pairing is defined in [Left Right Comparison](left-right-comparison.md).
