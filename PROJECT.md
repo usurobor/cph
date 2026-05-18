@@ -1,166 +1,44 @@
-# Project Status and Implementation
+# Project status
 
-This file owns project status, current stage, and implementation progress.
+This file carries cph's **current operational status only** — the snapshot a reader needs to answer "what is the project doing right now?" without scrolling through history or roadmap.
 
-## Current Stage
+It is one of four status-bearing surfaces, each with a single concern:
 
-**Stage:** Existing-data zeroth pilot — REVISE (2026-05-17 real-data run; supersedes the 2026-05-15 acquisition-blocked REVISE)
-**Phase:** Archive acquired and processed end-to-end. OpenCap-vs-reference comparison passes (AC4: Pearson r̄ 0.93–0.96 across HRNet / OpenPose_default / OpenPose_highAccuracy at 5-cameras × 60 trials). Gait-cycle segmentation primitive fails on real Mocap calcaneus markers (AC1: 18.3% of 60 trials, R-side only, zero L-side); the rest of the pipeline (discovery, IK parsing, marker pairing, feature extraction, comparison, plotting, persistence) is real-data-ready.
-**Next action:** Single-issue cycle to tune `scripts/segmentation.py::detect_heel_strikes` against real heel-marker dynamics (per-side baseline subtraction + percentile-of-range threshold). Verification harness uses the 60 Mocap trials already in `/opt/gait-data/opencap-lab-validation/extracted/`. After the fix, re-run `notebooks/existing-data-processing.ipynb` and re-evaluate the falsification table. See [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) §Recommendation for the bounded revision plan.
+- [`README.md`](README.md) — public charter, hypothesis, source-of-truth table.
+- [`ROADMAP.md`](ROADMAP.md) — gate-based research phases (R0–R6), where each phase stands, what closes it.
+- [`CHANGELOG.md`](CHANGELOG.md) — research coherence ledger across waves.
+- `PROJECT.md` (this file) — live operational status; updated when status changes, not on a schedule.
 
-## Implementation Status
+Do not duplicate roadmap content here. Do not duplicate ledger content here. If a fact lives in `ROADMAP.md` or `CHANGELOG.md`, point to it.
 
-### Documentation Complete ✓
+## Current stage
 
-All 24 content files have been written and organized:
+**R1 — Existing-data zeroth pilot.** R0 (charter and operationalization) is ACTIVE pending the close of master [usurobor/cph#11](https://github.com/usurobor/cph/issues/11); R2–R6 are gated behind R1 and R2. See [`ROADMAP.md`](ROADMAP.md) for each phase's gate and status.
 
-- 5 realization documents in `docs/realizations/`
-- 4 concept documents in `docs/concepts/`
-- 3 ethics documents in `docs/ethics/`
-- 4 protocol documents in `protocols/`
-- 3 instrument documents in `instruments/opencap/`
-- 3 analysis documents in `analysis/`
-- 2 report templates in `reports/`
+## Current empirical decision
 
-### Next Phase: Existing Data Processing
+**REVISE** (2026-05-17 real-data run, per [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md)). The Coherence Path Hypothesis is not validated; it is also not refuted. The OpenCap-vs-reference comparison passes (Pearson r̄ 0.93–0.96). Gait-cycle segmentation fails on real Mocap heel-marker data (18.3% R-side, 0% L-side), blocking 4 of 6 falsification conditions on cycle scarcity.
 
-**Immediate next step:** Process existing OpenCap Lab Validation walking data as defined in [protocols/existing-data-zeroth-pilot.md](protocols/existing-data-zeroth-pilot.md)
+## Current blocker
 
-**Goals for existing-data processing:**
-- Test whether the pipeline can process downloaded OpenCap validation data
-- Validate gait cycle segmentation on existing datasets  
-- Extract interpretable movement curves from known-good data
-- Compare OpenCap estimates against reference measurements
-- Generate first-pass support-path hypotheses from controlled conditions
+`scripts/segmentation.py::detect_heel_strikes` — parameters fit to the synthetic generator do not tolerate the ~25 mm R/L mean offset on real calcaneus markers. Bounded revision named: per-side baseline subtraction + percentile-of-range threshold.
 
-**Success condition:** Technical validation that the analysis pipeline can produce meaningful outputs from existing OpenCap data before collecting new participant data.
+## Next action
 
-## Current Realization Sequence
+Open a single-issue cycle scoped to `scripts/segmentation.py::detect_heel_strikes` plus a verification harness against the 60 Mocap heel-marker trials already in `/opt/gait-data/opencap-lab-validation/extracted/`. Merge the fix; re-run [`notebooks/existing-data-processing.ipynb`](notebooks/existing-data-processing.ipynb) on the unchanged archive; re-evaluate the falsification table in field-report-01.
 
-The project moves through five realizations. Each realization should answer one question and produce one artifact.
+Held in scope: no friend captures, no clustering, no new empirical claims. See [`ROADMAP.md`](ROADMAP.md) §"Phase R5" and §"Phase R6" for why those are blocked.
 
-### Realization 01 — Walking Is Not a Style
+## Active branch / issue
 
-Walking is a recurring whole-body load-transfer strategy, not a visual aesthetic.
+- **Master:** [usurobor/cph#11](https://github.com/usurobor/cph/issues/11) — CDR refactor wave (open until A+B+C+D close).
+- **In-flight wave:** [`cdr-refactor-2026-05-18`](.cdd/waves/cdr-refactor-2026-05-18/manifest.md) — Sub A merged ([cph#12](https://github.com/usurobor/cph/issues/12)), Sub B merged ([cph#13](https://github.com/usurobor/cph/issues/13)), Sub C in cycle ([cph#14](https://github.com/usurobor/cph/issues/14)), Sub D pending (cph#15, dispatched when A+B+C reach terminal state).
+- **Unmerged orthogonal branch:** `origin/cycle/segmentation-real-data-fix` (tip `a95415c`) — R2 segmentation fix; merge is a separate operator decision per the wave manifest.
 
-**Status:** Complete ✓
-**Artifact:** `docs/realizations/01-walking-is-not-a-style.md`
+## Last field report
 
-### Realization 02 — The Type List Is Not the Object
+[`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) — 2026-05-17 real-data run against the OpenCap Lab Validation archive (60 walking trials × 10 subjects, SHA-256 `3290d485124fd12c85dd3bc9ee851f3a0530ad0ff58bc396973e665dd6d28187`). Verdict: REVISE on R1; pass on the OpenCap-vs-reference comparison; fail on segmentation.
 
-Visible walking categories are provisional language. The object is the step, the support path, and the gait-cycle data.
+## Last coherence measurement
 
-**Status:** Complete ✓
-**Artifact:** `docs/realizations/02-the-type-list-is-not-the-object.md`
-
-### Realization 03 — OpenCap Is the Translation Layer
-
-OpenCap converts video into biomechanical time series. It is not the classifier.
-
-**Status:** Complete ✓
-**Artifact:** `docs/realizations/03-opencap-is-the-translation-layer.md`
-
-### Realization 04 — Existing Data Comes First
-
-Process existing validation datasets before collecting new participant data.
-
-**Status:** REVISE (2026-05-17, real-data) — acquisition gate cleared and the pipeline ran end-to-end against the real archive. OpenCap-vs-reference comparison cleanly passes (r̄ 0.93–0.96 across three Video backbones × 60 trials, validating the OpenCap technology stack). Gait-cycle segmentation primitive fails on real Mocap heel-marker dynamics (18.3% on the right side, 0% on the left), blocking 4 of 6 falsification conditions on cycle scarcity. The required revision is bounded to a single-issue cycle on `scripts/segmentation.py::detect_heel_strikes`. See `reports/field-report-01-existing-data-zeroth-pilot.md` for the full evaluation.
-**Artifact:** `docs/realizations/04-existing-data-comes-first.md`
-
-### Realization 05 — Friends Are Not Validation
-
-The friend cohort tests pipeline robustness, not theoretical claims.
-
-**Status:** Complete ✓  
-**Artifact:** `docs/realizations/05-friends-are-not-validation.md`
-
-### Realization 06 — What Broke
-
-The first field report documents what survived, what failed, what was visible, and what was not.
-
-**Status:** Pending field testing
-**Artifact:** `docs/realizations/06-what-broke.md` (template ready)
-
-## Implementation Timeline
-
-### Completed
-- Methods design and theory documentation
-- Protocol development
-- Ethics framework
-- Analysis plan
-- Instrument selection and documentation
-
-### In Progress
-- Preparation for friend pre-pilot execution
-
-### Upcoming
-- Friend pre-pilot execution (5-10 participants)
-- Pipeline testing and validation
-- Field report generation
-- Theory revision based on empirical results
-
-## Friend Pre-Pilot Overview
-
-The first cohort tests pipeline coherence, not theory validation.
-
-**Purpose:** Test whether the pipeline can capture, process, segment, and compare walking data well enough to decide whether a larger pilot is worth designing.
-
-**Target outcome:** Discrepancy analysis between blind observation and processed data.
-
-**Implementation details:** See [protocols/friend-pre-pilot.md](protocols/friend-pre-pilot.md)
-
-## Risk Management
-
-**Methodological risks:**
-- OpenCap outputs may be too noisy for intended analysis
-- Proposed categories may remain only visual impressions
-- Pipeline may fail at gait cycle segmentation
-
-**Mitigation:** Pre-pilot designed to reveal these failures early
-
-**Ethical risks:**
-- Identifiable biometric data mishandling
-- Participant pressure or inappropriate labeling
-
-**Mitigation:** Explicit consent protocols and data handling guidelines in [docs/ethics/](docs/ethics/)
-
-## Source of truth
-
-| Question | Owning file |
-|----------|-------------|
-| What is this repo? | `README.md` |
-| What is a support path? | `docs/concepts/support-path.md` |
-| What is the unit of analysis? | `docs/concepts/gait-cycle-as-unit.md` |
-| How is the friend pre-pilot run? | `protocols/friend-pre-pilot.md` |
-| How are recordings captured? | `protocols/capture-setup.md` |
-| What does OpenCap provide? | `instruments/opencap/outputs-to-extract.md` |
-| What are OpenCap's limits? | `instruments/opencap/limitations.md` |
-| Which features are extracted? | `analysis/features.md` |
-| How are clusters tested? | `analysis/clustering-plan.md` |
-| How is data handled? | `docs/ethics/data-handling.md` |
-
-Do not duplicate stable facts across files. State the fact once in its owning file and point to it elsewhere.
-
-## Success Criteria
-
-**Primary success condition:** Methodological clarity, not classification accuracy.
-
-After the pre-pilot, the project should know whether OpenCap-derived gait-cycle data contains enough structure to pursue support-path classification.
-
-**Specific success indicators:**
-- Usable gait cycles extracted from video data
-- Interpretable movement curves generated
-- Left-right stance phase comparison possible
-- Blind observation comparable with kinematic traces
-- Repeatable data across trials
-
-## Decision Points
-
-**Go/No-Go after pre-pilot:**
-- **Go:** If pipeline produces interpretable, repeatable gait-cycle data
-- **Revise:** If method needs adjustment but concept remains viable  
-- **Stop:** If fundamental assumptions fail measurement test
-
-**Failure conditions:** See [docs/concepts/failure-conditions.md](docs/concepts/failure-conditions.md)
-
-The goal is to find out what survives contact with measurement, not to protect the theory.
+`pending — coh unavailable` per the [`CHANGELOG.md`](CHANGELOG.md) 0.1.0-cdr baseline entry. The mechanical entrypoint [`scripts/measure-coherence.sh`](scripts/measure-coherence.sh) is in place; the first numeric C_Σ baseline lands the first time `coh` runs against this branch (or a successor).
