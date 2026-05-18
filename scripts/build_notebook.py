@@ -304,7 +304,7 @@ if USE_REAL_DATA and len(comparison):
 
     nb.cells.append(new_markdown_cell("## 6. Persist feature table (private — not committed)"))
 
-    nb.cells.append(new_code_cell("""PRIVATE_OUT = DATA_ROOT / "gait-support-paths-features"
+    nb.cells.append(new_code_cell("""PRIVATE_OUT = DATA_ROOT / "cph-features"
 PRIVATE_OUT.mkdir(parents=True, exist_ok=True)
 
 feature_path = PRIVATE_OUT / "features-zeroth-pilot.parquet"
@@ -379,7 +379,7 @@ lines = [
     "",
     "## Provenance",
     "- archive: `LabValidation_withoutVideos.zip`, SHA-256 `3290d485124fd12c85dd3bc9ee851f3a0530ad0ff58bc396973e665dd6d28187` (see `data/external/opencap-lab-validation.md`).",
-    "- per-cycle features csv lives at `$GAIT_DATA_ROOT/gait-support-paths-features/features-zeroth-pilot.csv` (outside repo).",
+    "- per-cycle features csv lives at `$GAIT_DATA_ROOT/cph-features/features-zeroth-pilot.csv` (outside repo).",
     "- regenerate this file by running `python3 scripts/build_notebook.py && jupyter nbconvert --execute --inplace notebooks/existing-data-processing.ipynb`.",
     "",
 ]

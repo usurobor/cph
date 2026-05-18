@@ -24,6 +24,6 @@
 
 ## Provenance
 - archive: `LabValidation_withoutVideos.zip`, SHA-256 `3290d485124fd12c85dd3bc9ee851f3a0530ad0ff58bc396973e665dd6d28187` (see `data/external/opencap-lab-validation.md`).
-- per-cycle features csv lives at `$GAIT_DATA_ROOT/gait-support-paths-features/features-zeroth-pilot.csv` (outside repo).
+- per-cycle features csv lives at `$GAIT_DATA_ROOT/cph-features/features-zeroth-pilot.csv` (outside repo).
 - regenerate this file by running `python3 scripts/build_notebook.py && jupyter nbconvert --execute --inplace notebooks/existing-data-processing.ipynb`.
 
