@@ -21,6 +21,11 @@ consent/
 __pycache__/
 *.pyc
 
+# TSC measurement output — `scripts/measure-coherence.sh` writes here.
+# Reports are produced from the canonical sources, not a canonical
+# source themselves; see `targets/*.tsc` exclusions.
+.tsc/
+
 # External datasets — manifests stay in git, raw payloads do not
 data/external/**/*.zip
 data/external/**/*.tar.gz
