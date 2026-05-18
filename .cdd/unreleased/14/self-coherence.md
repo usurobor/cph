@@ -177,7 +177,7 @@ The diff touches four languages: TOML (`targets/*.tsc`), Bash (`scripts/measure-
 
 - **TOML.** All five `targets/*.tsc` files parse via `python3 -c "import tomllib; tomllib.load(...)"` with no errors.
 - **Bash.** `bash -n scripts/measure-coherence.sh` returns clean. Script runs in the missing-`coh` branch and exits 127 with the expected install-instruction output. `shellcheck` is not available in the dispatch environment; the script is small, uses only `command -v`, `cat <<EOF`, `mkdir -p`, and a `for` loop over a literal array, so the absence of shellcheck is low risk.
-- **Markdown.** All tables and cross-references resolve. Intra-doc grep checks: `grep -c "pending — coh unavailable" CHANGELOG.md` → 6 occurrences (ledger row, §Coherence delta α/β/γ/C_Σ bullets, §Known limits, §Next gate); all six say the same thing (the literal `pending — coh unavailable`, not a variant). No drift between the ledger row's C_Σ cell and the §Coherence delta C_Σ bullet.
+- **Markdown.** All tables and cross-references resolve. Intra-doc grep checks: `grep -n "pending — coh unavailable" CHANGELOG.md` → 4 occurrences at lines 13 (ledger row C_Σ cell), 27 (§Coherence delta C_Σ bullet), 46 (§Known limits "`coh` is not installed" bullet), 52 (§Next gate); all four say the literal `pending — coh unavailable`, not a variant. No drift between the ledger row's C_Σ cell and the §Coherence delta C_Σ bullet. The ledger-row α / β / γ cells carry the bare word `pending` (not `pending — coh unavailable`); that variant is intentional — those cells are score cells, not status cells, and `pending` reads correctly there.
 - **gitignore.** New entry `.tsc/` appended to the existing block style; no syntax issue.
 
 ### Did α leave β a coherent surface?
