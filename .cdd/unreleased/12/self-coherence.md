@@ -3,7 +3,7 @@
 <!--
 section-manifest:
   planned: [Gap, Skills, ACs, Self-check, Debt, CDD-Trace, Review-readiness]
-  completed: [Gap, Skills, ACs]
+  completed: [Gap, Skills, ACs, Self-check]
 -->
 
 ## Gap
@@ -139,3 +139,37 @@ Per the wave manifest (`.cdd/waves/cdr-refactor-2026-05-18/manifest.md` §Pinned
 - `docs/articles/seven-ways-people-walk.md` — not a table row (the seven-families article is *cited from* the hypothesis-doc row and the README §How does this connect... section, not promoted into the canonical-question table; the doc owns observational vocabulary, not one of the nine canonical questions). This follows the wave manifest, which pins `docs/articles/seven-ways-people-walk.md` as the seven-families file but does not require it to appear as a source-of-truth row.
 
 **Negative oracle:** README does not contain the project status (PROJECT.md's row) and does not contain the hypothesis definition (coherence-path-hypothesis.md's row). README §Current empirical state names REVISE and the latest field report path, but does not duplicate PROJECT.md's current-stage / current-action narrative; it ends with "[PROJECT.md] carries the live operational status." README §What is the hypothesis? quotes the hypothesis in one sentence and immediately points to the authority doc for the full definition.
+
+## Self-check
+
+**Did α's work push ambiguity onto β?** No specific load. The wave's pinned paths are honoured (the preferred `docs/articles/seven-ways-people-walk.md` path was chosen, so no manifest update or Sub C coordination note was needed). The README source-of-truth table includes forward-reference rows for Sub B/C files, and the table's own caveat sentence ("`ROADMAP.md`, `CHANGELOG.md`, and `targets/` are delivered by sibling sub-issues in the same wave...") makes the forward-reference status legible without requiring β to reconstruct the wave structure. The single judgement call β may want to re-examine is the *placement* of the source-of-truth table inside README (between Q7 and Q8) rather than in a separate file linked from README — this is permitted by AC10 ("the table itself lives in README; this sub creates the initial version") and explicitly allowed by the AC10 surface ("`README.md` (and any doc it forwards the table to)").
+
+**Is every claim backed by evidence in the diff?**
+
+- AC1 evidence is the `grep -n "^## "` output reproduced above; each of the eight reader questions maps to a heading at a numbered line.
+- AC2 / AC4 evidence is the `grep -F "## "` output reproduced above; each required heading appears in-file.
+- AC10 evidence is the rendered table (9 rows, each with a path) plus the file-existence check (3 of the 4 Sub-A-created files match their row's path; `docs/articles/seven-ways-people-walk.md` does not occupy a table row by design and the rationale is named in §ACs above).
+- The empirical-state REVISE language across README, CDR.md, and `coherence-path-hypothesis.md` matches `reports/field-report-01-existing-data-zeroth-pilot.md` §Status — the OpenCap-vs-reference PASS finding (r̄ 0.93–0.96), the 18.3% R-only segmentation failure, the bounded revision scope, and the REVISE verdict are all sourced to that report and named consistently in each document.
+
+**Peer enumeration — empirical-state surfaces.** The new files that carry empirical-state language are:
+
+- `README.md` §Current empirical state → REVISE, r̄ 0.93–0.96 PASS, 18.3% / R-only / no L-side, bounded fix.
+- `CDR.md` — does not carry an empirical-state claim (CDR.md is doctrine); §Required cadence names "empirical gate transitions" abstractly without committing a verdict.
+- `docs/concepts/coherence-path-hypothesis.md` §Current empirical status → REVISE, same four facts as README, same field-report citation.
+- `docs/articles/seven-ways-people-walk.md` — does not carry detailed empirical claims; §What the list is not states "None of the seven has been tested against gait-cycle data as of the current empirical posture (REVISE — see [reports/field-report-01-existing-data-zeroth-pilot.md])" and points to the report.
+
+All four touchpoints either name REVISE explicitly or refrain from claiming a verdict, and all four point to the same field-report file as the canonical source. The peer set is consistent.
+
+**Peer enumeration — seven-family naming.** The seven family names appear in three places:
+
+- `docs/articles/seven-ways-people-walk.md` §The seven names — authoritative list (one paragraph per family).
+- `docs/concepts/coherence-path-hypothesis.md` §Relationship to the seven gait families — bullet list of names only, with cross-reference into the article.
+- `README.md` §How does this connect to the seven gait families? — single-sentence inline list of names, with cross-reference into the article.
+
+`grep -F "Pendular Carrier" README.md CDR.md docs/concepts/coherence-path-hypothesis.md docs/articles/seven-ways-people-walk.md` returns the names in exactly the three expected files. CDR.md is intentionally absent — doctrine should not reproduce vocabulary.
+
+**Authority surface check.** Before authoring, the existing `docs/concepts/support-path.md` was identified as the canonical owner of the operational `support path` term (per master #11 §Terms and the wave manifest constraint "Existing docs/concepts/support-path.md is preserved"). The new `coherence-path-hypothesis.md` §Relationship to support path explicitly names support-path.md as the authority and does not redefine the term:
+
+> `support path` is the repo's operational term for the measurable surface of this hypothesis. [docs/concepts/support-path.md](support-path.md) owns the operational definition; this document does not redefine it.
+
+No re-statement of support-path's operational definition appears in any new file; only cross-references.
