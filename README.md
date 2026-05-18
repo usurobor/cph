@@ -1,125 +1,196 @@
-# cph — Coherence Path Hypothesis
+# cph
 
-cph is a research project that tests one claim: during walking, each step may create a temporary whole-body coordination path around ground contact, inferred from how timing, stiffness, segment coupling, orientation, asymmetry, and condition response organize in gait-cycle data.
+Coherence Path Hypothesis — testing whether walking contains recurring, measurable support-path primitives.
 
-The repo is also a model project for **CDR — Coherence-Driven Research**. It does for research what versioning, changelogs, and release gates do for software: continuously measure whether the hypothesis, methods, evidence, and process still describe one system.
+This repo tests the **Coherence Path Hypothesis**: during walking, an active viscoelastic body may rhythmically form temporary whole-body coordination paths around ground contact, and those paths may be inferred from recurring patterns in gait-cycle data.
 
-## What is this project?
+It is also a model of **CDR — Coherence-Driven Research**: research run through explicit hypotheses, gates, field reports, a changelog, and continuous coherence measurement.
 
-cph is a research project that tests the **Coherence Path Hypothesis** in human walking. It is not a product, not a clinical tool, not a typology of people. It is the disciplined attempt to find out whether the hypothesis survives measurement against real gait-cycle data.
+The hypothesis is not validated. Current merged status is **REVISE**. The README is the public charter; live operational state lives in [PROJECT.md](PROJECT.md), and the [source-of-truth table](#source-of-truth) at the foot of this file names the owning file for every other question.
 
-The repo holds the theory, the methods, the analysis pipeline, the field reports, and the coherence ledger of the project itself.
+---
 
-## What is the hypothesis?
+*The body of this README is a dialogue between two voices working through the project. The project's method is "observation proposes, measurement decides"; the charter is written as inquiry so the form matches the work.*
 
-> During walking, each step may create a temporary whole-body coordination path around ground contact. The path is not a literal anatomical cord or fascia line. It is inferred from timing, stiffness, segment coupling, orientation, asymmetry, and condition response in gait-cycle data.
+---
 
-The full definition, the evidence rules, the operationalization, the falsification conditions, and the practical consequences if supported all live in [docs/concepts/coherence-path-hypothesis.md](docs/concepts/coherence-path-hypothesis.md).
+A: You said "may" twice in the opening.
 
-The repo's operational term for the measurable surface of the hypothesis is **support path**, defined in [docs/concepts/support-path.md](docs/concepts/support-path.md). The hypothesis and its operationalization are kept terminologically distinct on purpose:
+B: Twice on purpose. The hypothesis is not "the body does this." It is "if we look carefully at gait-cycle data, we should find recurring coordination structure that behaves the way temporary paths would behave." The body model is an interpretive frame. The evidence has to come from cycles.
 
-```
-Coherence Path Hypothesis = the research claim
-support path              = the operationalized gait-cycle pattern
-```
+A: So the repo is the hypothesis, a method for testing it, and a way of keeping the project coherent while it tests.
 
-## Why is this worth testing?
+B: Three things in one repo. The README should hold them without confusing them.
 
-If recurring coherence paths can be inferred from gait-cycle data, several things become possible — *none of which the project claims today*:
+---
 
-- gait description can move from visual labels toward measurable movement organization
-- available and missing movement strategies can be named without typing people
-- movement education, rehab reasoning, athletic analysis, and AI gait interpretation gain a measurable substrate to argue from
-- somatic observation and biomechanical measurement gain a shared object
+A: Say the governing question once, plainly.
 
-These are reasons to test the hypothesis. They are not consequences the hypothesis has earned.
+B: Can real walking data reveal stable, recurring low-level coordination primitives that explain visible walking patterns more precisely than coarse gait "types"?
 
-## What is not being claimed
+A: "More precisely than" — you are not asking whether the types are wrong.
 
-- not diagnosis
-- not personality inference
-- not fascia-line proof
-- not "you are this gait type"
-- not validation of the seven gait families
-- not a typology of people — the object is the step under a condition, not the person
+B: Correct. The types may be useful surface phrases. The question is whether they are built from something measurable underneath. If yes, "more precisely" follows. If no, the question dies cleanly.
 
-### Safety boundary
+---
 
-Gait video is identifiable biometric data. The repo treats it accordingly: no public raw video, no participant labeling, no diagnostic claims. The strongest allowed sentence about a recording is:
+A: The hypothesis has a name.
 
-> Under this condition, this recording shows this movement pattern.
+B: The Coherence Path Hypothesis. Stated tightly: during walking, each step may create a temporary whole-body coordination path around ground contact. The path is not an anatomical cord, not a fascia line, not a visible object. It is inferred — from how timing, stiffness, segment coupling, orientation, asymmetry, and condition response organize in gait-cycle data.
 
-Not: "This is who you are." Complete ethics protocols live in [docs/ethics/](docs/ethics/).
+A: Then what is a "support path"? You use both terms.
 
-## How does this connect to the seven gait families?
+B: Operational term. The hypothesis is the research claim. A support path is the gait-cycle pattern we try to infer from data. If we conflate them, the project loses the gap between claim and evidence.
 
-Seven informal walking families — Pendular Carrier, Elastic Rebounder, Braced Axial Walker, Collapse-and-Catch Walker, Spiral Driver, Segmented Block Mover, Asymmetric Protector — exist as observational vocabulary, described in [docs/articles/seven-ways-people-walk.md](docs/articles/seven-ways-people-walk.md).
+A: That gap is the whole project.
 
-The families are *candidate surface expressions* of coherence-path organization. They are not the core theory.
+B: That gap is the whole project.
 
-Three consequences follow:
+---
 
-1. The Coherence Path Hypothesis does not depend on the seven families. If measurement supports three families, twelve, or none, the hypothesis can still survive — what is at stake is recurrence of coordination paths, not the count.
-2. Asymmetry may be a modifier across families rather than a family of its own.
-3. AI clustering is not required to preserve the list. Measurement is allowed to destroy, split, merge, or replace the families.
+A: The body model.
 
-## Current empirical state
+B: A human body is an active viscoelastic structured volume. Not a rigid machine, not a passive fluid. Bones give shape, muscles regulate force and stiffness, connective tissues transmit tension and state, the nervous system coordinates the whole volume in time.
 
-**REVISE** (per [reports/field-report-01-existing-data-zeroth-pilot.md](reports/field-report-01-existing-data-zeroth-pilot.md), 2026-05-17 real-data run).
+A: And walking?
 
-- The OpenCap Lab Validation archive (60 walking trials × 10 subjects) has been acquired and run through the pipeline.
-- The OpenCap-vs-reference comparison **passes** by a wide margin (Pearson r̄ 0.93–0.96 across HRNet, OpenPose_default, OpenPose_highAccuracy). OpenCap-derived kinematics are reliable enough for the rest of the chain to use them.
-- Gait-cycle segmentation **fails** on real Mocap heel-marker data: 18.3% of trials (11 / 60), all right-side; zero left-side cycles. The failure is bounded to `scripts.segmentation.detect_heel_strikes` and is the next gate.
-- The hypothesis itself **is not yet testable** — with 11 right-side cycles and no left-side cycles, recurrence and asymmetry tests cannot be evaluated yet.
+B: Foot touches the ground. Force enters. Some regions firm. Some yield. Some rotate. Some delay. Some release. For a moment the body becomes less blob-like — a path, a rail, a triangle, a spiral, some support geometry may organize the step. Then the next step. Then again.
 
-The hypothesis is not validated. It is also not refuted. [PROJECT.md](PROJECT.md) carries the live operational status.
+A: So the hypothesis is a rhythm claim, not only an event claim.
 
-## How CDR works in this repo
+B: Yes. If it is real, repeated walking video should not look like isolated poses. It should show a phase-locked coordination pattern across cycles. If it does not, either the pattern is finer than our instruments, or it is not there. Both are answers.
 
-This repo runs research the way software is run: with versioning, changelogs, tests, and gates — but the unit being versioned is the project's coherence, not its features.
+---
 
-The working sequence:
+A: Why does any of this matter outside the lab?
 
-- **observation proposes** — qualitative description generates hypotheses
-- **OpenCap translates** — video becomes biomechanical time series
-- **AI / analysis sorts** — pattern extraction proposes structure
-- **measurement decides** — features tested against gait-cycle data render the verdict
-- **TSC measures the project itself** — does the repo still describe one coherent research project as the research changes?
+B: The goal is not to put people into gait boxes. It is to find the low-level primitives that make walking signatures recognizable. If they are real, gait analysis could move from "this person is a Braced Axial Walker" to something like "under this condition, this gait shows early same-side path locking, high axial stiffness, low pelvis-rib differentiation, and reduced release before the next step."
 
-[CDR.md](CDR.md) owns the full doctrine: what CDR is, what it is not, the three triadic-coherence axes (α pattern, β evidence relation, γ process), what C_Σ means and does not mean, the measurement cadence, and the changelog rule.
+A: A grammar instead of a label.
 
-A high project coherence score does **not** mean the Coherence Path Hypothesis is correct. A low score blocks empirical claims until the project re-coheres.
+B: Yes. Movement teachers, clinicians, athletes, researchers, AI systems — all of them could discuss a composition rather than an identity. Not who the person is. Not a diagnosis. Not a personality. A measurable composition under known conditions.
+
+---
+
+A: What are the candidate primitives today?
+
+B: Provisional, today nine. Contact anchor — where and when the step organizes around ground contact. Path direction — same-side, diagonal, posterior, axial, spiral, fragmented, multi-path. Stiffness profile — rise time, concentration, hold. Yield profile — ankle, knee, hip, pelvis, spine, trunk, distributed. Segment coupling — whole system or local parts. Phase timing — early, on time, late. Release or transfer — clean dissolution into the next step, or held. Side relation — shared grammar, or one side protecting, avoiding, shortening, overworking. Variability — stable, adaptive, rigid, noisy, context-sensitive.
+
+A: Nine gives us a first testing surface.
+
+B: Not final. If measurement collapses some or splits others, the list changes.
+
+---
+
+A: The seven gait families.
+
+B: Observational vocabulary. The article names seven — Pendular Carrier, Elastic Rebounder, Braced Axial Walker, Collapse-and-Catch Walker, Spiral Driver, Segmented Block Mover, Asymmetric Protector. Rough names for things humans can notice before measurement. They are not the core theory.
+
+A: Could they be composed from the primitives?
+
+B: That is the working guess. Pendular Carrier may be stance-leg support with quiet transfer. Braced Axial may be early path locking with high axial stiffness and reduced rotational release. Spiral Driver may be diagonal recurrence with pelvis-rib-arm coupling. Asymmetric Protector may be a side-specific modifier rather than a family.
+
+A: Seven is not sacred.
+
+B: If measurement finds three, twelve, or none, the list changes. The hypothesis survives only if recurring primitives survive measurement.
+
+---
+
+A: How is the hypothesis tested?
+
+B: Existing data, not new recordings. OpenCap validation data, then gait-cycle segmentation, feature extraction, comparison across condition and side, attempted support-path inference, falsification table. Only then do we let AI or clustering near it.
+
+A: Why that order?
+
+B: OpenCap is the translation layer — video-derived movement into biomechanical time series. AI is not asked to classify people first. The first task is to find whether gait-cycle data contains stable recurring structures at all. Observation proposes. OpenCap translates. Analysis sorts. Measurement decides. TSC measures whether the project itself stays coherent while it does all that.
+
+A: When AI is finally allowed in?
+
+B: It should not preserve our labels by force. It should test whether the data contains primitives or clusters that make the labels unnecessary, sharper, or wrong.
+
+---
+
+A: What would count as evidence?
+
+B: Measured gait-cycle structure. Repeatable timing patterns across cycles. Stable segment-coupling signatures. Consistent stance and swing phase relationships. Left-right differences that are systematic rather than random. Condition response — natural walking versus, say, trunk-sway walking. Agreement between OpenCap-derived features and reference motion-capture data where available. Future agreement with force, pressure, or EMG measures.
+
+A: And what does not count?
+
+B: A visible impression can propose a coherence path. It cannot establish one. A named gait family can propose a pattern. It cannot validate one. A high project coherence score can show that the repo is internally consistent. It cannot prove the body model true.
+
+---
+
+A: What would weaken or falsify it?
+
+B: If real gait-cycle data does not show recurring coordination structure. Or if apparent structure is better explained by trial crop, marker artifact, camera setup, walking speed, subject morphology, condition labels alone, OpenCap error, observer bias, or overfitted feature choices.
+
+A: And the response?
+
+B: Not to rescue the hypothesis by inventing more poetic labels. If measurement destroys the vocabulary, the vocabulary goes.
+
+---
+
+A: Boundaries.
+
+B: The repo is not a diagnostic system. It does not infer personality from walking. It does not claim that video can see fascia. It does not classify people as types.
+
+A: The safe sentence.
+
+B: "Under this condition, this recording shows this movement pattern." Not "this is who you are."
+
+A: The data itself.
+
+B: Gait video is identifiable biometric data. Raw participant video and private traces do not belong in the public repo. Ethics rules live in [`docs/ethics/`](docs/ethics/).
+
+---
+
+A: CDR. Why coherence at all?
+
+B: Because a research project has to stay coherent while it changes. Hypothesis, methods, evidence, roadmap, reports, changelog — they should keep describing one system. TSC tracks three axes. Alpha: are the project's terms stable. Beta: do methods, evidence, and claims refer to the same object. Gamma: can the project move through GO, REVISE, STOP without losing identity. C_Σ measures project coherence. Not truth.
+
+A: So a high C_Σ does not mean the hypothesis is right.
+
+B: It means the repo currently describes one coherent research project. It says nothing about whether walking actually forms support paths. A low C_Σ means the repo cannot safely claim to know what it knows.
+
+A: That is the move the field needs more of.
+
+B: That is the move this repo is trying to model.
+
+---
 
 ## Source of truth
 
-Each question below has one owning file. Sibling files point here; they do not restate it.
+Stable facts live once. Other files point to the owner.
 
 | Question | Owning file |
-|----------|-------------|
+|---|---|
 | What is this project? | `README.md` |
 | What is CDR? | `CDR.md` |
 | What is the hypothesis? | `docs/concepts/coherence-path-hypothesis.md` |
 | What is a support path? | `docs/concepts/support-path.md` |
+| What is the unit of analysis? | `docs/concepts/gait-cycle-as-unit.md` |
+| What are the failure conditions? | `docs/concepts/failure-conditions.md` |
+| How do the seven families relate? | `docs/articles/seven-ways-people-walk.md` |
 | Where are research gates tracked? | `ROADMAP.md` |
-| What is current operational status? | `PROJECT.md` |
+| What is the current operational status? | `PROJECT.md` |
 | What changed over time? | `CHANGELOG.md` |
 | What empirical evidence exists? | `reports/` |
 | What TSC targets are measured? | `targets/` |
-
-`ROADMAP.md`, `CHANGELOG.md`, and `targets/` are delivered by sibling sub-issues in the same wave (master usurobor/cph#11) and may not be present on this branch in isolation. The table is the wave's source-of-truth contract; rows resolve as the wave merges.
+| How is data handled? | `docs/ethics/data-handling.md` |
 
 ## Where to go next
 
-- **What is the hypothesis exactly?** → [docs/concepts/coherence-path-hypothesis.md](docs/concepts/coherence-path-hypothesis.md)
-- **What is a support path?** → [docs/concepts/support-path.md](docs/concepts/support-path.md)
-- **What are the seven families?** → [docs/articles/seven-ways-people-walk.md](docs/articles/seven-ways-people-walk.md)
-- **How does CDR work here?** → [CDR.md](CDR.md)
-- **What is the current operational status?** → [PROJECT.md](PROJECT.md)
-- **What is the latest field evidence?** → [reports/field-report-01-existing-data-zeroth-pilot.md](reports/field-report-01-existing-data-zeroth-pilot.md)
-- **How is data handled ethically?** → [docs/ethics/data-handling.md](docs/ethics/data-handling.md)
+- Hypothesis: [`docs/concepts/coherence-path-hypothesis.md`](docs/concepts/coherence-path-hypothesis.md)
+- Operational term: [`docs/concepts/support-path.md`](docs/concepts/support-path.md)
+- Roadmap: [`ROADMAP.md`](ROADMAP.md)
+- Current status: [`PROJECT.md`](PROJECT.md)
+- Latest field report: [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md)
+- Seven-family article: [`docs/articles/seven-ways-people-walk.md`](docs/articles/seven-ways-people-walk.md)
+- CDR doctrine: [`CDR.md`](CDR.md)
+- Ethics: [`docs/ethics/data-handling.md`](docs/ethics/data-handling.md)
 
 ## References
 
-- OpenCap Core: https://github.com/opencap-org/opencap-core
 - OpenCap paper: https://doi.org/10.1371/journal.pcbi.1011462
+- OpenCap Core: https://github.com/opencap-org/opencap-core
 - OpenSim: https://opensim.stanford.edu/
