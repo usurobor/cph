@@ -29,13 +29,12 @@ Recover L-side cycles via one of the two paths named in [`reports/field-report-0
 
 Held in scope: no friend captures, no clustering, no new empirical claims. See [`ROADMAP.md`](ROADMAP.md) §"Phase R5" and §"Phase R6" for why those are blocked.
 
-## Active branch / issue
+## Open issues
 
-- **Review branch:** `claude/review-repo-coherence-PNbjQ` — review surface for two coherence-drift-sweep waves landed against R0 (`cdr-refactor-2026-05-18` is closed; `coherence-drift-sweep-2026-05-18` and the follow-up `coherence-drift-sweep-followup-2026-05-18` are reviewing here). Merge to main is an operator gate per each wave's manifest §"Branching deviation".
-- **In-flight waves on the review branch:**
-  - [`coherence-drift-sweep-2026-05-18`](.cdr/waves/coherence-drift-sweep-2026-05-18/manifest.md) — master [cph#16](https://github.com/usurobor/cph/issues/16); all four subs (cph#17–20) closed APPROVE; master close is an ε/operator gate.
-  - [`coherence-drift-sweep-followup-2026-05-18`](.cdr/waves/coherence-drift-sweep-followup-2026-05-18/manifest.md) — master [cph#21](https://github.com/usurobor/cph/issues/21); four subs (cph#22–25) in flight on this branch.
-- **R2 segmentation fix:** ported onto current main as [`cycle/port-segmentation-fix`](https://github.com/usurobor/cph/tree/cycle/port-segmentation-fix) per [cph#26](https://github.com/usurobor/cph/issues/26). Step A (surgical 3-way port) at commit `41b3693`; Step B (notebook rerun + status-surface update) is in flight. The original orthogonal branch `origin/cycle/segmentation-real-data-fix` (tip `a95415c`) was the precursor and is superseded by the port.
+- [cph#27](https://github.com/usurobor/cph/issues/27) — R3 R-side aggregate condition-response analysis (n=60 R cycles × 10 subjects × 2 conditions).
+- [cph#28](https://github.com/usurobor/cph/issues/28) — L-cycle recovery (contralateral-anchored detection or wider IK windows).
+
+Both runnable in parallel (disjoint file surfaces). The [cph#26](https://github.com/usurobor/cph/issues/26) §"Post-port decision" recommendation was R-side aggregate first; the L-cycle recovery cycle is the sharper next gate for bilateral CPH testability.
 
 ## Last field report
 
