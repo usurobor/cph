@@ -115,15 +115,15 @@ The chain runs forward only. A break in any earlier link blocks inference at the
 
 ## Current empirical status
 
-**REVISE** (per [reports/field-report-01-existing-data-zeroth-pilot.md](../../reports/field-report-01-existing-data-zeroth-pilot.md), 2026-05-17 real-data run).
+**REVISE** (per [reports/field-report-01-existing-data-zeroth-pilot.md](../../reports/field-report-01-existing-data-zeroth-pilot.md), 2026-05-17 segmentation-fix run).
 
 State of the chain as of the latest merged field report:
 
 - **OpenCap technology** — PASS. The OpenCap-vs-reference comparison on the OpenCap Lab Validation archive (60 walking trials × 10 subjects) returns Pearson r̄ 0.962 (HRNet), 0.933 (OpenPose_default), 0.951 (OpenPose_highAccuracy), well above the r̄ ≥ 0.7 GO threshold. OpenCap-derived kinematics are reliable enough for the rest of the chain to use them.
-- **Gait-cycle segmentation** — FAIL on real Mocap heel-marker data. The detector fires on 18.3% of trials (11 / 60), all right-side; zero left-side cycles were extracted. The failure is in `scripts.segmentation.detect_heel_strikes` and is bounded to a single-issue revision cycle.
-- **Hypothesis testability** — blocked. With 11 right-side cycles and no left-side cycles, the within-participant recurrence and left–right asymmetry tests cannot be evaluated yet.
+- **Gait-cycle segmentation** — PASS on R-side; blocked on L-side. The detector now fires on 60/60 walking trials (100%, R-side) and produces 60 R cycles + 1 L cycle (61 total) at cycle durations 0.84–1.37 s. L-side cycle yield is structurally limited to 1/60 by trial cropping in the source archive (each trial ~1.3–1.5 s, R-stride-aligned); this is a property of the archive, not the detector.
+- **Hypothesis testability** — partial. With 60 R-side cycles across 10 subjects × 2 conditions, the within-participant recurrence test on R-side is now evaluable. The left–right asymmetry test (Hypothesis 3) remains blocked at n=1 L-cycle.
 
-The hypothesis is not validated. It is also not refuted. The current REVISE posture means the next gate is the segmentation fix, after which the recurrence and distinguishability tests can be run.
+The hypothesis is not validated. It is also not refuted. The current REVISE posture reflects the half-anchored bilateral construct: the R-side test surface is in range, but bilateral falsification requires L-cycle recovery via either contralateral-anchored detection or longer-trial capture.
 
 ## Falsification conditions
 

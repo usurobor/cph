@@ -77,6 +77,7 @@ def extract_range(cycle: Cycle) -> dict:
     side = cycle.side.lower()
     joint_map = {
         "hip_flexion": f"hip_flexion_{side}",
+        "hip_adduction": f"hip_adduction_{side}",
         "knee_angle": f"knee_angle_{side}",
         "ankle_angle": f"ankle_angle_{side}",
     }
@@ -91,6 +92,10 @@ def extract_range(cycle: Cycle) -> dict:
         if pelvis in df.columns:
             v = df[pelvis].to_numpy()
             out[f"{pelvis}_range_deg"] = float(np.max(v) - np.min(v))
+    for trunk in ["lumbar_bending", "lumbar_rotation", "lumbar_extension"]:
+        if trunk in df.columns:
+            v = df[trunk].to_numpy()
+            out[f"{trunk}_range_deg"] = float(np.max(v) - np.min(v))
     return out
 
 

@@ -1,9 +1,12 @@
 """Gait-cycle segmentation: detect heel-strike events and emit per-cycle slices.
 
 Heel-strike (HS) is the canonical cycle boundary in clinical gait analysis.
-This module detects HS from vertical heel-marker trajectory using a
-velocity zero-crossing heuristic, which works equally on OpenCap-derived
-marker data and synthetic data with the same column convention.
+This module detects HS from vertical heel-marker trajectory using
+robust-percentile normalization plus stance-region depth/length gating.
+The detector works on both OpenCap-derived synthetic marker data (heel
+range ~[0,100], zero baseline) and real OpenCap Lab Validation Mocap
+calcaneus markers (heel range ~[50,330] mm, ~25 mm R/L baseline offset,
+short trial cropping ≈1.3–1.5 s ≈ 1 cycle).
 
 A gait cycle = HS_n to HS_{n+1} of the SAME side.
 A stride includes both legs; a cycle here is one side.
@@ -37,56 +40,96 @@ class Cycle:
 
 def detect_heel_strikes(heel_y: np.ndarray, fs: float,
                         min_cycle_s: float = 0.6,
-                        max_cycle_s: float = 2.0) -> np.ndarray:
+                        max_cycle_s: float = 2.0,
+                        stance_thr: float = 0.30,
+                        deep_thr: float = 0.10,
+                        min_stance_s: float = 0.15) -> np.ndarray:
     """Return sample indices of heel-strike events.
 
-    Method: detect the falling-edge of the vertical heel marker through
-    a smoothed-threshold crossing. The heel marker rises into mid-swing
-    (peak lift) and falls back to the ground at heel-strike; we find the
-    instant the (smoothed) trajectory crosses below a small threshold
-    derived from the trial's own amplitude. This is more robust than
-    local-minimum search in the noise-flat stance region.
+    Method: stance-region detection on the vertical heel-marker trace,
+    with robust per-trial percentile normalization. Each contiguous run
+    of `yn < stance_thr` (where `yn = (smoothed_heel - q05) / (q95 - q05)`)
+    that lasts ≥`min_stance_s` AND reaches a deepest value `< deep_thr`
+    is one stance phase; the HS event for that phase is the first sample
+    inside the deep-stance plateau (`yn < deep_thr`) — i.e. the onset of
+    ground contact, matching the conventional marker-based HS definition.
+
+    This replaces an earlier falling-edge / fixed-threshold detector
+    that worked on the smoke-test synthetic schema (heel ~[0,100] mm,
+    zero R/L baseline offset) but failed on real OpenCap Lab Validation
+    Mocap calcaneus markers (heel ~[50,330] mm, ~25 mm R/L baseline
+    offset, short trial cropping ≈1.3–1.5 s ≈ 1 cycle). Robust-percentile
+    normalization removes baseline + amplitude bias; stance-region depth
+    + length gating rejects boundary noise and partial-stance edges.
 
     `min_cycle_s` enforces a refractory period between successive
-    detections; the default 0.6s is conservative for adult walking
-    (cycle durations of 0.8–1.4s are typical).
+    detections; defaults are conservative for adult walking
+    (cycle 0.8–1.4 s, stance ≥0.4 s, swing ≈0.4 s).
     """
-    if len(heel_y) < int(fs * min_cycle_s):
+    v = np.asarray(heel_y, dtype=float)
+    N = len(v)
+    if N < int(fs * min_cycle_s):
         return np.array([], dtype=int)
-    # Smooth lightly with a moving average to suppress noise without
-    # destroying the falling-edge timing.
+    finite = np.isfinite(v)
+    if int(finite.sum()) < int(fs * min_cycle_s):
+        return np.array([], dtype=int)
+    if not finite.all():
+        v = v.copy()
+        v[~finite] = np.interp(np.flatnonzero(~finite),
+                                np.flatnonzero(finite), v[finite])
+
     window = max(3, int(fs * 0.04))
-    if window > len(heel_y):
-        smooth = heel_y.copy()
+    if window > N:
+        smooth = v.copy()
     else:
         kernel = np.ones(window) / window
-        smooth = np.convolve(heel_y, kernel, mode="same")
-    amp = float(np.max(smooth) - np.min(smooth))
+        smooth = np.convolve(v, kernel, mode="same")
+
+    q05 = float(np.percentile(smooth, 5))
+    q95 = float(np.percentile(smooth, 95))
+    amp = q95 - q05
     if amp < 1e-3:
         return np.array([], dtype=int)
-    # Threshold: low fraction of the trial's amplitude above the min.
-    thresh = float(np.min(smooth)) + 0.05 * amp
-    above = smooth > thresh
-    # Falling-edge: above → not above (i.e. ground contact)
-    edges = np.where(above[:-1] & ~above[1:])[0]
-    if len(edges) == 0:
-        return edges
-    # Refractory filtering
+    yn = (smooth - q05) / amp
+
+    min_stance_n = max(3, int(min_stance_s * fs))
+    below = yn < stance_thr
+    idx = np.flatnonzero(below)
+    if len(idx) == 0:
+        return np.array([], dtype=int)
+    breaks = np.flatnonzero(np.diff(idx) > 1)
+    starts = np.concatenate([[idx[0]], idx[breaks + 1]])
+    ends = np.concatenate([idx[breaks], [idx[-1]]])
+
+    candidates: list[int] = []
+    for s, e in zip(starts, ends):
+        if (e - s + 1) < min_stance_n:
+            continue
+        seg = yn[s:e + 1]
+        if float(np.min(seg)) > deep_thr:
+            continue
+        deep_idx = np.where(seg < deep_thr)[0]
+        if len(deep_idx) > 0:
+            hs_local = int(deep_idx[0])
+        else:
+            hs_local = int(np.argmin(seg))
+        candidates.append(int(s + hs_local))
+
+    if not candidates:
+        return np.array([], dtype=int)
+
+    candidates.sort()
     refrac = int(min_cycle_s * fs)
-    keep = [edges[0]]
-    for e in edges[1:]:
-        if e - keep[-1] >= refrac:
-            keep.append(e)
-    keep = np.array(keep, dtype=int)
-    # Drop cycles whose duration exceeds max_cycle_s by splitting
-    if len(keep) > 1:
-        durs = np.diff(keep) / fs
-        out = [keep[0]]
-        for k, d in zip(keep[1:], durs):
-            if d <= max_cycle_s:
-                out.append(k)
-        keep = np.array(out, dtype=int)
-    return keep
+    refrac_filtered: list[int] = [candidates[0]]
+    for h in candidates[1:]:
+        if h - refrac_filtered[-1] >= refrac:
+            refrac_filtered.append(h)
+
+    out: list[int] = [refrac_filtered[0]]
+    for h in refrac_filtered[1:]:
+        if (h - out[-1]) / fs <= max_cycle_s:
+            out.append(h)
+    return np.array(out, dtype=int)
 
 
 def segment_trial(df: pd.DataFrame,

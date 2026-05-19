@@ -48,12 +48,15 @@ grep -nE '^\s+out\["[a-z_]+\.?[a-z_]*"\]|^def extract_' scripts/features.py
 
 ### Range / amplitude — `extract_range`
 
-For each joint with available columns (`hip_flexion_{side}`, `knee_angle_{side}`, `ankle_angle_{side}`):
+For each joint with available columns (`hip_flexion_{side}`, `hip_adduction_{side}`, `knee_angle_{side}`, `ankle_angle_{side}`):
 - `{joint}_range_deg` — max − min over the cycle
 - `{joint}_peak_deg` — max
 - `{joint}_min_deg` — min
 
 For each pelvis axis present (`pelvis_tilt`, `pelvis_list`, `pelvis_rotation`):
+- `{axis}_range_deg` — max − min over the cycle
+
+For each trunk axis present (`lumbar_bending`, `lumbar_rotation`, `lumbar_extension`):
 - `{axis}_range_deg` — max − min over the cycle
 
 ### Shape — `extract_shape_sentinel`
@@ -75,18 +78,18 @@ The features below appear in earlier drafts and operator notes as desirable but 
 
 ### Candidate timing features (not implemented)
 
-- step-to-step timing variability — requires multi-cycle per trial; blocked by segmentation reliability (only 11 of 60 trials currently segment, R-side only, per `reports/field-report-01-existing-data-zeroth-pilot.md` §Segmentation Status)
-- right-left duration difference per trial — blocked by the same segmentation reliability (0 L-side cycles)
+- step-to-step timing variability — requires multi-cycle per trial; blocked by trial cropping (each Lab Validation trial yields exactly 1 R cycle bookended by the cropping window, per `reports/field-report-01-existing-data-zeroth-pilot.md` §Segmentation Status — post-segmentation-fix state)
+- right-left duration difference per trial — blocked by L-side cycle yield (1 L-cycle across 60 trials post-fix; trial cropping favors R-stride completion)
 - timing of peak hip extension — requires extraction parallel to `peak_knee_flexion_phase`; trivial extension
 - timing of peak ankle plantarflexion — same; trivial extension
 - timing of pelvis rotation extrema — same; trivial extension
 
 ### Candidate range/amplitude features (not implemented)
 
-- hip adduction-abduction range — requires `hip_adduction_{side}` columns from the source data (not currently in the synthetic schema; OpenCap IK output may or may not include depending on backbone)
-- trunk rotation range — requires trunk segment data; not in the Lab Validation archive's marker set
 - stance-phase-only range for each joint — requires the stance-end timestamp from `extract_timing` to subset; gated on multi-cycle segmentation
 - peak values *and* their timing as a joint emission — currently `*_peak_deg` and `peak_knee_flexion_phase` are emitted but not paired in a single timing-and-magnitude shape; gated on a downstream consumer requiring the pair
+
+(Hip adduction-abduction range and lumbar bending / rotation / extension range are now realized — see §"Range / amplitude" above. The Lab Validation archive's OpenCap IK output does include `hip_adduction_{side}` and lumbar trunk axes; the segmentation-fix port (cph#26) added the corresponding `_range_deg` / `_peak_deg` / `_min_deg` emissions in `scripts/features.py::extract_range`.)
 
 ### Candidate shape features (not implemented)
 
@@ -103,7 +106,7 @@ The features below appear in earlier drafts and operator notes as desirable but 
 - knee-ankle timing offset — parallel to `hip_knee_lag_*`; trivial extension once a downstream consumer is named
 - pelvis rotation relative to stance side — requires both pelvis_rotation and a stance-side phase column
 - contralateral arm or trunk relation — requires arm/trunk marker data
-- side-specific coupling differences — gated on L-side cycle availability (currently 0)
+- side-specific coupling differences — gated on L-side cycle availability (1 L-cycle across 60 trials post-segmentation-fix; trial-cropping structural constraint, not detector)
 
 ### Candidate asymmetry features (not implemented in per-cycle extraction; partly available in aggregate)
 
