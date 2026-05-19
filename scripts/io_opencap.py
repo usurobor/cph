@@ -28,7 +28,7 @@ import pandas as pd
 
 # Documented default. The OpenCap Lab Validation archive is expected at
 # `<DEFAULT_DATA_ROOT>/opencap-lab-validation/extracted/`; the persisted
-# feature table is written to `<DEFAULT_DATA_ROOT>/gait-support-paths-features/`.
+# feature table is written to `<DEFAULT_DATA_ROOT>/cph-features/`.
 # Operators with a different filesystem layout override via the
 # `GAIT_DATA_ROOT` environment variable (see notebooks/README.md §Overriding
 # the data root). Stdlib only — no python-dotenv, no config libraries.

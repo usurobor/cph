@@ -94,7 +94,7 @@ def extract_range(cycle: Cycle) -> dict:
     return out
 
 
-def extract_shape(cycle: Cycle) -> dict:
+def extract_shape_sentinel(cycle: Cycle) -> dict:
     """Shape features: PC scores deferred to aggregate phase; per-cycle
     record holds the 101-point normalized curves so PCA can run later.
 
@@ -146,7 +146,7 @@ def extract_features(cycle: Cycle) -> dict:
     }
     row.update(extract_timing(cycle))
     row.update(extract_range(cycle))
-    row.update(extract_shape(cycle))
+    row.update(extract_shape_sentinel(cycle))
     row.update(extract_coordination(cycle))
     return row
 

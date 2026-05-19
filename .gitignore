@@ -21,10 +21,9 @@ consent/
 __pycache__/
 *.pyc
 
-# TSC measurement output — `scripts/measure-coherence.sh` writes here.
-# Reports are produced from the canonical sources, not a canonical
-# source themselves; see `targets/*.tsc` exclusions.
-.tsc/
+# Claude Code harness scaffolding (worktrees, session metadata).
+# Ephemeral container state, not project source.
+.claude/
 
 # External datasets — manifests stay in git, raw payloads do not
 data/external/**/*.zip
