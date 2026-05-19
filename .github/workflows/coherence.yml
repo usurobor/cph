@@ -1,0 +1,46 @@
+name: coherence
+
+# Triggers triadic-self-coherence (TSC) measurement on every tagged release.
+# Installs the `coh` CLI from usurobor/tsc and runs mechanical mode against
+# the target manifests in `targets/`. Reports upload as a workflow artifact;
+# the operator updates `.cdr/coherence-log.md` from the artifact in a
+# follow-on commit at release time.
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install coh (TSC CLI) from usurobor/tsc
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          BIN_DIR="$HOME/.local/bin" \
+            curl -fsSL https://raw.githubusercontent.com/usurobor/tsc/main/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify coh
+        run: coh --version
+
+      - name: Run mechanical TSC measurement
+        run: bash scripts/measure-coherence.sh
+
+      - name: Upload coherence reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coherence-reports-${{ github.ref_name }}
+          path: .tsc/
+          if-no-files-found: warn
+          retention-days: 90
