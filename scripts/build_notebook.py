@@ -328,14 +328,37 @@ n_subjects_in_archive = len({t.subject for t in trials})
 n_cycles_total = len(all_cycles)
 n_cycles_R = sum(1 for c in all_cycles if c.side == 'R')
 n_cycles_L = sum(1 for c in all_cycles if c.side == 'L')
+
+# Per-condition trial-with-cycle counts (natural walking vs trunk-sway).
+trials_with_cyc_keys = set(seg_summary.groupby(['subject', 'trial_id']).size().index) if len(seg_summary) else set()
+n_nat_trials = sum(1 for t in trials if 'walk' in t.condition.lower() and 'TS' not in t.trial_id)
+n_ts_trials = sum(1 for t in trials if 'walk' in t.condition.lower() and 'TS' in t.trial_id)
+n_nat_with = sum(1 for t in trials if 'walk' in t.condition.lower() and 'TS' not in t.trial_id and (t.subject, t.trial_id) in trials_with_cyc_keys)
+n_ts_with = sum(1 for t in trials if 'walk' in t.condition.lower() and 'TS' in t.trial_id and (t.subject, t.trial_id) in trials_with_cyc_keys)
+
 n_trials_with_cycles = (seg_summary.groupby(['subject', 'trial_id', 'condition']).size().shape[0]
                         if len(seg_summary) else 0)
 seg_rate = 100.0 * n_trials_with_cycles / max(n_walking_trials_total, 1)
-ac1_status = 'PASS' if seg_rate >= 80 else ('FAIL (NO-GO)' if seg_rate < 60 else 'PARTIAL (REVISE)')
+
+# AC1 oracle: ≥80% trials AND nonzero L AND both walking conditions covered.
+ac1_pass = (seg_rate >= 80) and (n_cycles_L > 0) and (n_nat_with > 0) and (n_ts_with > 0)
+if ac1_pass:
+    ac1_status = 'PASS'
+elif seg_rate < 60:
+    ac1_status = 'FAIL (NO-GO)'
+else:
+    ac1_status = 'PARTIAL (REVISE)'
+
+# Cycle-duration distribution (only meaningful when cycles exist)
+import numpy as _np
+cycle_durs = _np.array([c.duration_s for c in all_cycles]) if all_cycles else _np.array([])
+dur_summary = (f"mean={cycle_durs.mean():.2f}s, min={cycle_durs.min():.2f}s, max={cycle_durs.max():.2f}s"
+               if cycle_durs.size else 'n/a')
 
 n_features_rows = len(features)
 mean_missing = miss['null_pct'].mean() if len(features) else float('nan')
 ac2_status = 'PASS' if mean_missing < 20 else 'FAIL'
+hip_add_cols = [c for c in features.columns if c.startswith('hip_adduction_')]
 
 mode_label = 'real-data' if USE_REAL_DATA else 'synthetic-smoke'
 run_ts = _dt.datetime.now().strftime('%Y-%m-%d %H:%M:%SZ')
@@ -366,12 +389,16 @@ lines = [
     "",
     "## AC1 — Gait-cycle segmentation",
     f"- trials with ≥1 cycle: {n_trials_with_cycles} / {n_walking_trials_total} ({seg_rate:.1f}%)",
+    f"- natural walking trials with cycle: {n_nat_with} / {n_nat_trials}",
+    f"- trunk-sway walking trials with cycle: {n_ts_with} / {n_ts_trials}",
     f"- cycles total: {n_cycles_total}  (R: {n_cycles_R}, L: {n_cycles_L})",
-    f"- AC1 oracle (≥80% trials with cycles): {ac1_status}",
+    f"- cycle duration: {dur_summary}",
+    f"- AC1 oracle (≥80% trials, L>0, nat>0 ∧ TS>0): {ac1_status}",
     "",
     "## AC2 — Feature missingness",
     f"- feature-table rows (one per cycle): {n_features_rows}",
     f"- mean missingness across columns: {mean_missing:.2f}%",
+    f"- hip_adduction_* feature columns present: {len(hip_add_cols)}",
     f"- AC2 oracle (<20% missingness): {ac2_status}",
     "",
     "## AC4 — OpenCap-vs-reference comparison",
@@ -400,7 +427,6 @@ Maps notebook outputs to issue #6 ACs:
 **Known debt (carried into Sub C):**
 
 - The feature table omits some `analysis/features.md` features (asymmetry shape-correlation, condition-response deltas) — they require multi-trial aggregation that lives in Sub C's analysis, not Sub B's per-cycle extraction.
-- Hip ab/ad-duction features are not yet in `scripts/features.py::extract_range`; needed for Hypothesis 2's frontal-plane comparison. Trivial extension once a column-naming convention is fixed; queued for a later cycle per the operator-confirmed minimal-adaptation scope.
 """))
 
     return nb
