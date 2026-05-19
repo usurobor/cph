@@ -4,8 +4,6 @@ Coherence Path Hypothesis — testing whether walking contains recurring, measur
 
 This repo tests the **Coherence Path Hypothesis**: during walking, an active viscoelastic body may rhythmically form temporary whole-body coordination paths around ground contact, and those paths may be inferred from recurring patterns in gait-cycle data.
 
-It is also a model of **CDR — Coherence-Driven Research**: research run through explicit hypotheses, gates, field reports, a changelog, and continuous coherence measurement.
-
 The hypothesis is not validated. Current merged status is **REVISE**. The README is the public charter; live operational state lives in [PROJECT.md](PROJECT.md), and the [source-of-truth table](#source-of-truth) at the foot of this file names the owning file for every other question.
 
 ---
@@ -102,7 +100,7 @@ B: Existing data, not new recordings. OpenCap validation data, then gait-cycle s
 
 A: Why that order?
 
-B: OpenCap is the translation layer — video-derived movement into biomechanical time series. AI is not asked to classify people first. The first task is to find whether gait-cycle data contains stable recurring structures at all. Observation proposes. OpenCap translates. Analysis sorts. Measurement decides. TSC measures whether the project itself stays coherent while it does all that.
+B: OpenCap is the translation layer — video-derived movement into biomechanical time series. AI is not asked to classify people first. The first task is to find whether gait-cycle data contains stable recurring structures at all. Observation proposes. OpenCap translates. Analysis sorts. Measurement decides.
 
 A: When AI is finally allowed in?
 
@@ -116,7 +114,7 @@ B: Measured gait-cycle structure. Repeatable timing patterns across cycles. Stab
 
 A: And what does not count?
 
-B: A visible impression can propose a coherence path. It cannot establish one. A named gait family can propose a pattern. It cannot validate one. A high project coherence score can show that the repo is internally consistent. It cannot prove the body model true.
+B: A visible impression can propose a coherence path. It cannot establish one. A named gait family can propose a pattern. It cannot validate one.
 
 ---
 
@@ -144,17 +142,13 @@ B: Gait video is identifiable biometric data. Raw participant video and private 
 
 ---
 
-A: CDR. Why coherence at all?
+A: What does success look like?
 
-B: Because a research project has to stay coherent while it changes. Hypothesis, methods, evidence, roadmap, reports, changelog — they should keep describing one system. TSC tracks three axes. Alpha: are the project's terms stable. Beta: do methods, evidence, and claims refer to the same object. Gamma: can the project move through GO, REVISE, STOP without losing identity. C_Σ measures project coherence. Not truth.
+B: A measurable grammar of walking. Primitives that name how a step is organized, composition rules for how they combine, a way to express any walking signature as a composition rather than a label.
 
-A: So a high C_Σ does not mean the hypothesis is right.
+A: And until measurement shows the primitives?
 
-B: It means the repo currently describes one coherent research project. It says nothing about whether walking actually forms support paths. A low C_Σ means the repo cannot safely claim to know what it knows.
-
-A: That is the move the field needs more of.
-
-B: That is the move this repo is trying to model.
+B: Until then, the grammar is a hypothesis, not a deliverable.
 
 ---
 
@@ -165,7 +159,6 @@ Stable facts live once. Other files point to the owner.
 | Question | Owning file |
 |---|---|
 | What is this project? | `README.md` |
-| What is CDR? | `CDR.md` |
 | What is the hypothesis? | `docs/concepts/coherence-path-hypothesis.md` |
 | What is a support path? | `docs/concepts/support-path.md` |
 | What is the unit of analysis? | `docs/concepts/gait-cycle-as-unit.md` |
@@ -175,7 +168,6 @@ Stable facts live once. Other files point to the owner.
 | What is the current operational status? | `PROJECT.md` |
 | What changed over time? | `CHANGELOG.md` |
 | What empirical evidence exists? | `reports/` |
-| What TSC targets are measured? | `targets/` |
 | How is data handled? | `docs/ethics/data-handling.md` |
 
 ## Where to go next
@@ -186,7 +178,6 @@ Stable facts live once. Other files point to the owner.
 - Current status: [`PROJECT.md`](PROJECT.md)
 - Latest field report: [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md)
 - Seven-family article: [`docs/articles/seven-ways-people-walk.md`](docs/articles/seven-ways-people-walk.md)
-- CDR doctrine: [`CDR.md`](CDR.md)
 - Ethics: [`docs/ethics/data-handling.md`](docs/ethics/data-handling.md)
 
 ## References
