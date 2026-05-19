@@ -182,5 +182,32 @@ $ git ls-files | grep -E '\.(zip|trc|mot|sto|c3d|osim|mp4|mov|csv|parquet)$' || 
 
 **Pseudoreplication note (carry-forward).** field-report-01 §"R3 / R4 partial evaluability" already names pseudoreplication as the controlling risk for R3 and beyond (1 cycle per trial in most cases; within-trial repeatability not testable). This cycle does not run any aggregate test; the pseudoreplication risk is not yet incurred. Naming it here so β does not need to re-derive the constraint from field-report-01 §136.
 
+## Debt
+
+**Out-of-scope follow-ups carried in the issue body §"Post-port decision" — known and named, not exercised this cycle:**
+
+1. **R-side aggregate condition-response analysis** (P4 in the issue body). The R-side n=60 surface is now ready: 10 subjects × 2 conditions × 3 trials per (subject, condition); `hip_adduction_range_deg` + `pelvis_list_range_deg` + `lumbar_bending_range_deg` are populated for every cycle. Per the issue body, this is the operator-recommended next issue. Not exercised here.
+
+2. **L-side cycle recovery** (P5). The structural data-shape constraint (trial cropping ~1.3–1.5 s, R-stride-aligned) is documented in field-report-01 §"L-side cycles structurally limited by trial cropping" (L18, L154, L167). Two paths: (a) contralateral-anchored detection (R HS times + half-stride offset), (b) re-run OpenSim IK on source TRC files with wider time windows. Both out of scope per the issue body §"Non-goals" + §"Required approach"; named in PROJECT.md / ROADMAP.md as the next bounded cycle after R-side aggregate.
+
+3. **First mechanical `coh --mode mechanical` run for `CHANGELOG.md 0.3.0`.** The 0.3.0 entry's coherence-machinery is unrun this cycle — the `targets/*.tsc` measurement is gated on a tagged release (per `.github/workflows/coherence.yml` trigger), and 0.3.0 is not tagged yet. Operator-gated per the precursor wave's policy ("no release tags this wave" carried forward).
+
+4. **Pseudoreplication discipline as α-side documented constraint.** Named in §Self-check above as a carry-forward risk into R3; not converted into an enforcement check (e.g. a notebook lint or feature-table validator). Future-cycle authoring constraint, not this cycle's debt.
+
+**Known limits internal to this cycle:**
+
+- The Step A 3-way port produced 21 conflict markers in `notebooks/existing-data-processing.ipynb` (cell ordering + cached outputs differ between regeneration lineages). Resolved by reverting to main's notebook + regenerating via Step B. This is documented in `9bcef90`'s commit message; no debt carried forward (the regenerated notebook is the authoritative output).
+
+- The branch `origin/cycle/segmentation-real-data-fix` (tip `a95415c`) is superseded by this port but **not deleted**. Per issue body §"Steps" the branch is the precursor; deletion is a δ/operator decision after merge.
+
+- `git config --global user.email` was `epsilon@cph.cdd.cnos` at session start (carried from the prior wave's ε run). Path (a) retroactive correction applied via §2.6 row 14 — both `41b3693 → 9bcef90` and `9eb34ee → f27904a` rewritten to `Alpha <alpha@cph.cdd.cnos>`. No split-email survivors on the cycle history; force-with-lease push at the rebase tip.
+
+**Known limits external to this cycle (named, not addressed):**
+
+- field-report-01 explicitly names "Synthetic-data validation circularity" as a project-level coherence risk (L166): the smoke generator still produces an unphysical clipped-zero stance, and the rewritten detector ignores the boundary edge cases by design. field-report-01 mitigates by also classifying real-archive zero-cycle reasons per (trial, side) via `scripts/segmentation_diagnostics.py`. This is a project-level concern named in the report, not this cycle's debt.
+
+- The receipt format named in the issue body §"Receipt format" is not written as a separate artifact in this cycle. The fields the receipt requires (Branch, Commit, Ported files, Notebook mode/root/SHA, Segmentation totals, Feature extraction stats, OpenCap r̄, Decision, Next recommended issue, No-raw-data-committed) are covered across `self-coherence.md §ACs` (this file), `analysis/feature-summary-zeroth-pilot.md` (notebook output), and `reports/field-report-01-existing-data-zeroth-pilot.md` (post-fix evidence). If β requires a literal receipt artifact, α will produce one in a fix-round on RC. Not blocked on this absence in round 1.
+
+
 
 
