@@ -166,4 +166,21 @@ $ git ls-files | grep -E '\.(zip|trc|mot|sto|c3d|osim|mp4|mov|csv|parquet)$' || 
 
 **Verdict: AC6 PASS.** No raw data, traces, videos, archives, or private CSVs committed.
 
+## Self-check
+
+**Did α's work push ambiguity onto β?** No. The diff's surfaces are mechanically reproducible:
+- The detector is the same algorithm shipped on the precursor branch (`a95415c`), verifiable by `git diff origin/cycle/segmentation-real-data-fix..HEAD -- scripts/segmentation.py` → the detector body is unchanged; only the quality_flag tri-value emission (cph#22) and import-ordering preservation differ.
+- The notebook's evidence is reproducible: running `python3 scripts/build_notebook.py && jupyter nbconvert --execute --inplace notebooks/existing-data-processing.ipynb` against `/opt/gait-data/opencap-lab-validation/extracted/` regenerates the same outputs (verified within this session at `f27904a`).
+- The status-surface rewrite is anchored on field-report-01: every claim in PROJECT.md / ROADMAP.md / CHANGELOG.md is traceable to a numbered line in `reports/field-report-01-existing-data-zeroth-pilot.md` (see AC3 / AC4 evidence tables above).
+
+**Is every claim backed by evidence in the diff?** Yes. The AC table in §ACs maps each AC to either (a) a concrete file/line citation in the cycle's diff, (b) a runner-output line from notebook execution, or (c) a status-surface claim with its file/section pointer. No claim relies on unmerged context or off-branch evidence.
+
+**Has α surfaced authoring work that β should not need to redo?**
+- Peer enumeration (§2.3): the segmentation contract has one producer (`scripts/segmentation.py::detect_heel_strikes`) and three consumers I verified: (1) `scripts/features.py::extract_features` (consumes the cycle list), (2) `scripts/build_notebook.py` (calls segmentation in the §"Real-data segmentation" cell), (3) `scripts/segmentation_diagnostics.py` (consumes the heel-marker timeseries directly, parallel diagnostic surface). The `quality_flag` peer (cph#22 alignment) was preserved through the 3-way merge — verified by `grep -nE 'quality_flag\s*=\s*"' scripts/segmentation.py` which yields the tri-value `"ok"`/`"short"`/`"long"`.
+- Intra-doc repetition (§2.3): the "60/60 R-side; 1 L-side; 61 cycles" tuple appears across PROJECT.md (§"Current empirical decision"), ROADMAP.md (§"Current state", R1 §"Current evidence"), CHANGELOG.md §0.3.0, and is the source-of-truth from field-report-01 (L8, L22, L47, L57, L58). Verified by `grep -nE '60/60|60 R|60 ?[+] ?1|n=60' PROJECT.md ROADMAP.md CHANGELOG.md` → consistent across all sites; no stale "18.3%" or "11 of 60" survivors in the status surfaces (the precursor wording was removed wholesale).
+- Harness audit (§2.4): the schema-bearing change is the `quality_flag` tri-value (preserved from cph#22, not introduced by this cycle) and the feature columns added by `scripts/features.py` (`hip_adduction_*`, `lumbar_*`). The feature schema is read by `analysis/feature-table-schema.md` and `analysis/features.md` — both already align with the post-cph#22/cph#25 state of `main` and were not touched by this cycle. The harness on which this audit would be tightest is the CHANGELOG 0.3.0 §"Changed" list (the "code-first oracle" surface from cph#22 F7 / §"Review mode"): verified by reading the 0.3.0 entry against the actual diff.
+
+**Pseudoreplication note (carry-forward).** field-report-01 §"R3 / R4 partial evaluability" already names pseudoreplication as the controlling risk for R3 and beyond (1 cycle per trial in most cases; within-trial repeatability not testable). This cycle does not run any aggregate test; the pseudoreplication risk is not yet incurred. Naming it here so β does not need to re-derive the constraint from field-report-01 §136.
+
+
 
