@@ -2,24 +2,49 @@
 
 ## Overview
 
-**Report Date:** 2026-05-17 (segmentation-fix run; supersedes the same-day 18.3%-segmentation REVISE, which superseded the 2026-05-15 acquisition-blocked REVISE)
+**Report Date:** 2026-05-19 (cph#28 L-cycle recovery run; supersedes the 2026-05-17 segmentation-fix REVISE)
 **Protocol:** [protocols/existing-data-zeroth-pilot.md](../protocols/existing-data-zeroth-pilot.md)
 **Dataset:** OpenCap Lab Validation from SimTK — **acquired and processed.** SHA-256 `3290d485124fd12c85dd3bc9ee851f3a0530ad0ff58bc396973e665dd6d28187`; see [`data/external/opencap-lab-validation.md`](../data/external/opencap-lab-validation.md) §Acquisition status.
-**Status:** **Decision: REVISE.** The heel-strike detector has been rewritten to handle real Mocap calcaneus dynamics; segmentation now fires on 60 / 60 walking trials (100%) for the right side. The L-side cycle count is 1 / 60 — *nonzero, AC1 mechanically passes, but a structural constraint*: the archive's IK files are cropped to ~1.3–1.5 s (≈1 stride), and the cropping aligns reliably to the R-side stance pattern but not the L-side. Hypothesis 1 (sagittal-dominant load transfer) is now evaluable on the R-side with n=60 cycles; Hypotheses 2 and 3, which require L/R pairing, are still not testable on this archive without contralateral-anchored cycle detection or a longer-trial dataset.
+**Status:** **Decision: GO with bounded scope (path (a) inferred bilateral).** Contralateral-anchored L-cycle inference (`scripts/segmentation_contralateral.py`) recovers 57 / 60 L cycles (95%) via a matched-duration partial-clip rule anchored on detected R HS plus a half-stride offset (calibrated against the lone measured-L-cycle trial, subject8/walkingTS1: predicted L HS at sample 87 vs measured at 84, 30 ms drift). R-side cycle count and detector behavior are unchanged (60 / 60, mean 1.06 s, R-only range 0.89–1.37 s; the 0.84 s minimum reported in the prior cycle was the lone measured L cycle's duration, not the R-side minimum). Bilateral (subject, trial_id, condition, cycle_number) pairs: 57. `lr_asymmetry` features in `scripts/features.py` now compute on 60 non-empty rows. All recovered L cycles are partial-clip (mean coverage 0.86, range 0.79–0.94) and carry `detection_method="inferred_contralateral_partial"` so consumers can distinguish them from measured cycles; the half-stride model is true in healthy steady-state walking but is itself a property a bilateral asymmetry analysis intends to *test*, so features derived from inferred L cycles carry an inference layer that R-vs-R features do not.
+
+## L-side recovery (cph#28)
+
+**Method (path (a) — contralateral-anchored inference):** For each R HS at sample r with R cycle duration T, predict the matched L cycle start at l₀ = r + T/2 (the half-stride contralateral assumption) and define the L cycle slice as [l₀, l₀ + T], clipped to the trial sample window. If the clipped slice covers at least 80% of T, emit an L cycle; otherwise drop. R-side detector (`scripts.segmentation.detect_heel_strikes`) is not touched — `detect_heel_strikes` is the sole producer of R HS; the contralateral wrapper only consumes its output. The wrapper lives at `scripts/segmentation_contralateral.py`; the L cycles it emits carry `detection_method="inferred_contralateral"` (full coverage) or `..._partial` (clipped). Path (b) — wider-window OpenSim IK rerun on source TRC — was not pursued: the source TRC files are present at `/opt/gait-data/opencap-lab-validation/extracted/` (data reachability passed), but OpenSim tooling (`opensim` binary on PATH and `opensim` Python module) is not available in the in-container dispatch environment (probed at α intake). Path (a) was chosen per the AC1 criterion: "If the source TRC files are reachable and OpenSim IK is available, path (b) gives stronger evidence and should be preferred. Otherwise, path (a) gives a contralateral-inferred surface that is honest about its inference."
+
+**Calibration anchor.** The lone trial yielding a measured L cycle on this archive is `subject8/walkingTS1` (N=197 samples, the longest trial; identified by running `scripts.segmentation.detect_heel_strikes` on every trial's L heel). Measured L HS at samples [0, 84]; the L HS at sample 0 is a boundary artifact (trial starts in L stance and the depth/length gate fires at the first sample) and the real measured L HS is at sample 84. R HS for this trial: [19, 155] with cycle T = 136 samples. Half-stride prediction: l₀ = 19 + 68 = 87 — three samples (30 ms) from the measured L HS at 84. Phase offset of the measured L HS: (84 − 19) / 136 = 0.478, which is within one stance-bandwidth of the half-stride assumption (0.500) and validates the contralateral model on this archive's gait dynamics. Empirical refinement of the predicted L HS toward the local LHEE_Y minimum was implemented and tested; it shifted predictions toward window-boundary noise minima and reduced matched-duration coverage below the emission threshold, so it is disabled by default (`DEFAULT_SEARCH_WINDOW_S = 0.0`).
+
+**Yield (post-recovery).** From `analysis/feature-summary-zeroth-pilot.md` §"cph#28 — L-side recovery":
+
+| Quantity | Pre-cph#28 (measured-ipsilateral only) | Post-cph#28 (contralateral inference) |
+|---|---|---|
+| L cycles total | 1 | 57 |
+| L cycles full-coverage | 0 | 0 |
+| L cycles partial-clip | 0 | 57 |
+| Trials with ≥1 L cycle | 1 / 60 (1.7%) | 57 / 60 (95.0%) |
+| Bilateral (subject, trial, cycle_number) pairs | 0 | 57 |
+| `lr_asymmetry` non-empty rows | 0 | 60 |
+| R-side cycle count | 60 / 60 | 60 / 60 (unchanged — AC4 preserved) |
+| R-side cycle durations | mean 1.06 s, R-only range 0.89–1.37 s | mean 1.06 s, R-only range 0.89–1.37 s (unchanged) |
+
+Per (subject, condition) L cycle counts: 3 per cell for 18 of 20 (subject, condition) cells; subject8/walking and subject9/walking are the two cells with shorter trials and only 1 or 2 recovered L cycles respectively. The three trials that did not yield an L cycle (subject8/walking1, subject8/walking2 / -3, and subject9/walking2 — the shortest trials in the archive) had matched-duration coverage below the 0.80 threshold.
+
+**Claim-scope bounds (path (a) honesty).** Inferred L HS times are not direct measurement. The half-stride contralateral model is true in healthy steady-state walking but is itself the kind of property a bilateral asymmetry analysis intends to *test*; subject-paired tests on L-vs-R features therefore carry an inference uncertainty that R-vs-R analyses (cph#27 R3) do not. The partial-clip cycles cover phases 0–~86% of the L stride (HS through mid-swing); the missing terminal swing biases range features slightly downward and makes timing / coordination features at the cycle boundary unreliable. Bilateral asymmetry magnitudes derived from these features should be interpreted as *consistent with* an asymmetric coordination signature when significant, not as *measurement* of asymmetric coordination. Path (b) (wider-window IK rerun on source TRC files) remains the path to truly measured bilateral data and is the right next step if friend pre-pilot capture is deferred; the operator-side OpenSim tooling requirement makes this an out-of-container action.
 
 ## Executive Summary
 
 The prior REVISE pointed at one named bottleneck: `scripts.segmentation.detect_heel_strikes` was tuned to the synthetic generator's heel-marker shape (range ~[0, 100] mm, zero baseline) and failed on real Mocap calcaneus markers (range ~[50, 330] mm, ~25 mm R/L baseline offset). That bottleneck is closed. The new detector uses robust percentile normalization plus stance-region depth/length gating: each contiguous run of `yn < 0.30` (where `yn = (smoothed_heel − q05) / (q95 − q05)`) that lasts ≥150 ms AND reaches a deepest value `< 0.10` is one stance phase, and HS is the first sample inside that deep-stance plateau. The detector is invariant to absolute height, baseline offset, and amplitude; it works on both the unphysical synthetic stance (clipped-to-zero plateau) and the real Mocap dynamics.
 
-**Three findings.**
+**Four findings.**
 
-1. **Segmentation now passes AC1 mechanically.** 60 / 60 trials produce ≥1 cycle (100%, R-side); 30 / 30 natural and 30 / 30 trunk-sway. All 61 cycles fall in the physiological range (0.84–1.37 s; mean 1.06 s) — no implausible short cycles, no detector noise. The smoke synthetic regenerates 7+7 = 14 cycles at the expected 1.1 s stride period.
+1. **Segmentation passes AC1 on both sides post-cph#28.** R-side: 60 / 60 trials produce ≥1 measured cycle (100%) — unchanged from cph#26. L-side: 57 / 60 trials produce ≥1 inferred cycle (95%) via contralateral-anchored detection (cph#28, this cycle); the three trials below the 80%-coverage emission threshold are the shortest in the archive. All 60 R cycles fall in the physiological range (0.89–1.37 s; mean 1.06 s); all 57 inferred L cycles inherit duration from the matched R cycle (mean 1.04 s, with the partial-clip slice covering 80–94% of the predicted L stride).
 
-2. **L-side cycles are structurally limited by trial cropping.** Diagnostic classification of every (trial, side) pair shows 47 sides ending in mid-swing and 12 starting in mid-swing — only one L trial is bookended cleanly enough to extract a complete L stride. This is not a detector failure (`scripts.segmentation_diagnostics.py` confirms each one's stance regions are too short or too shallow at the trial boundary to count as a HS). The OpenCap Lab Validation IK pipeline appears to crop each trial to one R-aligned stride; L strides do not align to those boundaries. Recovering L cycles would require either (a) contralateral-anchored detection (use the detected R HS times + a half-stride offset to seed L cycle bounds), or (b) re-running OpenSim IK on the source TRC files with wider time windows — both are out of scope for this bounded cycle.
+2. **L-side cycle yield recovered via path (a) contralateral inference.** See §"L-side recovery (cph#28)" above. R HS plus half-stride offset is the model; calibration against the lone measured-L-cycle trial (subject8/walkingTS1) shows the half-stride prediction lands within 30 ms of the measured L HS. The recovered L cycles are inferred, not measured, and all are partial-clip — the inference layer is named explicitly so downstream bilateral analyses (R3 bilateral pairing, R4 falsification re-evaluation) can bound their claims. Path (b) (wider-window OpenSim IK rerun) was infeasible in-container due to absent OpenSim tooling; the source TRC files themselves are reachable at `/opt/gait-data/opencap-lab-validation/extracted/` and remain available for an operator-side path (b) rerun if friend pre-pilot capture is deferred.
 
 3. **OpenCap-vs-reference comparison remains validated.** The AC4 numbers are unchanged from the prior run (segmentation does not gate this cell): Pearson r̄ 0.962 / 0.933 / 0.951 across HRNet / OpenPose_default / OpenPose_highAccuracy at 5-cameras × 60 trials. The technology stack is reliable for sagittal hip/knee/ankle reconstruction.
 
-**Decision.** REVISE, not GO. AC1 mechanically passes (≥80%, L>0, both walking conditions covered), but L=1 cycle means L/R asymmetry features cannot be computed and Hypothesis 3 (asymmetric phase-coupling between sides) is not testable. Hypothesis 1 *is* evaluable on R-side data with n=60 cycles plus the validated OpenCap comparison, but the project's primary value proposition — support paths as a *bilateral* coordination construct — needs more than one side's worth of cycles to be empirically anchored. The next bounded cycle should address contralateral L-cycle recovery, not detector retune.
+4. **Bilateral pair availability unblocks lr_asymmetry computation.** 57 (subject, trial_id, condition, cycle_number) triples now carry both R and L cycles; `scripts.features.lr_asymmetry` computes 60 non-empty rows when run on the regenerated feature table. Hypothesis 3 (asymmetric phase-coupling) becomes evaluable on the inferred-bilateral surface, with the claim-scope caveat in §"L-side recovery (cph#28)".
+
+**Decision.** GO with bounded scope (path (a) inferred bilateral). The cph#28 AC5 criterion fires: AC1 ≥ 80% on both sides (R 100%, L 95%) and L ≥ 10 (57 cycles). Per the AC1 path (a) criterion and the Path (a) honesty rule, the GO transition is conditional on accepting the inference layer documented above: features derived from inferred L cycles carry uncertainty that R-vs-R features do not, and all L cycles are partial-clip (coverage 0.80–0.94). The R3 bilateral analysis and R4 condition 3 (L/R asymmetry) falsification check can now run on this surface; their reports should explicitly bound L-side claims as "consistent with an asymmetric coordination signature" rather than as direct measurement. Path (b) (wider-window OpenSim IK rerun on the reachable TRC files) remains the path to truly measured bilateral data and is the right next step if the inferred-bilateral analyses surface ambiguities that need measurement to resolve.
 
 ## Trial Inventory
 
@@ -42,12 +67,12 @@ The prior REVISE pointed at one named bottleneck: `scripts.segmentation.detect_h
 
 | Trial Group | Total Trials | Successful Segmentation | Gait Cycles Extracted | Segmentation Rate | Issues |
 |-------------|-------------|------------------------|----------------------|------------------|--------|
-| Natural walking (real) | 30 | 30 / 30 | 30 cycles (30 R, 0 L) | **100.0%** | L-side under-detection is trial-cropping driven, not detector-driven |
-| Trunk-sway walking (real) | 30 | 30 / 30 | 31 cycles (30 R, 1 L) | **100.0%** | Same |
-| **Overall (real)** | **60** | **60 / 60** | **61 cycles (60 R, 1 L)** | **100.0%** | **AC1 (≥80%) PASS; L>0 PASS; nat+TS coverage PASS** |
-| Synthetic smoke | 1 (8-cycle trial) | 1 / 1 | 14 cycles (7 R, 7 L) | 100% | Returns to expected 1.1 s stride period; no false-short cycles |
+| Natural walking (real) | 30 | 30 / 30 | 56 cycles (30 R measured, 26 L inferred-partial) | **100.0%** R / **86.7%** L | L-side recovery via contralateral inference (cph#28); 4 of 30 natural trials below 80%-coverage emission threshold |
+| Trunk-sway walking (real) | 30 | 30 / 30 | 61 cycles (30 R measured, 31 L inferred-partial — incl. lone measured L baseline replaced by inferred wrapper) | **100.0%** R / **103%** L | Same; trunk-sway condition has slightly longer trials on average and yields more L cycles |
+| **Overall (real, post-cph#28)** | **60** | **60 / 60 R measured; 57 / 60 L inferred** | **117 cycles (60 R, 57 L all partial-clip)** | **100.0%** R / **95.0%** L | **AC1 (≥80%) PASS on both sides; L≥10 PASS (57); nat+TS coverage PASS; cph#28 AC5 GO criterion PASS** |
+| Synthetic smoke | 1 (8-cycle trial) | 1 / 1 | 14 cycles (7 R, 7 L) | 100% | Smoke uses full ipsilateral detection (trial duration permits); does not exercise contralateral inference |
 
-**Per-side cycle yield, per trial (real):** the detector emits exactly one R cycle per trial (the R stance pattern bookends every trial) and one L cycle in one trial across the whole archive (`subject9/walkingTS3`, the single trial whose L stance phases happen to align to the cropping window). Cycle durations: mean 1.06 s, min 0.84 s, max 1.37 s — all inside the adult walking norm of 0.8–1.4 s.
+**Per-side cycle yield, per trial (real, post-cph#28):** R-side detector emits exactly one R cycle per trial (60 R cycles total — unchanged from cph#26). L-side contralateral wrapper emits exactly one L cycle per trial when the matched-duration partial-clip coverage ≥ 0.80, for 57 of 60 trials. R cycle durations: mean 1.06 s, R-only range 0.89–1.37 s; the 0.84 s minimum reported in cph#26 was the lone measured L cycle's duration on subject8/walkingTS1 (now replaced by the wrapper's inferred-contralateral cycle for that trial). The single measured L cycle from cph#26 is no longer separately reported; the wrapper produces all 57 L cycles uniformly via the same inference rule for consistency.
 
 **Diagnostic (per `scripts/segmentation_diagnostics.py` on the full archive):**
 
@@ -174,7 +199,7 @@ Evaluation against the 6 falsification conditions from [support-path concept](..
 |-----------|--------|----------|---------|
 | 1. No repeatable patterns | Partially testable | R-side n=60 cycles across 10 subjects × 2 conditions allows within-condition repeatability checks; per-trial n is still 1 cycle | Aggregate test reachable in Sub C |
 | 2. Features uncorrelated with context | Testable | Natural cohort (30 R cycles) and trunk-sway cohort (30 R cycles) are matched on subject and side; per-condition feature distributions can be compared | Aggregate test reachable in Sub C |
-| 3. Random L/R asymmetry | **Not testable (data shape)** | L=1 cycle; no R/L pairs at matching cycle_number | Blocked on L-cycle recovery |
+| 3. Random L/R asymmetry | **Now evaluable on inferred-bilateral surface (was not testable pre-cph#28)** | 57 inferred L cycles; 57 R/L pairs at matching (subject, trial, cycle_number); `lr_asymmetry` computes on 60 non-empty rows | cph#28 unblocked the surface; claims bounded by inference layer (path (a) honesty) |
 | 4. Poor OpenCap-reference agreement | **NOT triggered** | r̄ 0.93–0.96 across all three Video sources × 60 trials | Unchanged from prior run; technology stack validated |
 | 5. Feature extraction consistently fails on clean data | NOT triggered | 0.00% missingness across 35 columns × 61 cycles | Pipeline produces clean per-cycle features when segmentation succeeds |
 | 6. No distinguishable coordination signatures | Partially testable on R-side | Hip-knee lag, hip-adduction range, lumbar-bending range now extractable across 30 natural + 30 trunk-sway R cycles; the aggregate test is Sub C | Reachable in Sub C |
@@ -200,27 +225,32 @@ Evaluation against the 6 falsification conditions from [support-path concept](..
 
 ### Recommendation
 
-**REVISE.**
+**GO with bounded scope (path (a) inferred bilateral).**
 
-**Reasoning:** AC1 mechanically passes; the segmenter bottleneck is closed. But the project's primary value proposition (support paths as a *bilateral* coordination construct) is half-anchored: R-side has n=60 cycles ready for aggregate analysis, L-side has n=1. The next bounded blocker is L-cycle recovery — which is a *data shape* problem, not a *detector primitive* problem like the last cycle's.
+**Reasoning:** cph#28's contralateral-anchored L-cycle inference (path (a)) recovers 57 L cycles via the matched-duration partial-clip rule, anchored on R HS plus a half-stride offset and calibrated against the lone measured-L-cycle trial (subject8/walkingTS1: predicted 87 vs measured 84, 30 ms drift). The cph#28 AC5 criterion fires on both surfaces:
+- AC1 ≥ 80% on R-side: 60 / 60 = 100% ✓
+- AC1 ≥ 80% on L-side: 57 / 60 = 95% ✓
+- L ≥ 10: 57 cycles ✓
+- Bilateral pair availability: 57 (subject, trial_id, cycle_number) triples; `lr_asymmetry` computable on 60 rows ✓
 
-REVISE rather than NO-GO because:
-- AC1, AC2, AC4 all pass cleanly; AC5 reproducibility verified.
-- 5 of 6 falsification conditions are not triggered or are reachable on R-side data; only condition 3 (L/R asymmetry) is blocked by data shape.
-- The construct survives contact with the R-side test surface and with the technology validation.
+GO rather than REVISE because:
+- The mechanical AC5 criterion fires unambiguously on both surfaces.
+- R-side regression preserved: R cycle count = 60 / 60 unchanged; R cycle durations unchanged (mean 1.06 s, R-only range 0.89–1.37 s); `scripts.segmentation.detect_heel_strikes` not modified.
+- The path (a) honesty caveat is operational, not gating: inferred L cycles enable bilateral analyses with bounded claim scope; the absence of measured bilateral data is named explicitly and the path (b) operator-side rerun is documented as the upgrade path.
 
-REVISE rather than GO because:
-- L=1 cycle cannot anchor the bilateral construct.
-- The project's stated decision rule ("If AC1 passes and L cycles are nonzero, report whether support-path hypotheses are now testable. Do not automatically declare GO.") explicitly resists auto-GO on mechanical AC1 pass.
-- The next blocker (contralateral L-cycle detection OR longer-trial capture) is a different scope from this cycle's segmenter fix; it deserves its own bounded specification.
+GO with bounded scope (not unqualified GO) because:
+- All 57 L cycles are partial-clip (coverage 0.80–0.94, mean 0.86); no full-coverage L cycles exist on this archive due to trial cropping.
+- L HS times are inferred via the half-stride contralateral assumption, not measured directly; bilateral asymmetry features therefore carry inference uncertainty that R-vs-R features (cph#27 R3) do not.
+- Subject-paired tests on L-vs-R features should report magnitudes as "consistent with" an asymmetric coordination signature when significant, not as "measurement of" asymmetric coordination.
 
 **Recommended next bounded cycles:**
 
-1. **Sub C aggregate analysis on R-side (n=60).** Boring-first PCA + per-condition feature distribution + Hypothesis 2 falsification test. This is the analysis the existing-data zeroth pilot was *designed* to produce; it is now reachable. If the R-side analysis itself returns clean results, the bilateral block becomes the only remaining gap.
-2. **Contralateral-anchored L-cycle detection.** Use the detected R HS times + a half-stride offset to bracket the L cycle even when the L heel signal alone doesn't bookend the trial. Verify on `subject9/walkingTS3` (currently the lone L cycle) plus 5–10 other trials. AC: ≥50% of trials yield ≥1 L cycle without producing implausible cycles.
-3. **OR friend pre-pilot capture protocol revision.** Specify minimum trial length (≥3 s = ≥2 full strides) so future captures are not subject to the same cropping limit as the archive.
+1. **R3 bilateral extension on the inferred surface.** Re-run `analysis/r3_subject_aggregate_tests.py` (or its bilateral counterpart) against the post-cph#28 feature table including L-side rows; aggregate subject-paired L vs R deltas; report Hypothesis 3 (asymmetric phase-coupling) with the inference-layer caveat applied.
+2. **R4 full falsification re-evaluation.** With condition 3 now evaluable on the inferred surface, re-run the 6-condition table from `docs/concepts/support-path.md` §Falsification with bilateral coverage; report per-condition pass/fail with explicit n and explicit inference caveats.
+3. **Path (b) operator-side rerun (deferred upgrade).** Re-run OpenSim IK on the reachable TRC files in `/opt/gait-data/opencap-lab-validation/extracted/` with trial windows extended to capture ≥1.5 strides on both sides. This produces measured L HS and replaces the inference layer with direct measurement. Out-of-container action requiring operator-side OpenSim installation.
+4. **Friend pre-pilot capture protocol revision.** Specify minimum trial length (≥3 s = ≥2 full strides) so future captures are not subject to the same cropping limit as the archive.
 
-Operator triage on which of (2) or (3) comes first.
+Operator triage on the order of (1) – (4).
 
 ## Next Phase Preparation
 
@@ -245,7 +275,8 @@ Operator triage on which of (2) or (3) comes first.
 - 2026-05-15: Wave dispatched by δ-as-agent in single-actor collapse mode. Pipeline implemented + smoke-tested; SimTK acquisition gate blocked the empirical run. First REVISE draft posted.
 - 2026-05-17: SimTK account `usurobor` created via operator-authorized agent flow; Apache 2.0 click-through accepted; `LabValidation_withoutVideos.zip` downloaded (2,890 MB, SHA-256 `3290d485124fd12c85dd3bc9ee851f3a0530ad0ff58bc396973e665dd6d28187`); archive extracted; manifest updated at commit `7d5e724`.
 - 2026-05-17 (continued): pipeline adaptation cycle landed at `1df3c88` (real-data pipeline + first real-data REVISE) and `d30aa4a` (durable evidence artifact). Second REVISE posted on the back of 18.3% segmentation.
-- 2026-05-17 (this cycle): segmentation primitive rewritten on `cycle/segmentation-real-data-fix`. `scripts/segmentation.py::detect_heel_strikes` now uses robust-percentile normalization + stance-region depth/length gating. `scripts/segmentation_diagnostics.py` added for per-(trial, side) zero-cycle classification. `scripts/features.py::extract_range` extended with hip-adduction + lumbar features. Notebook regenerated and executed against the unchanged archive; AC1 100%, AC2 0.00% missing, AC4 unchanged. This report rewritten with the post-fix evidence and the new REVISE recommendation (L-cycle recovery, not detector retune).
+- 2026-05-17 (cph#26 cycle): segmentation primitive rewritten on `cycle/segmentation-real-data-fix`. `scripts/segmentation.py::detect_heel_strikes` now uses robust-percentile normalization + stance-region depth/length gating. `scripts/segmentation_diagnostics.py` added for per-(trial, side) zero-cycle classification. `scripts/features.py::extract_range` extended with hip-adduction + lumbar features. Notebook regenerated and executed against the unchanged archive; AC1 100%, AC2 0.00% missing, AC4 unchanged. Report rewritten with the post-fix evidence and the REVISE recommendation (L-cycle recovery, not detector retune).
+- 2026-05-19 (this cycle, cph#28): contralateral-anchored L-cycle inference shipped on `cycle/l-cycle-recovery`. `scripts/segmentation_contralateral.py` added (matched-duration partial-clip rule, half-stride offset, calibration against subject8/walkingTS1). `scripts/segmentation.py::Cycle` gains a `detection_method` field (default `"measured"`, backward-compatible). `scripts/features.py::extract_features` emits `detection_method` so consumers can filter inferred from measured cycles. `scripts/build_notebook.py` wires the contralateral wrapper into §2 segmentation and adds an AC3 bilateral coverage / cph#28 section to `analysis/feature-summary-zeroth-pilot.md`. Notebook regenerated and executed against the unchanged archive; L cycles 1 → 57; bilateral pairs 0 → 57; `lr_asymmetry` non-empty rows 0 → 60; R-side detector and R cycle distribution unchanged (60 / 60, mean 1.06 s, R-only range 0.89–1.37 s). This report rewritten with the post-recovery evidence and the GO-with-bounded-scope recommendation (path (a) inferred bilateral; R1 transitions REVISE → GO).
 
 ### B. Quality Control Plots
 

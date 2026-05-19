@@ -2,6 +2,46 @@
 
 Project changelog: what shipped, what changed, what's still open. Empirical state lives in the latest merged field report; live operational status lives in [PROJECT.md](PROJECT.md); the gate-based roadmap lives in [ROADMAP.md](ROADMAP.md).
 
+## 0.3.2 — R1 GO with bounded scope via cph#28 L-cycle recovery (2026-05-19)
+
+**Where we were.** R1 was REVISE. R3 was partial GO on R-side post-cph#27. L-side cycle yield was 1/60 trials (subject8/walkingTS1 only) — a property of the source archive's R-aligned ~1.3–1.5 s trial cropping rather than of `scripts/segmentation.py::detect_heel_strikes`, which fired HS on all 60 L sides but lacked the second L HS needed for cycle bracketing in 59/60 trials. cph#28's open question: can L-side cycles be recovered well enough to satisfy R1's bilateral gate without requiring new captures?
+
+**What this version unblocked.** Yes — contralateral-anchored L-cycle inference recovers 57/60 L cycles via a matched-duration partial-clip rule (R HS plus half-stride offset, calibrated against the lone measured-L-cycle trial to 30 ms drift). R1 transitions REVISE → GO with bounded scope (path (a) inferred bilateral). The cph#28 AC5 GO criterion fires: AC1 ≥ 80% on R (100%) and L (95%); L ≥ 10 (57 cycles). Bilateral (subject, trial_id, cycle_number) pair count: 57; `scripts.features.lr_asymmetry` computes on 60 non-empty rows. R-side detector and R cycle distribution are unchanged (60/60, mean 1.06 s, R-only range 0.89–1.37 s) — `scripts/segmentation.py::detect_heel_strikes` not modified, AC4 regression preserved.
+
+**What is now testable on the inferred-bilateral surface.**
+
+- **R3 bilateral extension** — re-run `analysis/r3_subject_aggregate_tests.py` against the post-cph#28 feature table; aggregate subject-paired L-vs-R deltas; report H3 (asymmetric phase-coupling) with the path (a) honesty caveat applied (inferred not measured; partial-clip coverage 0.80–0.94).
+- **R4 condition 3 (L/R asymmetry)** — transitions from "not testable" to "evaluable on inferred-bilateral surface"; full 6-condition substantive falsification verdict now reachable.
+- **lr_asymmetry features** — `(hip_flexion / knee_angle / ankle_angle / pelvis_* / lumbar_*)_range_deg_lr_diff` and `hip_knee_lag_pct_cycle_lr_diff` columns computable across the 60 R/L paired rows.
+
+**What is still bounded / blocked.**
+
+- **All L cycles are inferred not measured.** Bilateral asymmetry features carry an inference layer that R-vs-R features (cph#27 R3) do not. Subject-paired tests on L-vs-R features should report magnitudes as "consistent with" an asymmetric coordination signature when significant, not as "measurement of" asymmetric coordination.
+- **All L cycles are partial-clip** (coverage 0.80–0.94, mean 0.86); the matched L cycle slice extends only to trial end, missing terminal swing (~14% of the L stride on average). Range features are slightly biased downward; timing / coordination features at the cycle boundary are unreliable.
+- **Path (b) (measured-bilateral upgrade)** — the source TRC files at `/opt/gait-data/opencap-lab-validation/extracted/` are reachable; an operator-side OpenSim IK rerun with extended trial windows would produce measured L HS and replace the inference layer. Deferred; path (a) suffices for the R1 gate.
+- **Friend pre-pilot capture protocol** — should specify minimum trial length (≥3 s = ≥2 full strides) so future captures are not subject to the same cropping limit as the archive.
+
+**The new question.** With R1 closed and a bilateral surface now available (inferred), does the construct survive a full R3 bilateral aggregate + R4 6-condition falsification re-evaluation? cph#27's R3 R-side partial GO + cph#28's inferred-bilateral coverage define the surface; the next cycle answers the bilateral question with the path (a) caveat applied.
+
+### Changed (file-level)
+
+- `scripts/segmentation_contralateral.py` — new module. `infer_contralateral_heel_strikes` (R HS → L HS at r + T/2, validated via local LHEE_Y minimum when refinement is enabled — disabled by default after empirical refinement shifted predictions toward noisy boundary minima). `segment_trial_with_contralateral_l` (R-side unchanged via `scripts.segmentation.segment_trial`; L-side via matched-duration partial-clip rule with `min_coverage=0.80` emission threshold). `calibrate_against_measured_l` (validates half-stride model against subject8/walkingTS1: predicted 87 vs measured 84, 30 ms drift). Standalone `main()` produces per-trial diagnostic with `--calibrate` switch.
+- `scripts/segmentation.py` — `Cycle` dataclass gains `detection_method: str = "measured"` (backward-compatible default). `detect_heel_strikes` untouched (R2 closed; AC4 preserved).
+- `scripts/features.py` — `extract_features` emits `detection_method` column for downstream filtering.
+- `analysis/r3_subject_aggregate_tests.py` — `NON_FEATURE_COLS` adds `detection_method`.
+- `scripts/build_notebook.py` — wires `segment_trial_with_contralateral_l` into §2 segmentation; adds an AC3 bilateral coverage characterization to the summary cell (per (subject, condition) L counts, bilateral pair count, `lr_asymmetry` row count) and a cph#28 section to `analysis/feature-summary-zeroth-pilot.md`.
+- `notebooks/existing-data-processing.ipynb`, `analysis/feature-summary-zeroth-pilot.md` — regenerated against the unchanged archive on 2026-05-19.
+- [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) — rewritten post-cph#28; supersedes the 2026-05-17 segmentation-fix REVISE.
+- [`PROJECT.md`](PROJECT.md), [`ROADMAP.md`](ROADMAP.md) — realigned to R1 → GO with bounded scope.
+
+### Decision
+
+R1 transitions REVISE → GO with bounded scope (path (a) inferred bilateral). cph#27 R3 partial GO on R-side stands. The hypothesis is neither validated nor refuted; the project has moved from "can we recover L-side cycles?" to "does the bilateral construct survive on the inferred-bilateral surface, and is the path (b) measured-bilateral upgrade necessary?"
+
+### Next gate
+
+R3 bilateral extension on the post-cph#28 feature table (operator triage on cycle ordering vs R4 full falsification re-evaluation).
+
 ## 0.3.1 — R3 R-side construct evaluation; partial GO on R-side (2026-05-19)
 
 **Where we were.** R3 was NOT STARTED. The post-cph#26 R-side feature table was in place (60 R cycles × 25 numeric features × 0% missingness) but no inferential statement existed about whether features actually responded to condition under the protocol's stated comparison (natural vs trunk-sway) at the inferential unit the protocol requires (*subject*, not cycle). The open question was whether the construct survives R-side contact with measurement, with R1 / Hypothesis 3 owned separately by cph#28.
