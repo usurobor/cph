@@ -16,3 +16,20 @@
 **Required outcome.** Port the implementation + evidence changes (segmenter + diagnostics + features + build script + notebook + summary + field report) onto current `main` without regressing the charter / process surfaces; re-run the notebook against real data; realign status surfaces (PROJECT.md / ROADMAP.md / CHANGELOG.md) to the post-fix field-report-01 evidence; preserve the empirical REVISE posture (the detector fix is necessary but not sufficient for construct validation, because L-side cycle yield is structurally limited by trial cropping).
 
 **Why it is α work, not a δ operator action.** The port is an implementation cycle: it produces new code (the detector rewrite + the diagnostics module) and new evidence (the post-fix field-report-01 + notebook outputs). δ stewards waves and dispatches; α implements within an issue's scope. cph#26 is a single-issue cycle with 6 ACs and a "Required approach" / "Steps" section that names the implementation operations. The earlier `δ-as-agent` author attribution on `41b3693` was a session-identity drift carried over from the prior wave's δ-as-agent role (`cdr-refactor-2026-05-18`); per `cdd/alpha/SKILL.md §2.6` row 14, retroactive identity correction via path (a) `git rebase --exec 'git commit --amend --reset-author --no-edit'` has been applied (commits rewritten to `Alpha <alpha@cph.cdd.cnos>`; force-with-lease push at `41b3693 → 9bcef90`, `9eb34ee → f27904a`).
+
+## Skills
+
+**Tier 1 (CDD core):**
+- `cdd/CDD.md` — lifecycle and role contract.
+- `cdd/alpha/SKILL.md` — α role surface; §2.2 CDD-Trace steps, §2.3 peer enumeration + intra-doc repetition, §2.5 self-coherence, §2.6 pre-review gate (14 rows), §2.7 review-readiness signal.
+- `cdd/issue/SKILL.md` — AC interpretation for AC1–AC6.
+
+**Tier 2 (always-applicable engineering):**
+- `eng/python` — for the detector rewrite, the diagnostics module, the features module additions, and the build script. Python is the dominant language of the diff.
+- `eng/markdown` — for the field-report-01 rewrite + status surface realignment (PROJECT.md / ROADMAP.md / CHANGELOG.md).
+
+**Tier 3 (issue-specific):**
+- *None loaded.* cph#26's "Required approach" / "Steps" sections operationalize the port in mechanical terms (3-way merge via `git restore --source`; notebook regeneration + execution; status-surface reconciliation); no design or plan skill is required because the direction-choice is bounded by the issue body. The detector implementation (rewritten on the precursor branch `origin/cycle/segmentation-real-data-fix` at `a95415c`) is *ported*, not authored — α's surface here is integration + reconciliation + evidence reproduction, not detector design.
+
+**Not loaded:** no `design/SKILL.md` or `plan/SKILL.md` — the issue body provides the implementation sequence (Steps 1–8) and the AC structure (AC1–AC6); no impact-graph judgment or sequencing decision is required. Marked explicit-not-required per §2.2 rule.
+
