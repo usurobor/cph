@@ -24,7 +24,7 @@ Every feature row should include:
 - condition (column `condition`)
 - side (column `side`; values `L`/`R`)
 - cycle number (column `cycle_number`)
-- quality flag (column `quality_flag`; values `ok`/`short`/`low_contact_gap` per `analysis/feature-table-schema.md` §"quality_flag")
+- quality flag (column `quality_flag`; values `ok`/`short`/`long` per `analysis/feature-table-schema.md` §"quality_flag")
 - exclusion flag (column `exclusion_flag`; derived as `quality_flag != "ok"`)
 
 Column names match what `scripts/features.py::extract_features` emits and what `analysis/feature-table-schema.md` §"Identification" prescribes. Without this indexing, feature values cannot be interpreted.
@@ -129,12 +129,12 @@ The notebook §7 "Known debt" cell explicitly names these as "asymmetry shape-co
 The following indexing columns are named in `analysis/feature-table-schema.md` but not realized in code:
 
 - `cycle_start_frame` / `cycle_end_frame` — `Cycle` carries `start_time`/`end_time` in seconds; frame-index columns need a `sample_rate_hz` round-trip
-- `exclusion_reason` — currently implicit in `quality_flag` values (`short`, `low_contact_gap`); materializing as a dedicated string column is a small ergonomic improvement
+- `exclusion_reason` — currently implicit in `quality_flag` values (`short`, `long`); materializing as a dedicated string column is a small ergonomic improvement
 - `source_file` — the trial's source `.mot` filename; not currently propagated through `Cycle`
 
 ### Quality-flag widening (not implemented)
 
-The schema doc originally listed `good` / `fair` / `poor` / `unusable`; the code emits `ok` / `short` / `low_contact_gap`. Aligning to the longer label set requires segmenter changes and is deferred until a downstream consumer needs the granularity.
+The schema doc originally listed `good` / `fair` / `poor` / `unusable`; an interim draft listed `ok` / `short` / `low_contact_gap`. The code emits `ok` / `short` / `long`, where `short` and `long` are derived from cycle duration alone (`duration <= 0.5` and `duration >= 1.8` respectively, in `scripts/segmentation.py::segment_trial`). Finer-grained labels — in particular `low_contact_gap` to distinguish a genuine slow cycle from a detector miss that produced a heel-strike-to-heel-strike interval longer than one cycle — would require the segmenter to inspect contact-gap structure (e.g. swing-time within the cycle, force-plate or contralateral HS hints) rather than the cycle-duration interval alone. Aligning to a longer label set is deferred until a downstream consumer needs the granularity.
 
 ### Long-format alternative (not implemented)
 

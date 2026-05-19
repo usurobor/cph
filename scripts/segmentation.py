@@ -119,7 +119,9 @@ def segment_trial(df: pd.DataFrame,
                 start_idx=start, end_idx=end,
                 start_time=t0, end_time=t1, duration_s=duration,
                 df=sub_df,
-                quality_flag="ok" if 0.5 < duration < 1.8 else "out_of_range",
+                quality_flag=("short" if duration <= 0.5
+                              else "long" if duration >= 1.8
+                              else "ok"),
             ))
     return cycles
 

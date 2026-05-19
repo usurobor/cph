@@ -29,10 +29,10 @@ Feature tables store extracted measurements from gait cycles. The realized table
 ### Quality Control
 | Column | Type | Description | Null | Example |
 |--------|------|-------------|------|---------|
-| `quality_flag` | string | Data quality assessment | No | "ok", "short", "low_contact_gap" |
+| `quality_flag` | string | Data quality assessment | No | "ok", "short", "long" |
 | `exclusion_flag` | boolean | Should cycle be excluded from analysis (derived: `quality_flag != "ok"`) | No | True, False |
 
-(`exclusion_reason` is not currently emitted as a separate column; the reason is implicit in `quality_flag` ("short", "low_contact_gap", etc.). Materializing it as a dedicated string column is named in `analysis/features.md` §"Candidate set" → indexing widening.)
+(`exclusion_reason` is not currently emitted as a separate column; the reason is implicit in `quality_flag` ("short", "long"). Materializing it as a dedicated string column is named in `analysis/features.md` §"Candidate set" → indexing widening.)
 
 ### Feature Data
 
@@ -63,13 +63,13 @@ The exact feature column set is enumerated against the code in `analysis/feature
 
 ### quality_flag
 
-Realized values emitted by `scripts/segmentation.py` and propagated through `scripts/features.py::extract_features`:
+Realized values emitted by `scripts/segmentation.py::segment_trial` and propagated through `scripts/features.py::extract_features`:
 
-- `ok`: cycle passes segmenter QC
-- `short`: cycle duration below threshold; `exclusion_flag=True`
-- `low_contact_gap`: heel-strike to heel-strike interval below threshold; `exclusion_flag=True`
+- `ok`: cycle duration in `(0.5, 1.8)` seconds; cycle passes segmenter QC
+- `short`: cycle duration `<= 0.5` seconds (below typical adult walking range); `exclusion_flag=True`
+- `long`: cycle duration `>= 1.8` seconds (above typical adult walking range, includes detector dropouts that produced a heel-strike-to-next-heel-strike interval that is too long to be a single cycle); `exclusion_flag=True`
 
-(The earlier draft of this schema listed `good` / `fair` / `poor` / `unusable`; those long-form labels were not realized in code. The widening is named in `analysis/features.md` §"Candidate set" → quality-flag widening.)
+(An earlier draft of this schema listed `good` / `fair` / `poor` / `unusable`, and a later draft listed `low_contact_gap` as a third realized label. Neither set is realized in code today — the segmenter only inspects cycle duration, not contact-gap structure. Finer-grained quality labels (e.g. `low_contact_gap` to distinguish a detector miss from a genuinely slow cycle) require segmenter changes and are named as deferred work in `analysis/features.md` §"Candidate set" → quality-flag widening.)
 
 ## Data Rules
 
