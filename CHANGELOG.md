@@ -2,6 +2,40 @@
 
 Project changelog: what shipped, what changed, what's still open. Empirical state lives in the latest merged field report; live operational status lives in [PROJECT.md](PROJECT.md); the gate-based roadmap lives in [ROADMAP.md](ROADMAP.md).
 
+## 0.3.1 — R3 R-side construct evaluation; partial GO on R-side (2026-05-19)
+
+**Where we were.** R3 was NOT STARTED. The post-cph#26 R-side feature table was in place (60 R cycles × 25 numeric features × 0% missingness) but no inferential statement existed about whether features actually responded to condition under the protocol's stated comparison (natural vs trunk-sway) at the inferential unit the protocol requires (*subject*, not cycle). The open question was whether the construct survives R-side contact with measurement, with R1 / Hypothesis 3 owned separately by cph#28.
+
+**What this version unblocked.** The R-side construct evaluation now exists. The aggregate analysis (10 subjects × 2 conditions × 25 numeric features, median aggregation, paired Wilcoxon signed-rank, rank-biserial effect size + percentile bootstrap 95% CI, BH-FDR at q=0.05) produced 7 BH-significant condition responses including a textbook-magnitude lumbar bending increase (+18.3°, r_rb = +1.0, all 10 subjects in agreement) and a distal sagittal contraction (ankle range −6.6°, r_rb = −1.0). Three candidate support-path hypotheses surfaced with mechanism and condition-bound scope: *Lateral-trunk substitution path*, *Distal sagittal contraction under proximal compensation*, *Cadence-slowdown signature*. R3 transitions from NOT STARTED to partial GO on R-side.
+
+**What is now testable / supported (R-side surfaces).**
+
+- **H1 (sagittal-dominant load transfer)** — partial: 1/5 features BH-significant (ankle range), 1 trending (knee range). Supported in *distal-contraction-under-proximal-compensation* form; the hip-as-sagittal-driver sub-claim is not supported on R-side.
+- **H2 (trunk-sway compensation)** — partial: 2/9 features BH-significant (lumbar bending +18.3°, lumbar extension +1.6°), 1 trending (pelvis tilt). Supported in *trunk-segment-driven* form; the hip-adduction-as-compensation sub-claim is not supported on R-side.
+- **Falsification re-evaluation (R-side):** 5 of 6 conditions cleanly NOT triggered (1, 2, 4, 5, 6); 1 not testable (condition 3, L/R asymmetry, owned by cph#28). 0 of 6 triggered. Mechanically ≪ 4-condition NO-GO threshold.
+
+**What is still blocked.**
+
+- **H3 (asymmetric phase-coupling between sides)** — structurally non-testable on this archive (n=1 L-cycle; no R/L pairs at matching (subject, cycle_number)). Owned by [cph#28](https://github.com/usurobor/cph/issues/28).
+- **R1 itself stays REVISE** — partial GO on R-side does *not* lift R1. The bilateral construct is still half-anchored; cph#28 owns R1's transition gate.
+- **Full R4 falsification re-evaluation** — partially evaluable on R-side (5/6 conditions); condition 3 (L/R asymmetry) transitions from "not testable" to a substantive verdict only after cph#28.
+
+**The new question.** The R-side construct survives — does the bilateral construct? cph#28 owns the answer. Once L-side cycle yield is recovered, the R3 partial-GO can be extended to a full bilateral R3 evaluation and R4 can produce a full 6-condition substantive verdict.
+
+### Changed (file-level)
+
+- `analysis/r3_subject_aggregate_tests.py` — new single-purpose reproducibility harness. Reads `$GAIT_DATA_ROOT/cph-features/features-zeroth-pilot.csv` (read-only; not committed), aggregates per (subject, condition) by median (primary) and mean (robustness), runs paired Wilcoxon signed-rank tests across n=10 subjects, computes rank-biserial effect sizes with percentile bootstrap 95% CI (B=10,000, deterministic seed=20260519), applies BH-FDR at q=0.05, and emits markdown tables to stdout. Does not write any aggregate to disk (AC9 boundary). Method picks documented in `.cdr/unreleased/27/self-coherence.md` §Method picks.
+- `reports/field-report-03-construct-evaluation.md` — new R3 field report. Carries the 700-cell aggregate table, the 25-feature paired-test result table, per-hypothesis evidence summaries (H1, H2, H3-not-testable), three candidate support-path hypotheses with mechanism + condition-bound scope, the 6-condition falsification re-evaluation on R-side, and the partial-GO decision per protocol thresholds.
+- [`PROJECT.md`](PROJECT.md), [`ROADMAP.md`](ROADMAP.md) — realigned to the partial-GO-on-R-side reading. R3 phase moves from NOT STARTED to partial GO on R-side; R4 phase moves from NOT STARTED to partially evaluable on R-side; R1 holds REVISE (cross-cycle binding to cph#28).
+
+### Decision
+
+R3 = partial GO on R-side. R1 stays REVISE (cross-cycle binding; cph#28 owns the transition gate). The hypothesis is neither validated nor refuted. The project has moved from "can the R-side construct survive contact with measurement?" to "does the bilateral construct survive once cph#28 recovers L-cycle yield?"
+
+### Next gate
+
+[cph#28](https://github.com/usurobor/cph/issues/28) — L-cycle recovery (contralateral-anchored detection or wider IK windows). After cph#28 lands, full R3 bilateral evaluation + full R4 falsification re-evaluation become possible.
+
 ## 0.3.0 — R2 segmentation fix ported; bilateral construct half-anchored (2026-05-19)
 
 **Where we were.** R1 was REVISE on a hard blocker: `scripts/segmentation.py::detect_heel_strikes` was tuned to the synthetic generator's heel-marker shape and failed on real Mocap calcaneus markers — only 11/60 trials segmented (18.3%, R-side only), zero L-side cycles. The open question was whether the real-data segmenter could work at all.
