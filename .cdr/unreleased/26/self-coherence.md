@@ -332,6 +332,36 @@ Per `cdd/alpha/SKILL.md §2.6`. 14 rows. Transient rows (1, 10) re-validated imm
 
 **Gate outcome:** PASS at 14 rows (4 ✓, 3 "none apply" / N/A, 7 ✓ with explicit evidence). Transient rows 1 + 10 will be re-validated immediately before the review-readiness signal per §2.7.
 
+## Review-readiness
+
+**Round:** 1.
+**Issue:** [usurobor/cph#26](https://github.com/usurobor/cph/issues/26).
+**Branch:** `cycle/port-segmentation-fix`.
+**Implementation SHA:** `c5cf241` (last implementation commit before this readiness signal; per `cdd/alpha/SKILL.md §2.6` "SHA convention for readiness signal" path (a) — stable because the readiness-signal commit comes after it).
+**Base SHA (origin/main):** `ebd909c` (`δ: strip TSC/CDR doctrine framing from active surfaces`).
+**Transient-row re-validation at signal time** (per §2.7):
+
+- **Row 1** (branch rebased on origin/main): re-fetched at 2026-05-19T17:17:45Z; `git merge-base HEAD origin/main = ebd909c = origin/main HEAD` → still on top of main; no drift since gate write. ✓
+- **Row 10** (CI green): no cycle-branch CI on cph (workflow triggers only on tagged release); notebook execution at Step B (`f27904a`) served as the runtime gate — `jupyter nbconvert --execute --inplace` completed without error, 548928 bytes written, no synthetic fallback. ✓ (unchanged).
+
+**β's load-bearing tasks for round 1 review:**
+
+1. **AC3 evidence parity** — re-grep `reports/field-report-01-existing-data-zeroth-pilot.md` for the 12 quantities in §AC3's cross-reference table, and independently confirm the notebook output matches. The "60/60 R; 1 L; 61 total; 100%; r̄ 0.962/0.933/0.951; 0.00% missingness" tuple is the load-bearing claim of this cycle.
+2. **AC4 verdict discipline** — verify no GO claim has slipped into the status surfaces (the empirical posture is REVISE on R1; GO on R2-detector only). Particularly: `ROADMAP.md §"Current state"` should still read `**R1 is REVISE**`; `PROJECT.md §"Current empirical decision"` should still read `**REVISE**`; `CHANGELOG.md §0.3.0 §"Empirical state"` should still read `**REVISE**`.
+3. **AC5 protection** — confirm no stale wholesale overwrite. Spot-check `README.md` is unchanged (`git diff origin/main..HEAD -- README.md` empty); `.cdr/**` non-self-coherence files unchanged; `targets/**` unchanged; `scripts/measure-coherence.sh` unchanged; `.github/workflows/coherence.yml` unchanged; `docs/concepts/coherence-path-hypothesis.md` touched only in §"Current empirical status" (the empirical-state surface; conceptual framing §"What is...", §"Falsification conditions" untouched).
+4. **AC6 data-policy regression** — independently run `git ls-files | grep -E '\.(zip|trc|mot|sto|c3d|osim|mp4|mov|csv|parquet)$' || echo NONE` and confirm NONE. The OpenCap data root (`/opt/gait-data/`) is outside the repo; feature CSV writes to `/opt/gait-data/cph-features/features-zeroth-pilot.csv` (also outside).
+5. **Fix-round 1 sibling-surface peer enumeration** — verify the schema-doc realignment in `analysis/feature-table-schema.md` L42 + `analysis/features.md` §"Range / amplitude" matches what `scripts/features.py::extract_range` actually emits (the canonical oracle is `grep -nE 'out\[' scripts/features.py`).
+
+**Round-1 RC risk surface (named for β):**
+
+- The `docs/concepts/coherence-path-hypothesis.md` §"Current empirical status" patch is the closest to the AC5 "protect CPH/COG framing" boundary. The patch is bounded to the empirical-state paragraph (which is peer to PROJECT/ROADMAP/CHANGELOG); the conceptual framing is untouched. If β reads the patch as crossing AC5, the round-1 RC fix is to revert the patch and add the patch to known debt; this cycle's status surfaces (PROJECT/ROADMAP/CHANGELOG) would then carry the post-fix state alone, with the conceptual doc as the one remaining stale site.
+
+- The notebook diff is large (1,499 lines) because it contains cached cell outputs (PNG plot bytes inside the .ipynb). β should not review the notebook line-by-line; the canonical surfaces are (a) the source-of-truth Python code in `scripts/`, (b) the runner-output excerpts in §AC2, (c) the field-report-01 cross-reference table in §AC3. The notebook file itself is a build artifact.
+
+- The pseudoreplication risk named in §Self-check is *not yet incurred* by this cycle (no aggregate test runs). β should not RC on pseudoreplication discipline for this cycle; the discipline applies when the *next* cycle (R-side aggregate analysis) runs.
+
+**Ready for β review (round 1).** Polling on `origin/cycle/port-segmentation-fix` per `cdd/alpha/SKILL.md §2.7`.
+
 
 
 
