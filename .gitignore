@@ -30,6 +30,11 @@ __pycache__/
 # Ephemeral container state, not project source.
 .claude/
 
+# cnos body activation scaffolding (clones of cnos/hub, local activation
+# trace, outbound drafts). Per-session working state when a Sigma body
+# activates from inside this repo; identity is not replicated into cph.
+.cn/
+
 # External datasets — manifests stay in git, raw payloads do not
 data/external/**/*.zip
 data/external/**/*.tar.gz
