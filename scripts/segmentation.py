@@ -36,6 +36,14 @@ class Cycle:
     duration_s: float
     df: pd.DataFrame     # slice of source df, [start_idx:end_idx+1]
     quality_flag: str = "ok"
+    # Cycle endpoints come from either ipsilateral marker detection
+    # ("measured", produced by `detect_heel_strikes`) or contralateral
+    # inference from the opposite-side HS plus a half-stride offset
+    # ("inferred_contralateral", produced by
+    # `scripts.segmentation_contralateral.segment_trial_with_contralateral_l`).
+    # Default preserves pre-cph#28 behavior for callers that construct
+    # Cycle directly.
+    detection_method: str = "measured"
 
 
 def detect_heel_strikes(heel_y: np.ndarray, fs: float,

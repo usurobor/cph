@@ -44,6 +44,7 @@ NON_FEATURE_COLS = {
     "subject", "session", "trial_id", "condition", "side", "cycle_number",
     "quality_flag", "exclusion_flag",
     "timing_estimate_method", "normalized_curve_available",
+    "detection_method",
 }
 
 # Hypothesis → features (per issue body §Approach "Hypothesis evaluation surface").
