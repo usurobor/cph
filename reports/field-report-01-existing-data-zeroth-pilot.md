@@ -13,7 +13,7 @@ The prior REVISE pointed at one named bottleneck: `scripts.segmentation.detect_h
 
 **Three findings.**
 
-1. **Segmentation now passes AC1 mechanically.** 60 / 60 trials produce ≥1 cycle (100%, R-side); 60 / 30 natural and 30 / 30 trunk-sway. All 61 cycles fall in the physiological range (0.84–1.37 s; mean 1.06 s) — no implausible short cycles, no detector noise. The smoke synthetic regenerates 7+7 = 14 cycles at the expected 1.1 s stride period.
+1. **Segmentation now passes AC1 mechanically.** 60 / 60 trials produce ≥1 cycle (100%, R-side); 30 / 30 natural and 30 / 30 trunk-sway. All 61 cycles fall in the physiological range (0.84–1.37 s; mean 1.06 s) — no implausible short cycles, no detector noise. The smoke synthetic regenerates 7+7 = 14 cycles at the expected 1.1 s stride period.
 
 2. **L-side cycles are structurally limited by trial cropping.** Diagnostic classification of every (trial, side) pair shows 47 sides ending in mid-swing and 12 starting in mid-swing — only one L trial is bookended cleanly enough to extract a complete L stride. This is not a detector failure (`scripts.segmentation_diagnostics.py` confirms each one's stance regions are too short or too shallow at the trial boundary to count as a HS). The OpenCap Lab Validation IK pipeline appears to crop each trial to one R-aligned stride; L strides do not align to those boundaries. Recovering L cycles would require either (a) contralateral-anchored detection (use the detected R HS times + a half-stride offset to seed L cycle bounds), or (b) re-running OpenSim IK on the source TRC files with wider time windows — both are out of scope for this bounded cycle.
 
