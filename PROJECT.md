@@ -31,9 +31,11 @@ Held in scope: no friend captures, no clustering, no new empirical claims. See [
 
 ## Active branch / issue
 
-- **Master:** [usurobor/cph#11](https://github.com/usurobor/cph/issues/11) — CDR refactor wave (open until A+B+C+D close).
-- **In-flight wave:** [`cdr-refactor-2026-05-18`](.cdd/waves/cdr-refactor-2026-05-18/manifest.md) — Sub A merged ([cph#12](https://github.com/usurobor/cph/issues/12)), Sub B merged ([cph#13](https://github.com/usurobor/cph/issues/13)), Sub C in cycle ([cph#14](https://github.com/usurobor/cph/issues/14)), Sub D pending (cph#15, dispatched when A+B+C reach terminal state).
-- **Unmerged orthogonal branch:** `origin/cycle/segmentation-real-data-fix` (tip `a95415c`) — R2 segmentation fix; merge is a separate operator decision per the wave manifest.
+- **Review branch:** `claude/review-repo-coherence-PNbjQ` — review surface for two coherence-drift-sweep waves landed against R0 (`cdr-refactor-2026-05-18` is closed; `coherence-drift-sweep-2026-05-18` and the follow-up `coherence-drift-sweep-followup-2026-05-18` are reviewing here). Merge to main is an operator gate per each wave's manifest §"Branching deviation".
+- **In-flight waves on the review branch:**
+  - [`coherence-drift-sweep-2026-05-18`](.cdd/waves/coherence-drift-sweep-2026-05-18/manifest.md) — master [cph#16](https://github.com/usurobor/cph/issues/16); all four subs (cph#17–20) closed APPROVE; master close is an ε/operator gate.
+  - [`coherence-drift-sweep-followup-2026-05-18`](.cdd/waves/coherence-drift-sweep-followup-2026-05-18/manifest.md) — master [cph#21](https://github.com/usurobor/cph/issues/21); four subs (cph#22–25) in flight on this branch.
+- **Unmerged orthogonal branch:** `origin/cycle/segmentation-real-data-fix` (tip `a95415c`) — R2 segmentation fix; merge is a separate operator decision per the precursor cdr-refactor wave's manifest.
 
 ## Last field report
 
