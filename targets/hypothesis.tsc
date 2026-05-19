@@ -1,14 +1,4 @@
-# TSC target — hypothesis
-#
-# Surfaces that own the Coherence Path Hypothesis: the public charter,
-# the doctrine of how the repo runs research, the hypothesis authority
-# doc, the operational-term doc, the seven-families observational
-# reference, and the failure-conditions / gait-cycle-as-unit concept
-# files the hypothesis depends on.
-#
-# This target answers the α-axis question from CDR.md: do the terms
-# `coherence path`, `support path`, `gait family`, `feature`, and
-# `evidence` remain distinguishable across files?
+# Charter and hypothesis-authority surfaces of cph.
 
 format = "tsc-target/0.1"
 name = "hypothesis"
@@ -16,7 +6,6 @@ description = "Charter and hypothesis-authority surfaces of cph"
 
 sources = [
   "README.md",
-  "CDR.md",
   "ROADMAP.md",
   "docs/concepts/coherence-path-hypothesis.md",
   "docs/concepts/support-path.md",

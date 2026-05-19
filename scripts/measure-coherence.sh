@@ -1,17 +1,8 @@
 #!/usr/bin/env bash
-# scripts/measure-coherence.sh — mechanical TSC measurement entrypoint for cph.
+# scripts/measure-coherence.sh — coherence measurement entrypoint for cph.
 #
-# Runs `coh --mode mechanical` against every target named in
-# `targets/registry.tsc` (repo, hypothesis, method, evidence) and writes
-# the report set to `.tsc/`. Mechanical mode does not require LLM
-# credentials; hybrid mode is documented but not invoked here.
-#
-# If `coh` is not on PATH, the script prints installation instructions
-# and exits nonzero so that CI and humans see a clear missing-tool
-# signal rather than a silent skip.
-#
-# Targets are sourced from the registry, not hardcoded, so adding a new
-# target only requires editing `targets/registry.tsc`.
+# Runs `coh --mode mechanical` against every target in
+# `targets/registry.tsc` and writes reports to `.tsc/`.
 
 set -euo pipefail
 
@@ -21,16 +12,11 @@ TARGETS=(repo hypothesis method evidence)
 
 if ! command -v coh >/dev/null 2>&1; then
   cat >&2 <<'EOF'
-error: `coh` (TSC CLI) is not installed or not on PATH.
-
-cph measures project coherence via the TSC CLI. Install `coh` and re-run.
+error: `coh` is not installed or not on PATH.
 
 Install:
 
-    pip install tsc-cli         # if published on PyPI
-    # or from source:
-    git clone https://github.com/usurobor/tsc
-    pip install -e ./tsc
+    curl -fsSL https://raw.githubusercontent.com/usurobor/tsc/main/install.sh | sh
 
 Verify:
 
@@ -39,9 +25,6 @@ Verify:
 Re-run:
 
     scripts/measure-coherence.sh
-
-This script runs mechanical mode only. Mechanical mode does not require
-LLM credentials. Hybrid mode is optional and documented in CDR.md.
 EOF
   exit 127
 fi

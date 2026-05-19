@@ -1,14 +1,4 @@
-# TSC target — method
-#
-# Surfaces that own how the repo measures: protocols (capture, ethics,
-# rehearsals), instruments (OpenCap outputs, limitations), analysis
-# (features, schema, comparison), scripts (segmentation, features, I/O,
-# notebook builder), and notebook entrypoints.
-#
-# This target supports the β-axis question from CDR.md: do methods,
-# data, scripts, and reports refer to the same object? Drift here looks
-# like a feature named in analysis/features.md that no script computes,
-# or a protocol step no instrument supports.
+# Methods, instruments, analysis plan, and pipeline scripts.
 
 format = "tsc-target/0.1"
 name = "method"

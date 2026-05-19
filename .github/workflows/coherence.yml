@@ -1,10 +1,6 @@
 name: coherence
 
-# Triggers triadic-self-coherence (TSC) measurement on every tagged release.
-# Installs the `coh` CLI from usurobor/tsc and runs mechanical mode against
-# the target manifests in `targets/`. Reports upload as a workflow artifact;
-# the operator updates `.cdr/coherence-log.md` from the artifact in a
-# follow-on commit at release time.
+# Triggers coherence measurement on every tagged release.
 
 on:
   push:
@@ -23,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install coh (TSC CLI) from usurobor/tsc
+      - name: Install coh
         run: |
           mkdir -p "$HOME/.local/bin"
           BIN_DIR="$HOME/.local/bin" \
@@ -33,7 +29,7 @@ jobs:
       - name: Verify coh
         run: coh --version
 
-      - name: Run mechanical TSC measurement
+      - name: Run coherence measurement
         run: bash scripts/measure-coherence.sh
 
       - name: Upload coherence reports

@@ -1,15 +1,4 @@
-# TSC target — repo (default)
-#
-# Aggregates every major canonical surface in the repo. Measures whether
-# the whole project — charter, doctrine, roadmap, status, ledger,
-# methods, instruments, analysis, reports, references, and the target
-# manifests themselves — still describes one coherent research system.
-#
-# This is the target invoked by default. The narrower targets exist for
-# axis diagnosis; `repo` is the C_Σ surface the changelog records.
-#
-# Generated output (`.tsc/**`) is excluded — it is the measurement
-# record, not a measurement subject.
+# Aggregates the major canonical surfaces of cph.
 
 format = "tsc-target/0.1"
 name = "repo"
@@ -20,7 +9,6 @@ sources = [
   "PROJECT.md",
   "ROADMAP.md",
   "CHANGELOG.md",
-  "CDR.md",
   "targets/**/*.tsc",
   "docs/**/*.md",
   "protocols/**/*.md",
