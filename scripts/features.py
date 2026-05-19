@@ -148,6 +148,7 @@ def extract_features(cycle: Cycle) -> dict:
         "cycle_number": cycle.cycle_number,
         "quality_flag": cycle.quality_flag,
         "exclusion_flag": cycle.quality_flag != "ok",
+        "detection_method": cycle.detection_method,
     }
     row.update(extract_timing(cycle))
     row.update(extract_range(cycle))

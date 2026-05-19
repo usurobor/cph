@@ -121,15 +121,48 @@ else:
     print(f"  rows per trial: min={min(len(t.df) for t in trials)} max={max(len(t.df) for t in trials)} mean={int(np.mean([len(t.df) for t in trials]))}")
 """))
 
-    nb.cells.append(new_markdown_cell("## 2. Gait-cycle segmentation (AC1)"))
+    nb.cells.append(new_markdown_cell("""## 2. Gait-cycle segmentation (AC1)
 
-    nb.cells.append(new_code_cell("""from scripts.segmentation import segment_trial, summary_table
+R-side cycles come from `scripts.segmentation.detect_heel_strikes`
+(robust-percentile normalization + stance-region depth/length gating —
+cph#26 R2 detector, unchanged). L-side cycles come from
+`scripts.segmentation_contralateral.segment_trial_with_contralateral_l`
+(cph#28): the matched-duration partial-clip rule emits an L cycle
+starting at the inferred L HS (R HS + ½-stride offset) and running for
+T samples, clipped to the trial sample window. L cycles carry
+`detection_method="inferred_contralateral_partial"` (or
+`..._contralateral` if the full cycle fits) so consumers can filter or
+annotate the inference; `quality_flag` follows the same duration tri-value
+as R-side cycles. See `scripts/segmentation_contralateral.py` module
+docstring for the honesty caveats around inferred L HS times and
+partial-coverage cycles.
+"""))
+
+    nb.cells.append(new_code_cell("""from scripts.segmentation import summary_table
+from scripts.segmentation_contralateral import segment_trial_with_contralateral_l
 
 all_cycles = []
+contralateral_meta = []
 for trial in trials:
-    cycles = segment_trial(trial.df, trial.subject, trial.trial_id, trial.condition, trial.sample_rate_hz)
+    cycles, meta = segment_trial_with_contralateral_l(
+        trial.df, trial.subject, trial.trial_id, trial.condition, trial.sample_rate_hz,
+    )
     all_cycles.extend(cycles)
-    print(f"  {trial.subject}/{trial.trial_id}/{trial.condition}: {len(cycles)} cycles ({sum(1 for c in cycles if c.side=='R')} R, {sum(1 for c in cycles if c.side=='L')} L)")
+    contralateral_meta.append(meta)
+    n_r = sum(1 for c in cycles if c.side == 'R')
+    n_l = sum(1 for c in cycles if c.side == 'L')
+    n_l_full = sum(1 for c in cycles if c.detection_method == 'inferred_contralateral')
+    n_l_partial = sum(1 for c in cycles if c.detection_method == 'inferred_contralateral_partial')
+    if len(trials) <= 12:
+        print(f"  {trial.subject}/{trial.trial_id}/{trial.condition}: {len(cycles)} cycles "
+              f"({n_r} R measured, {n_l} L inferred [{n_l_full} full, {n_l_partial} partial])")
+
+n_l_total = sum(1 for c in all_cycles if c.side == 'L')
+n_l_full_total = sum(1 for c in all_cycles if c.detection_method == 'inferred_contralateral')
+n_l_partial_total = sum(1 for c in all_cycles if c.detection_method == 'inferred_contralateral_partial')
+n_r_total = sum(1 for c in all_cycles if c.side == 'R')
+print(f"\\nArchive cycle counts: {n_r_total} R (measured) + {n_l_total} L (inferred, "
+      f"{n_l_full_total} full / {n_l_partial_total} partial) = {len(all_cycles)} total")
 
 seg_summary = summary_table(all_cycles)
 seg_summary
@@ -341,7 +374,17 @@ n_trials_with_cycles = (seg_summary.groupby(['subject', 'trial_id', 'condition']
 seg_rate = 100.0 * n_trials_with_cycles / max(n_walking_trials_total, 1)
 
 # AC1 oracle: ≥80% trials AND nonzero L AND both walking conditions covered.
+# cph#28 binding: L-side count is now both AC1's L>0 surface (still nonzero
+# under contralateral inference) and the cph#28 AC2 "≥10 L cycles" / AC5
+# "AC1 ≥80% on both sides AND L≥10" decision surface. The L cycles are
+# counted regardless of detection_method here; the breakdown of
+# inferred-full vs inferred-partial is in the per-trial loop above and
+# in the AC1 / AC3 sections of analysis/feature-summary-zeroth-pilot.md.
 ac1_pass = (seg_rate >= 80) and (n_cycles_L > 0) and (n_nat_with > 0) and (n_ts_with > 0)
+n_cycles_L_full = sum(1 for c in all_cycles if c.detection_method == 'inferred_contralateral')
+n_cycles_L_partial = sum(1 for c in all_cycles if c.detection_method == 'inferred_contralateral_partial')
+n_cycles_L_inferred = n_cycles_L_full + n_cycles_L_partial
+n_cycles_L_measured = n_cycles_L - n_cycles_L_inferred  # legacy ipsilateral-detected, if any
 if ac1_pass:
     ac1_status = 'PASS'
 elif seg_rate < 60:
@@ -359,6 +402,30 @@ n_features_rows = len(features)
 mean_missing = miss['null_pct'].mean() if len(features) else float('nan')
 ac2_status = 'PASS' if mean_missing < 20 else 'FAIL'
 hip_add_cols = [c for c in features.columns if c.startswith('hip_adduction_')]
+
+# AC3 (cph#28): bilateral coverage characterization.
+# - (subject, trial, cycle_number) triples with both R and L cycles.
+# - Whether lr_asymmetry features are computable on >0 pairs (the test
+#   pivots feat by side and emits R - L on matching cycle_number per
+#   (subject, trial, condition)).
+from scripts.features import lr_asymmetry as _lr_asymmetry
+bilateral_keys = set()
+if len(features):
+    by_key = features.groupby(['subject', 'trial_id', 'condition', 'cycle_number'])['side'].agg(lambda s: set(s))
+    bilateral_keys = {k for k, sides in by_key.items() if 'R' in sides and 'L' in sides}
+n_bilateral_pairs = len(bilateral_keys)
+try:
+    asym_test_cols = [c for c in features.columns
+                      if c.endswith('_range_deg') or c.endswith('_lag_pct_cycle')]
+    asym = _lr_asymmetry(features, asym_test_cols) if asym_test_cols else None
+    asym_n_pairs = (int(asym.dropna(how='all').shape[0]) if asym is not None and not asym.empty else 0)
+except Exception:
+    asym_n_pairs = 0
+
+# Per (subject, condition) L cycle count breakdown.
+l_by_subj_cond = (features[features['side'] == 'L']
+                  .groupby(['subject', 'condition']).size().to_dict()
+                  if len(features) else {})
 
 mode_label = 'real-data' if USE_REAL_DATA else 'synthetic-smoke'
 run_ts = _dt.datetime.now().strftime('%Y-%m-%d %H:%M:%SZ')
@@ -403,6 +470,15 @@ lines = [
     "",
     "## AC4 — OpenCap-vs-reference comparison",
 ] + ac4_lines + [
+    "",
+    "## cph#28 — L-side recovery (contralateral-anchored detection)",
+    f"- L cycles total: {n_cycles_L}  ({n_cycles_L_full} full / {n_cycles_L_partial} partial / {n_cycles_L_measured} measured-ipsilateral)",
+    f"- bilateral (subject, trial, cycle_number) pairs: {n_bilateral_pairs}",
+    f"- lr_asymmetry rows with ≥1 non-null feature delta: {asym_n_pairs}",
+    f"- L cycles per (subject, condition):",
+] + [f"  - {subj} / {cond}: {n}" for (subj, cond), n in sorted(l_by_subj_cond.items())] + [
+    f"- cph#28 AC2 oracle (L ≥ 10 across 60 trials): {'PASS' if n_cycles_L >= 10 else 'FAIL'}",
+    f"- cph#28 AC5 GO criterion (AC1 ≥80% on both sides AND L ≥ 10): {'PASS (GO)' if (seg_rate >= 80 and (n_cycles_L * 100 / max(n_walking_trials_total, 1)) >= 80 and n_cycles_L >= 10) else 'PARTIAL (REVISE)'}",
     "",
     "## Provenance",
     "- archive: `LabValidation_withoutVideos.zip`, SHA-256 `3290d485124fd12c85dd3bc9ee851f3a0530ad0ff58bc396973e665dd6d28187` (see `data/external/opencap-lab-validation.md`).",
