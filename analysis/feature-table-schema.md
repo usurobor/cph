@@ -40,7 +40,7 @@ The realized table is wide-format. Feature columns are emitted by the `extract_*
 
 - `extract_timing` → `cycle_duration_s`, `stance_duration_s`, `swing_duration_s`, `stance_pct_cycle`, `timing_estimate_method`, `peak_knee_flexion_phase`
 - `extract_range` → for each present joint (`hip_flexion`, `knee_angle`, `ankle_angle`): `{joint}_range_deg`, `{joint}_peak_deg`, `{joint}_min_deg`; for each present pelvis axis (`pelvis_tilt`, `pelvis_list`, `pelvis_rotation`): `{axis}_range_deg`
-- `extract_shape` → `normalized_curve_available`
+- `extract_shape_sentinel` → `normalized_curve_available`
 - `extract_coordination` → `hip_knee_lag_samples`, `hip_knee_lag_pct_cycle`
 
 The exact feature column set is enumerated against the code in `analysis/features.md` §"First-pass set (currently implemented)".

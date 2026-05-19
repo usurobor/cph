@@ -56,7 +56,7 @@ For each joint with available columns (`hip_flexion_{side}`, `knee_angle_{side}`
 For each pelvis axis present (`pelvis_tilt`, `pelvis_list`, `pelvis_rotation`):
 - `{axis}_range_deg` — max − min over the cycle
 
-### Shape — `extract_shape`
+### Shape — `extract_shape_sentinel`
 
 - `normalized_curve_available` — boolean placeholder; the actual 101-point time-normalized curves are persisted to a private parquet outside the repo and consumed by the notebook's aggregate PCA cell (see notebook §7 "Known debt" for the PCA-on-curves status)
 
