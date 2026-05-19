@@ -2,7 +2,7 @@
 
 This file tracks the gates by which the Coherence Path Hypothesis is validated, revised, or abandoned.
 
-The hypothesis itself lives in [docs/concepts/coherence-path-hypothesis.md](docs/concepts/coherence-path-hypothesis.md). Live operational status lives in [PROJECT.md](PROJECT.md). The coherence ledger across waves lives in [CHANGELOG.md](CHANGELOG.md). This roadmap names what each phase must achieve and where each phase stands.
+The hypothesis itself lives in [docs/concepts/coherence-path-hypothesis.md](docs/concepts/coherence-path-hypothesis.md). Live operational status lives in [PROJECT.md](PROJECT.md). The project changelog lives in [CHANGELOG.md](CHANGELOG.md). This roadmap names what each phase must achieve and where each phase stands.
 
 ## Goal
 
@@ -24,17 +24,17 @@ Each phase carries seven fields:
 - **Next action** — the next concrete step the phase requires.
 - **Owning files** — the surfaces that this phase reads from and writes to.
 
-A high coherence score (C_Σ in [CDR.md](CDR.md)) does not transition any phase. Only the gate transitions a phase.
+Phase transitions are gate-based. Each phase moves only when its specific gate is satisfied.
 
-## Phase R0 — Charter and operationalization
+## Phase R0 — Charter coherence
 
 - **Goal:** Make the Coherence Path Hypothesis explicit, bound its operational terms, and pin source-of-truth ownership across the repo.
-- **Current evidence:** [`README.md`](README.md), [`CDR.md`](CDR.md), [`docs/concepts/coherence-path-hypothesis.md`](docs/concepts/coherence-path-hypothesis.md), [`docs/concepts/support-path.md`](docs/concepts/support-path.md), [`docs/concepts/failure-conditions.md`](docs/concepts/failure-conditions.md), and [`docs/articles/seven-ways-people-walk.md`](docs/articles/seven-ways-people-walk.md) are merged (Sub A of master cph#11). This roadmap is the Sub B deliverable. `CHANGELOG.md`, `targets/*.tsc`, and `scripts/measure-coherence.sh` are the Sub C deliverables; the AC8/AC9/AC10 sweep is the Sub D deliverable.
-- **Gate:** README, hypothesis doc, support-path doc, failure-conditions doc, CDR doctrine, ROADMAP, and CHANGELOG agree on terms, empirical state, and source-of-truth ownership. AC8/AC9/AC10 conformance sweep passes.
-- **Status:** ACTIVE.
-- **Coherence risk:** Charter files re-state the hypothesis or its operational terms with subtly different wording, producing the α-axis drift CDR.md is designed to catch. The risk is that `coherence path`, `support path`, `gait family`, and `feature` lose their boundaries across files. The Sub D sweep (AC8) is the structural backstop.
-- **Next action:** Land the first numeric C_Σ baseline against this branch via [`scripts/measure-coherence.sh`](scripts/measure-coherence.sh), gated on `coh` being on PATH in an operator environment (per [`CHANGELOG.md`](CHANGELOG.md) 0.1.0-cdr §"Deferred items"). The mechanical entrypoint is in place; the baseline lands the first time `coh --mode mechanical` runs against this branch and gets recorded in `CHANGELOG.md`. Phase transitions to GO at that recording.
-- **Owning files:** [`README.md`](README.md), [`CDR.md`](CDR.md), [`docs/concepts/coherence-path-hypothesis.md`](docs/concepts/coherence-path-hypothesis.md), [`docs/concepts/support-path.md`](docs/concepts/support-path.md), [`docs/concepts/failure-conditions.md`](docs/concepts/failure-conditions.md), [`docs/articles/seven-ways-people-walk.md`](docs/articles/seven-ways-people-walk.md), `ROADMAP.md` (this), [`PROJECT.md`](PROJECT.md), [`CHANGELOG.md`](CHANGELOG.md), `targets/*.tsc`, [`scripts/measure-coherence.sh`](scripts/measure-coherence.sh).
+- **Current evidence:** [`README.md`](README.md), [`docs/concepts/coherence-path-hypothesis.md`](docs/concepts/coherence-path-hypothesis.md), [`docs/concepts/support-path.md`](docs/concepts/support-path.md), [`docs/concepts/failure-conditions.md`](docs/concepts/failure-conditions.md), and [`docs/articles/seven-ways-people-walk.md`](docs/articles/seven-ways-people-walk.md) describe one project. README repositions cph as the gait-domain empirical case for the broader coherence-object theory in [`usurobor/cog`](https://github.com/usurobor/cog).
+- **Gate:** README, hypothesis doc, support-path doc, failure-conditions doc, ROADMAP, and PROJECT.md agree on terms, empirical state, and source-of-truth ownership.
+- **Status:** GO (closed).
+- **Coherence risk:** Charter files re-state the hypothesis or its operational terms with subtly different wording. The risk is that `coherence path`, `support path`, `gait family`, and `feature` lose their boundaries across files. Drift-sweep waves (master issues against the review branch) are the structural backstop.
+- **Next action:** None for R0 itself. Future drift sweeps run as needed when charter surfaces are edited.
+- **Owning files:** [`README.md`](README.md), [`docs/concepts/coherence-path-hypothesis.md`](docs/concepts/coherence-path-hypothesis.md), [`docs/concepts/support-path.md`](docs/concepts/support-path.md), [`docs/concepts/failure-conditions.md`](docs/concepts/failure-conditions.md), [`docs/articles/seven-ways-people-walk.md`](docs/articles/seven-ways-people-walk.md), `ROADMAP.md` (this), [`PROJECT.md`](PROJECT.md), [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Phase R1 — Existing-data zeroth pilot
 
@@ -72,7 +72,7 @@ A high coherence score (C_Σ in [CDR.md](CDR.md)) does not transition any phase.
 - **Current evidence:** Per [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) §Falsification Assessment, 0 of 6 falsification conditions cleanly triggered; condition 5 (feature extraction failure) is partially triggered via the segmenter; condition 4 (OpenCap-reference agreement) is cleanly NOT triggered; 4 of 6 are not testable at n=11. The hypothesis is neither validated nor refuted. The mechanical "below the 4-condition NO-GO threshold" reading is not construct-survival evidence; it reflects cycle scarcity.
 - **Gate:** The falsification table from [`docs/concepts/support-path.md`](docs/concepts/support-path.md) §Falsification is evaluated on data capable of triggering each condition; the evaluation distinguishes measured surfaces (kinematics, timing, segment coupling, asymmetry, condition response) from inferred interpretation (coherence-path organization, load-transfer reading); alternative explanations are named per [`docs/concepts/failure-conditions.md`](docs/concepts/failure-conditions.md).
 - **Status:** NOT STARTED.
-- **Coherence risk:** Treating coherence-path inference as a measurement. The α-axis terminology distinction (Coherence Path Hypothesis = the claim; support path = the operationalized pattern) collapses if a phase-4 write-up calls a measured feature a "coherence path" without inference, or treats the seven gait families as proven by a clustering output rather than as candidate surface expressions. CDR.md names this failure mode as `coherence laundering` — using a high project coherence score (or a clean feature table) to support the substantive claim.
+- **Coherence risk:** Treating coherence-path inference as a measurement. The terminology distinction (Coherence Path Hypothesis = the claim; support path = the operationalized pattern) collapses if a phase-4 write-up calls a measured feature a "coherence path" without inference, or treats the seven gait families as proven by a clustering output rather than as candidate surface expressions. *Coherence laundering* — treating a clean feature table or a self-consistent repo as substantive evidence for the hypothesis — is the failure mode to avoid.
 - **Next action:** After R3 closes, re-evaluate the falsification table at adequate n; report per-condition pass/fail with explicit n; separate measurement from interpretation in the field report.
 - **Owning files:** [`docs/concepts/support-path.md`](docs/concepts/support-path.md) (§Falsification), [`docs/concepts/failure-conditions.md`](docs/concepts/failure-conditions.md), [`docs/concepts/coherence-path-hypothesis.md`](docs/concepts/coherence-path-hypothesis.md) (§Falsification conditions, §Current empirical status), future field report.
 
@@ -92,6 +92,6 @@ A high coherence score (C_Σ in [CDR.md](CDR.md)) does not transition any phase.
 - **Current evidence:** No clustering has been run. [`analysis/clustering-plan.md`](analysis/clustering-plan.md) exists as a plan-only document.
 - **Gate:** A stable per-cycle feature table from R3 / R4 is available; unsupervised structure (clusters, embeddings, manifold organization) survives confound checks against trial crop, marker artifact, camera setup, subject morphology, and condition labels alone; clustering output is reported as candidate structure, not as confirmation of the seven gait families or the Coherence Path Hypothesis.
 - **Status:** Not started.
-- **Coherence risk:** The largest coherence risk in the project. Clustering output is the most likely surface to be read as hypothesis confirmation, since AI labels are easy to mistake for measurement. CDR.md names this failure mode as `coherence laundering` — using a high project coherence score (or a clean clustering output) to support a substantive claim. Adjacent risks: the seven gait families being reintroduced as proven categories by automated labels; the project's identity drifting from "test the hypothesis" toward "build a typology"; the safety boundary in [`README.md`](README.md) eroded by labels that read as diagnoses.
+- **Coherence risk:** The largest coherence risk in the project. Clustering output is the most likely surface to be read as hypothesis confirmation, since AI labels are easy to mistake for measurement. *Coherence laundering* — treating a clean clustering output (or a self-consistent repo) as substantive evidence for the hypothesis — is the failure mode to avoid. Adjacent risks: the seven gait families being reintroduced as proven categories by automated labels; the project's identity drifting from "test the hypothesis" toward "build a typology"; the safety boundary in [`README.md`](README.md) eroded by labels that read as diagnoses.
 - **Next action:** Hold. Do not run clustering against existing or future data until R4 closes GO.
 - **Owning files:** [`analysis/clustering-plan.md`](analysis/clustering-plan.md), future analysis documents.
