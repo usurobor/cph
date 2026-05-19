@@ -46,7 +46,7 @@ The following may propose a coherence path but cannot establish one:
 
 These belong on the proposal side of the working sequence (observation proposes → measurement decides). They generate hypotheses; they do not confirm them.
 
-A high project coherence score (C_Σ, see [CDR.md](../../CDR.md)) is also not evidence. C_Σ measures whether the repo describes one coherent research project. It is mute on whether the hypothesis is correct.
+Project coherence is also not evidence. The fact that the repo describes one consistent research project says nothing about whether walking actually forms coherence paths. Internal consistency and external truth are independent.
 
 ## Relationship to support path
 
@@ -59,7 +59,7 @@ Coherence Path Hypothesis = the research claim (this document)
 support path              = the operationalized gait-cycle pattern (support-path.md)
 ```
 
-The hypothesis and its operationalization must remain terminologically distinct. Drift between them — calling a measured trace a "coherence path" without inference, or calling the hypothesis a "support path" — is one of the recurring failure modes the CDR α-axis (pattern coherence) is meant to catch.
+The hypothesis and its operationalization must remain terminologically distinct. Drift between them — calling a measured trace a "coherence path" without inference, or calling the hypothesis a "support path" — is a recurring failure mode this distinction is meant to catch.
 
 ## Relationship to the seven gait families
 
