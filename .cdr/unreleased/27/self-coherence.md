@@ -185,8 +185,8 @@ Per `alpha/SKILL.md` §2.6, all 14 rows verified before signaling review-readine
 | Field | Value |
 |---|---|
 | Round | 1 |
-| Implementation SHA | (last α implementation commit before this readiness section; see `git log --format='%h %s' origin/cycle/r3-rside-aggregate-analysis ^origin/main` — the AC7 status-surface commit is the last implementation commit, then this readiness section appends as its own commit) |
-| Base SHA (cycle base, was `1d87d4a` at γ scaffold; re-verified) | `1d87d4a3db170bbb6c77e8633bc37a550187fc43` (current `origin/main`) |
+| Implementation SHA (last α implementation commit before the readiness signal) | `d0435760498ff2c90cbfa9dcdb078ac7301fae4a` (commit `d043576` — "α #27: AC7 status surfaces — R3 partial GO on R-side; R1 stays REVISE"). The readiness signal itself first landed in commit `84df451`; this row is appended in the subsequent commit. |
+| Base SHA (cycle base, was `1d87d4a` at γ scaffold; re-verified immediately before this signal) | `1d87d4a3db170bbb6c77e8633bc37a550187fc43` (current `origin/main` at re-validation; `origin/main` has not advanced since γ scaffold; cph#28 has not merged yet — if it lands first, α will rebase and append a fix-round section here) |
 | Branch | `cycle/r3-rside-aggregate-analysis` |
 | Branch CI | not applicable (no per-PR CI for analysis surfaces; release-only CI per `.github/workflows/coherence.yml`); β verifies reproducibility by re-running `python3 analysis/r3_subject_aggregate_tests.py` per field-report-03 §Appendix A |
 | AC8 charter-surface sweep | empty diff verified at `git diff origin/main..HEAD -- README.md docs/concepts/coherence-path-hypothesis.md docs/concepts/support-path.md docs/articles/seven-ways-people-walk.md` (returns no output, exit 0); re-validated immediately before this signal |
