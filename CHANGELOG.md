@@ -2,32 +2,50 @@
 
 Project changelog: what shipped, what changed, what's still open. Empirical state lives in the latest merged field report; live operational status lives in [PROJECT.md](PROJECT.md); the gate-based roadmap lives in [ROADMAP.md](ROADMAP.md).
 
-## 0.3.0 — R2 segmentation fix ported; status surfaces realigned (2026-05-19)
+## 0.3.0 — R2 segmentation fix ported; bilateral construct half-anchored (2026-05-19)
 
-- **Empirical state:** REVISE — per [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) (post-segmentation-fix run). R1 stays REVISE; the active blocker has moved from the detector to L-side cycle yield, which is structurally limited by trial cropping in the OpenCap Lab Validation archive (1/60 L cycles). R-side passes AC1 cleanly (60/60 trials, 100%; 61 cycles total = 60 R + 1 L).
-- **Decision:** [cph#26](https://github.com/usurobor/cph/issues/26) ported the R2 detector fix from the precursor branch `origin/cycle/segmentation-real-data-fix` (tip `a95415c`) onto current main via per-file 3-way merge ([`cycle/port-segmentation-fix`](https://github.com/usurobor/cph/tree/cycle/port-segmentation-fix), Step A `41b3693`). Step B regenerated and re-executed [`notebooks/existing-data-processing.ipynb`](notebooks/existing-data-processing.ipynb) against `/opt/gait-data/opencap-lab-validation/extracted/` and realigned the status surfaces (this entry, PROJECT.md, ROADMAP.md) to the post-fix field report. R2 transitions REVISE → GO; R1 holds REVISE.
+**Where we were.** R1 was REVISE on a hard blocker: `scripts/segmentation.py::detect_heel_strikes` was tuned to the synthetic generator's heel-marker shape and failed on real Mocap calcaneus markers — only 11/60 trials segmented (18.3%, R-side only), zero L-side cycles. The open question was whether the real-data segmenter could work at all.
 
-### Changed
+**What this version unblocked.** Yes — the real-data segmenter works. The detector has been rewritten with robust-percentile normalization plus stance-region depth/length gating, invariant to absolute height, baseline offset, and amplitude. It now passes AC1 cleanly on R-side: 60/60 trials, 100%, 61 cycles total (60 R + 1 L), 0.00% feature-extraction missingness across 35 columns. R2 transitions from REVISE to GO at the detector level.
 
-- `scripts/segmentation.py` — detector rewritten: robust-percentile normalization (`yn = (smoothed_heel − q05) / (q95 − q05)`) plus stance-region depth/length gating (`yn < 0.30` for ≥150 ms AND `< 0.10` at deepest). Invariant to absolute height, baseline offset, and amplitude. Works on real Mocap calcaneus markers (range ~[50, 330] mm, ~25 mm R/L baseline offset) and on the synthetic generator's clipped-to-zero plateau. The `quality_flag` tri-value (`"ok"`/`"short"`/`"long"` from cph#22) preserved.
-- `scripts/segmentation_diagnostics.py` — new per-(trial, side) diagnostic utility that classifies zero-cycle reasons (`trial_ends_mid_swing`, `trial_crops_only_swing`, `ok`) mechanically against the real archive. Used to characterize the L-side cropping constraint.
-- `scripts/features.py` — adds frontal-plane `hip_adduction_range_deg` / `hip_adduction_peak_deg` / `hip_adduction_min_deg` and lumbar `lumbar_extension_range_deg` / `lumbar_bending_range_deg` / `lumbar_rotation_range_deg` columns. The `extract_shape_sentinel` name (from cph#25) preserved.
-- `scripts/build_notebook.py` — integrates `scripts/segmentation_diagnostics.py` into the §"Known debt" segmentation cell.
-- `notebooks/existing-data-processing.ipynb` — regenerated and executed on real data (60/60 R-side trials at 100% segmentation; 0.00% missingness across 35 columns × 61 cycles).
-- `analysis/feature-summary-zeroth-pilot.md` — post-fix evidence summary (60 R cycles, 1 L cycle).
-- [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) — rewritten to post-fix REVISE; supersedes the 18.3%-segmentation REVISE.
-- [`PROJECT.md`](PROJECT.md) §"Current empirical decision" / §"Current blocker" / §"Next action" / §"Active branch / issue" / §"Last field report" — realigned to the post-fix evidence.
-- [`ROADMAP.md`](ROADMAP.md) §"Current state" / R1 / R2 / R3 / R4 — realigned. R2 status transitions REVISE → GO. R1 stays REVISE pending L-cycle recovery.
+**What is now testable.**
 
-### Known limits
+- R-side sagittal coordination (hip / knee / ankle range, peak, min, hip-knee lag)
+- R-side frontal-plane coordination (new `hip_adduction_*` columns) and trunk dynamics (new `lumbar_*` columns)
+- Natural vs trunk-sway condition response on 30 + 30 R-side cycles across 10 subjects
+- Subject-level R-side aggregate patterns ([cph#27](https://github.com/usurobor/cph/issues/27))
+- OpenCap-vs-reference reliability for this archive (Pearson r̄ 0.962 HRNet, 0.933 OpenPose_default, 0.951 OpenPose_highAccuracy across 60 trials × 3 backbones)
 
-- **L-side cycle yield is the new load-bearing bottleneck.** 1 L-cycle across 60 trials blocks Hypothesis 3 (asymmetric phase-coupling) and prevents L/R asymmetry features (the central bilateral surface of [`docs/concepts/support-path.md`](docs/concepts/support-path.md)). Recovery requires either (a) contralateral-anchored L-cycle detection (R HS times + half-stride offset) or (b) re-running OpenSim IK on the source TRC files with wider time windows. Both are out of scope for cph#26.
-- **R-side n=60 is partial test surface.** Hypothesis 1 is evaluable on R-side data; Hypothesis 2 is partially evaluable on the 30 + 30 natural / trunk-sway R-side cycles; Hypothesis 3 is not testable on this archive.
-- **No new empirical claims on the construct.** The hypothesis is still neither validated nor refuted. The R-side n=60 anchor is a partial test, not construct survival.
+**What is still blocked.**
+
+- Bilateral support-path comparison — L=1 cycle is insufficient
+- Left-right phase coupling (Hypothesis 3 in [`docs/concepts/support-path.md`](docs/concepts/support-path.md))
+- L/R asymmetry features (`lr_asymmetry` in `scripts/features.py`)
+- Full falsification-table evaluation — only R-side-evaluable conditions are reachable
+- R1 itself stays REVISE — the bilateral construct is half-anchored, not anchored
+
+The blocker has moved from the detector to the source archive: each trial in OpenCap Lab Validation is cropped to ~1.3–1.5 s and R-aligned, so 47/60 L sides end mid-swing and 12/60 start mid-swing. `scripts/segmentation_diagnostics.py` reports the per-(trial, side) zero-cycle reasons mechanically.
+
+**The new question.** Can we recover enough bilateral structure to test Hypothesis 3, or do we proceed with a bounded R-side construct test? Filed in parallel at [cph#27](https://github.com/usurobor/cph/issues/27) (R-side aggregate, runnable now) and [cph#28](https://github.com/usurobor/cph/issues/28) (L-cycle recovery via contralateral-anchored detection or wider IK windows).
+
+### Changed (file-level)
+
+- `scripts/segmentation.py` — detector rewritten (robust-percentile normalization `yn = (smoothed_heel − q05) / (q95 − q05)` + stance-region depth/length gating `yn < 0.30` for ≥150 ms AND `< 0.10` at deepest). Preserves the `quality_flag` tri-value from cph#22.
+- `scripts/segmentation_diagnostics.py` — new per-(trial, side) diagnostic utility classifying zero-cycle reasons (`trial_ends_mid_swing`, `trial_crops_only_swing`, `ok`).
+- `scripts/features.py` — adds frontal-plane `hip_adduction_range_deg` / `_peak_deg` / `_min_deg` and trunk `lumbar_extension_range_deg` / `lumbar_bending_range_deg` / `lumbar_rotation_range_deg`. Preserves the `extract_shape_sentinel` name from cph#25.
+- `scripts/build_notebook.py` — integrates the diagnostics utility into §"Known debt".
+- `notebooks/existing-data-processing.ipynb` — regenerated and executed on real data.
+- `analysis/feature-summary-zeroth-pilot.md` — post-fix evidence summary.
+- [`reports/field-report-01-existing-data-zeroth-pilot.md`](reports/field-report-01-existing-data-zeroth-pilot.md) — rewritten post-fix; supersedes the 18.3%-segmentation REVISE.
+- [`PROJECT.md`](PROJECT.md), [`ROADMAP.md`](ROADMAP.md) — realigned to the post-fix evidence; R2 → GO at the detector level, R1 holds REVISE.
+
+### Decision
+
+REVISE on R1 (bilateral construct half-anchored). R2 transitions to GO. The hypothesis is neither validated nor refuted; the project has moved from "can the real-data segmenter work?" to "can we recover the missing side, or run a bounded R-side test?"
 
 ### Next gate
 
-R3 — first construct-level evidence on R-side data (subject-level condition-response analysis per [`analysis/left-right-comparison.md`](analysis/left-right-comparison.md) and [`analysis/feature-table-schema.md`](analysis/feature-table-schema.md)). The next changelog entry should land at the close of either R3 (R-side construct-level analysis) or an L-cycle recovery cycle, whichever comes first.
+[cph#27](https://github.com/usurobor/cph/issues/27) — R3 R-side aggregate condition-response analysis. Or [cph#28](https://github.com/usurobor/cph/issues/28) — L-cycle recovery. Runnable in parallel.
 
 ## 0.2.0 — Coherence drift sweep + docs refactor (2026-05-18)
 
