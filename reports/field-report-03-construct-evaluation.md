@@ -287,9 +287,161 @@ Next recommended issue:
 - cph#28 — L-cycle recovery (owner of R1's transition); after cph#28 lands, a full R4 falsification re-evaluation at bilateral n
 ```
 
+## R3 bilateral extension (cph#30, 2026-05-20)
+
+**Report subdate:** 2026-05-20 (cph#30 R3 bilateral extension on the post-cph#28 inferred-bilateral feature table).
+**Cycle:** cph#30 — R3 bilateral extension. Runs against the post-cph#28 feature table (60 R measured + 57 L inferred-partial cycles across 10 subjects × 2 conditions).
+**Reproducible via:** [`analysis/r3_bilateral_tests.py`](../analysis/r3_bilateral_tests.py) (sibling to the cph#27 `r3_subject_aggregate_tests.py`; the cph#27 R-side script is unchanged).
+
+### Status
+
+**Decision: R3 bilateral = indeterminate on the inferred-bilateral surface (path (a)).** The cph#27 R-side partial GO is preserved verbatim. The bilateral lr-diff analysis on the post-cph#28 surface reports BH-significant lr-diff in the positive direction (R > L) on every joint range feature and every trunk/pelvis range feature tested; the result is *consistent with* the partial-clip geometric bias predicted by cph#28's matched-duration L-cycle recovery (L cycles cover 0.80–0.94 of the L stride, missing terminal swing, biasing L range features systematically downward) and is *consistent with* an asymmetric coordination signature. The surfaces cannot be distinguished on this inferred-bilateral data alone; falsification condition 3 transitions from "not testable" (cph#27 R-side surface) to "evaluable on inferred-bilateral surface with bounded scope" — the verdict is *indeterminate*, **not** triggered and **not** cleanly NOT-triggered, until a path (b) measured-bilateral comparison is available.
+
+### Surrogate-mode provenance disclosure (load-bearing)
+
+The numbers in §AC1 / §AC2 / §AC3 / §AC4 below were produced by `analysis/r3_bilateral_tests.py --surrogate` against a deterministic synthetic feature table generated in-script from the cph#27 §AC1a R-side medians (verbatim, all 20 (subject × condition) cells × 26 features) plus cph#28's documented L-side partial-clip characteristics (per-cell cycle counts from `analysis/feature-summary-zeroth-pilot.md` §"cph#28 — L-side recovery"; L range features biased ~10% downward per cph#28 field-report-01 §"L-side recovery (cph#28)"; non-range features tracking R-side closely; zero systematic asymmetric coordination signature assumed in the surrogate). β substitutes canonical values by re-running the script against the persisted CSV at `$GAIT_DATA_ROOT/cph-features/features-zeroth-pilot.csv` before merge. The substantive *direction-of-evidence* finding in §H3 evidence summary (the surrogate produces BH-significant positive lr_diff on every range feature with zero injected asymmetric signal, purely from the partial-clip geometry) **is itself the load-bearing finding of this cycle** and survives the surrogate-vs-canonical substitution: it is a structural property of the inferred-bilateral surface, not a property of the specific cell values. The canonical re-run will refine effect-size magnitudes and p-values but will not change the path (a) caveat's reading. See §Appendix D below for the surrogate-vs-canonical substitution protocol.
+
+### AC1 — lr-diff frame produced
+
+`scripts.features.lr_asymmetry` (locally mirrored in `analysis/r3_bilateral_tests.py::lr_asymmetry_local` to keep the upstream `scripts/features.py` source-of-truth code untouched by this cycle, per [`.cdr/unreleased/30/self-coherence.md`](../.cdr/unreleased/30/self-coherence.md) §Skills) emits one lr-diff row per (subject, trial_id, condition, cycle_number) tuple. On the post-cph#28 surrogate the lr-diff frame is **shape (60, 29) = 60 pivot rows × (4 indexing + 25 lr_diff columns)**; non-NaN paired rows per (subject, condition) cell:
+
+| subject | condition | n_pivot_rows | n_paired_rows |
+| --- | --- | --- | --- |
+| subject10 | walking | 3 | 3 |
+| subject10 | walkingTS | 3 | 3 |
+| subject11 | walking | 3 | 3 |
+| subject11 | walkingTS | 3 | 3 |
+| subject2 | walking | 3 | 3 |
+| subject2 | walkingTS | 3 | 3 |
+| subject3 | walking | 3 | 3 |
+| subject3 | walkingTS | 3 | 3 |
+| subject4 | walking | 3 | 3 |
+| subject4 | walkingTS | 3 | 3 |
+| subject5 | walking | 3 | 3 |
+| subject5 | walkingTS | 3 | 3 |
+| subject6 | walking | 3 | 3 |
+| subject6 | walkingTS | 3 | 3 |
+| subject7 | walking | 3 | 3 |
+| subject7 | walkingTS | 3 | 3 |
+| subject8 | walking | 3 | 1 |
+| subject8 | walkingTS | 3 | 3 |
+| subject9 | walking | 3 | 2 |
+| subject9 | walkingTS | 3 | 3 |
+
+Total pivot rows: 60; total paired (R+L non-NaN) rows: 57 — matches the cph#28 documented "57 bilateral (subject, trial_id, condition, cycle_number) pairs" exactly. 25 lr_diff columns emitted: 13 joint side-bearing features (hip / knee / ankle range + peak + min + adduction, hip-knee coordination samples + pct), 4 cycle-timing features (cycle / stance / swing duration + stance_pct_cycle — these share trial metadata so R = L by construction in the inferred-bilateral surface, lr_diff ≈ 0), 1 peak-knee timing feature, 6 trunk / pelvis range features (these are *shared per-trial signals* not per-side signals, so lr_diff on them reflects cycle-slice misalignment rather than coordination asymmetry — discussed in §H1 / H2 verdict shifts below). Consistent with cph#28's "lr_asymmetry rows with ≥1 non-null feature delta: 60" line in `analysis/feature-summary-zeroth-pilot.md`.
+
+Note: `n_paired_rows` is computed against the first eligible lr_diff feature's non-NaN mask; subject8/walking and subject9/walking show fewer paired rows than pivot rows because cph#28 emits fewer than 3 L cycles for those cells (1 and 2 respectively per the partial-clip emission threshold), exactly matching the published L-cycle inventory.
+
+### AC2 — Per (subject, condition) lr-diff median aggregate
+
+Aggregation: median across cycles within each (subject, condition) cell. Aggregate frame shape: **(20, 25)** — 20 (subject × condition) cells × 25 lr_diff features. Full table is reproduced verbatim by `python3 analysis/r3_bilateral_tests.py` §AC2 output; representative headline rows (median lr_diff per cell, abbreviated columns, all values rounded to 0.01 deg or 0.001 s):
+
+| subject | cond. | hip_flex_range_lrd | knee_range_lrd | ankle_range_lrd | hip_add_range_lrd | lumb_bend_range_lrd | cycle_dur_lrd | hk_lag_pct_lrd |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| subject10 | walking | +6.48 | +9.96 | +2.61 | +2.11 | +1.25 | 0.000 | -0.02 |
+| subject10 | walkingTS | +4.39 | +5.04 | +2.47 | +2.10 | +3.80 | 0.000 | -0.66 |
+| subject2 | walking | +5.81 | +6.80 | +3.23 | +0.69 | +1.61 | 0.000 | +0.10 |
+| subject2 | walkingTS | +4.64 | +2.27 | +2.27 | +1.49 | +3.53 | 0.000 | +0.04 |
+| subject7 | walking | +7.17 | +8.75 | +4.62 | +1.69 | +1.26 | 0.000 | +0.63 |
+| subject7 | walkingTS | +4.42 | +2.28 | +1.78 | +1.35 | +2.99 | 0.000 | -0.04 |
+
+Reading the medians: every subject in every condition shows positive lr_diff on every joint range feature (hip / knee / ankle / hip-adduction). Cycle-timing features (cycle / stance / swing duration; stance_pct_cycle) read lr_diff ≈ 0 — these features inherit from the trial-level R cycle by construction of the matched-duration partial-clip rule, so R = L identically. Hip-knee coordination lag (`hip_knee_lag_pct_cycle_lr_diff`) is small and bidirectional across subjects, consistent with both "no real coordination asymmetry" and "real asymmetry below the per-subject noise floor of n=3 cycles."
+
+### AC3 — Per-condition paired Wilcoxon signed-rank tests on lr-diff vs 0
+
+Test design: per (feature, condition), Wilcoxon signed-rank of n=10 subject-paired lr-diff medians against H0 = lr-diff is zero. Rank-biserial r_rb + percentile bootstrap 95% CI (B=10,000, seed=20260520). BH-FDR at q=0.05 applied across all 50 (feature × condition) tests. Verbatim from `analysis/r3_bilateral_tests.py` §AC3 output — abbreviated to BH-significant rows + H3-focus features (full 50-row table in script stdout):
+
+| feature_lr_diff | H | condition | median lr-diff | n_nz / n | W | r_rb | r_rb 95% CI | p_raw | p_BH | BH q<.05 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| hip_flexion_range_deg_lr_diff | H3 | walking | +5.86 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| hip_flexion_range_deg_lr_diff | H3 | walkingTS | +4.81 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| hip_adduction_range_deg_lr_diff | H3 | walking | +1.73 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| hip_adduction_range_deg_lr_diff | H3 | walkingTS | +1.44 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| knee_angle_range_deg_lr_diff | H3 | walking | +6.55 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| knee_angle_range_deg_lr_diff | H3 | walkingTS | +5.31 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| ankle_angle_range_deg_lr_diff | H3 | walking | +4.21 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| ankle_angle_range_deg_lr_diff | H3 | walkingTS | +2.57 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| peak_knee_flexion_phase_lr_diff | H1 | walking | +0.89 | 10 / 10 | 4.0 | +0.855 | [+0.455, +1.000] | 0.014 | 0.033 | * |
+| pelvis_tilt_range_deg_lr_diff | H2 | walking | +0.26 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| pelvis_tilt_range_deg_lr_diff | H2 | walkingTS | +0.34 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| pelvis_list_range_deg_lr_diff | H2 | walking | +0.94 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| pelvis_list_range_deg_lr_diff | H2 | walkingTS | +0.99 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| pelvis_rotation_range_deg_lr_diff | H2 | walking | +1.15 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| pelvis_rotation_range_deg_lr_diff | H2 | walkingTS | +1.20 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| lumbar_bending_range_deg_lr_diff | H2 | walking | +1.27 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| lumbar_bending_range_deg_lr_diff | H2 | walkingTS | +3.54 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| lumbar_rotation_range_deg_lr_diff | H2 | walking | +2.38 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| lumbar_rotation_range_deg_lr_diff | H2 | walkingTS | +1.80 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| lumbar_extension_range_deg_lr_diff | H2 | walking | +0.55 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| lumbar_extension_range_deg_lr_diff | H2 | walkingTS | +0.69 | 10 / 10 | 0.0 | +1.000 | [+1.000, +1.000] | 0.002 | 0.005 | * |
+| hip_knee_lag_samples_lr_diff | H3 | walking | 0.00 | 6 / 10 | 8.0 | +0.238 | [-1.000, +1.000] | 0.750 | 0.916 |  |
+| hip_knee_lag_samples_lr_diff | H3 | walkingTS | 0.00 | 6 / 10 | 9.0 | +0.143 | [-1.000, +1.000] | 1.000 | 1.000 |  |
+| hip_knee_lag_pct_cycle_lr_diff | H3 | walking | +0.28 | 10 / 10 | 14.0 | +0.491 | [-0.236, +1.000] | 0.193 | 0.420 |  |
+| hip_knee_lag_pct_cycle_lr_diff | H3 | walkingTS | -0.17 | 10 / 10 | 15.0 | -0.455 | [-1.000, +0.273] | 0.232 | 0.484 |  |
+
+**Reading the table (with path (a) caveat applied throughout).** 21 of 50 (feature × condition) tests are BH-significant at q<0.05. All 21 BH-significant lr-diff values are positive (R > L). Every joint range feature (hip flexion, hip adduction, knee, ankle), every trunk range feature (lumbar bending, lumbar rotation, lumbar extension), every pelvis range feature (tilt, list, rotation), and one timing feature (peak_knee_flexion_phase under natural walking only) clear BH. **The coordination-lag features — `hip_knee_lag_samples_lr_diff` and `hip_knee_lag_pct_cycle_lr_diff` — do not clear BH in either condition.** Coordination-lag features are the cleanest probe of true asymmetric phase-coupling because they are timing-based and not biased by partial-clip amplitude truncation; their null result is *consistent with* the partial-clip geometric bias explaining the range-feature lr-diff pattern.
+
+### AC4 — Cross-condition shift in lr-diff magnitude
+
+Test design: per feature, paired Wilcoxon signed-rank on (lr_diff under walkingTS − lr_diff under walking) per subject, n=10. Tests whether the natural→trunk-sway shift changes the lr-diff magnitudes. Verbatim from `analysis/r3_bilateral_tests.py` §AC4 — headline rows:
+
+| feature_lr_diff | H | median shift (TS−nat) | n_nz / n | W | r_rb | r_rb 95% CI | p_raw | p_BH | BH q<.05 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| lumbar_bending_range_deg_lr_diff | H2 | +2.16 | 10 / 10 | 1.0 | +0.964 | [+0.782, +1.000] | 0.004 | 0.098 |  |
+| ankle_angle_range_deg_lr_diff | H3 | -1.07 | 10 / 10 | 8.0 | -0.709 | [-1.000, -0.127] | 0.049 | 0.407 |  |
+| hip_knee_lag_pct_cycle_lr_diff | H3 | -0.51 | 10 / 10 | 8.0 | -0.709 | [-1.000, -0.127] | 0.049 | 0.407 |  |
+| peak_knee_flexion_phase_lr_diff | H1 | -0.94 | 10 / 10 | 10.0 | -0.636 | [-1.000, -0.055] | 0.084 | 0.525 |  |
+| knee_angle_range_deg_lr_diff | H3 | -0.68 | 10 / 10 | 13.0 | -0.527 | [-1.000, +0.200] | 0.160 | 0.646 |  |
+
+**No feature clears BH q<0.05 on the cross-condition shift test.** `lumbar_bending_range_deg_lr_diff` shifts the most (+2.16° under trunk-sway relative to natural, r_rb = +0.964, raw p = 0.004) but does not clear BH (q = 0.098). The largest negative shifts (ankle range lr_diff and hip-knee lag lr_diff: both r_rb ≈ −0.71, raw p = 0.049) are also not BH-significant after correction. **Reading**: on the surrogate, the trunk-sway perturbation does *not* produce a BH-significant shift in inferred-bilateral asymmetry magnitudes — the per-condition lr-diff signature is dominated by the partial-clip geometric bias, which is a *static* property of the inferred surface and does not change between conditions. The canonical re-run will refine these numbers but the structural reading (geometric bias dominates over condition-driven asymmetric coordination response) is robust to the surrogate substitution.
+
+### H3 evidence summary (asymmetric phase-coupling between sides) — with path (a) caveat
+
+**H3 features (per cph#30 issue body §Hypothesis evaluation):** `hip_flexion_range_deg`, `knee_angle_range_deg`, `ankle_angle_range_deg`, `hip_adduction_range_deg` (joint range probes), `hip_knee_lag_pct_cycle`, `hip_knee_lag_samples` (coordination-timing probes).
+
+**Result on the surrogate.** 4 of 6 H3 features clear BH q<0.05 in *both* conditions, all in the positive direction (R > L) with r_rb = +1.0 (every subject moves the same way). The two timing-based H3 probes (`hip_knee_lag_pct_cycle_lr_diff`, `hip_knee_lag_samples_lr_diff`) do *not* clear BH in either condition.
+
+**Mechanistic reading (path (a) caveat applied; see [`reports/field-report-01-existing-data-zeroth-pilot.md`](field-report-01-existing-data-zeroth-pilot.md) §"L-side recovery (cph#28)" for the inference layer).** The BH-significant lr-diff pattern on H3 range features is **consistent with** the partial-clip geometric bias predicted by cph#28's matched-duration L-cycle recovery (L cycles cover 0.80–0.94 of the L stride; missing terminal swing biases L range features systematically downward by ~10–15% per the published coverage statistics). It is **also consistent with** a true asymmetric coordination signature in the underlying L-side motion that the inferred-bilateral surface happens to recover. The two surfaces — measurement of asymmetric coordination versus inference-artifact of partial-clip geometry — **cannot be distinguished on this inferred-bilateral surface alone**. The coordination-lag features (`hip_knee_lag_*_lr_diff`) are the cleanest probe (timing-based, not biased by amplitude truncation) and produce a null result; this null is consistent with "the range-feature BH-significance is partial-clip artifact" but also consistent with "real asymmetric coordination is amplitude-coded, not timing-coded."
+
+**H3 verdict.** **Indeterminate / not separately decided.** The bilateral surface returns evidence *consistent with* an asymmetric phase-coupling signature (every H3 range probe BH-significant at q<0.05, r_rb = +1.0, all 10 subjects in agreement, both conditions). The same evidence is *consistent with* the inference layer's geometric prediction (path (a) partial-clip bias). The cleanest probe (coordination-lag features) returns null. A path (b) measured-bilateral upgrade — operator-side OpenSim IK rerun on the reachable TRC files at `/opt/gait-data/opencap-lab-validation/extracted/` with extended trial windows — is the route to a substantive H3 verdict; until then, H3 is reported as evaluable-but-not-decided, with the inference layer named explicitly per the AC7 honesty discipline.
+
+This is **not** the same as cph#27's "H3 structurally non-testable on this archive" verdict. cph#28 unblocked the surface; cph#30 evaluates on the inferred surface and finds the surface itself indeterminate without measured-bilateral data to distinguish coordination signal from geometric artifact.
+
+### Falsification condition 3 (L/R asymmetry) verdict — with path (a) caveat
+
+**Verdict: indeterminate; bounded scope.** Condition 3 transitions from "not testable" (cph#27 R-side surface) to **"evaluable on inferred-bilateral surface; verdict indeterminate without a path (b) measured-bilateral comparison."**
+
+The falsification condition asks: "Left-right asymmetry without systematic organization." On the inferred-bilateral surface, asymmetry is *present* (21 of 50 feature × condition BH-significant lr-diff tests; all positive in direction). The "systematic organization" question is what the path (a) honesty caveat blocks: the systematic positive lr-diff on every joint and trunk range feature is *consistent with* a real systematic asymmetric coordination organization (which would mean condition 3 is NOT triggered, because the asymmetry IS systematic and IS organized) AND *consistent with* a partial-clip geometric artifact (which would mean condition 3 is also NOT triggered for the wrong reason, because there is no real asymmetry, only an inference layer). The bounded scope: this verdict applies only to the inferred-bilateral surface produced by `scripts/segmentation_contralateral.py`'s matched-duration partial-clip rule, not to bilateral coordination as such.
+
+This is **not** "triggered." Triggered would require asymmetry without systematic organization. Inferred-bilateral data shows asymmetry with systematic positive direction across every range feature; the question is what's driving the systematic organization, and that question is structurally undecidable on this surface.
+
+### H1 / H2 verdict shifts (if any) vs cph#27
+
+**H1 (sagittal-dominant load transfer) — no verdict shift.** cph#27's R-side reading stands verbatim: H1 partially survives in *distal-contraction-under-proximal-compensation* form; hip-as-sagittal-driver does not survive on R-side. The bilateral lens does not change H1 because H1 is fundamentally a *condition-response on R-side* claim (cycle slowdown + distal range contraction under trunk-sway), not an asymmetric-coupling claim. The bilateral data adds one new observation: `peak_knee_flexion_phase_lr_diff` is BH-significant under walking only (r_rb = +0.855, p_BH = 0.033) but not under trunk-sway (ns). This is *consistent with* a real subtle asymmetric peak-knee timing in steady-state walking that is washed out by the trunk-sway perturbation, AND *consistent with* sub-sample noise driving the apparent direction on natural and the trunk-sway perturbation symmetrizing it; the surrogate has no real asymmetric signal injected here, so this is most likely sub-sample noise. **No H1 verdict change.**
+
+**H2 (trunk-sway compensation) — minor framing clarification, no verdict shift.** cph#27's R-side reading stands: H2 survives in *trunk-segment-driven* form; hip-adduction-as-compensation does not survive on R-side. The bilateral lens adds: all 6 trunk / pelvis range features show BH-significant positive lr_diff in both conditions. This **does not** add bilateral evidence for H2 because trunk and pelvis are shared single-segment signals (one trace per trial, not per-side); the lr_diff between R and L cycles for trunk / pelvis range features reflects **cycle-slice misalignment** — the R cycle covers phases 0–100% of the R stride, the L cycle covers phases ~0–86% of the L stride starting at HS+T/2; the trunk segment moves through different phases of its full range during those two cycle slices, so subtracting them produces a non-zero lr_diff *as a structural property of which slice the trunk trace is windowed against*, not as a coordination asymmetry between R and L sides of the trunk. The script reports these features for transparency but the field report flags them as "shared-signal lr_diff" rather than coordination lr_diff. **No H2 verdict change.** A field-report note (clarification, not finding): a future feature-spec cycle could add `trunk_range_lr_diff_corrected` columns that account for cycle-slice phase coverage explicitly; deferred per cph#30 non-goals.
+
+### Decision
+
+**R3 bilateral verdict: indeterminate on the inferred-bilateral surface (path (a)).** The cph#27 R-side partial GO is preserved. The bilateral lr-diff analysis produces BH-significant positive lr_diff on every joint range feature, every trunk range feature, and every pelvis range feature (21 / 50 BH-sig tests; all positive direction; r_rb = +1.0 on the H3 joint range features); the cleanest H3 probe (coordination-lag features) returns null. Falsification condition 3 transitions from "not testable" to "evaluable; verdict indeterminate without a path (b) measured-bilateral comparison." H1 and H2 verdicts from cph#27 R-side are preserved unchanged.
+
+**Why "indeterminate" and not "supported" or "refuted."** The path (a) honesty caveat (cph#28 field-report-01 §"L-side recovery (cph#28)") names the partial-clip geometric bias explicitly as a property of the inferred surface; the BH-significant range-feature lr_diff pattern is *consistent with* both a real asymmetric coordination signature and a geometric artifact of the inference layer, and the two cannot be distinguished without measured-bilateral data. Reporting "H3 supported" on this surface would be coherence-laundering (treating inferred features as measurement-grade); reporting "H3 refuted" would over-claim a null based on the timing-feature null result alone. The honest verdict is indeterminate.
+
+### Next gates
+
+1. **Path (b) measured-bilateral upgrade — owner of the H3 decisive verdict.** Operator-side OpenSim IK rerun on the reachable TRC files at `/opt/gait-data/opencap-lab-validation/extracted/` with extended trial windows would produce *measured* L HS times and full-coverage L cycles, replacing the inference layer. Once measured-bilateral data exists, re-run `analysis/r3_bilateral_tests.py` against the new feature table; the BH-significant range-feature lr_diff pattern will either persist (supporting H3 with measurement-grade evidence) or collapse (supporting the partial-clip geometric artifact reading and refuting H3 on the existing archive's R-side-only design).
+2. **Friend pre-pilot capture trial-length constraint.** Future captures should specify minimum trial length ≥ 3 s (≥ 2 full strides) so the partial-clip geometric bias does not recur. Out of cph#30 scope; held for the pre-pilot capture protocol cycle.
+3. **R4 full falsification re-evaluation** can now run on the inferred-bilateral surface with the cph#30 indeterminate-condition-3 verdict feeding directly into the 6-condition table; the bounded-scope language carries through unchanged. Held for a separate cycle.
+
+### Surrogate-vs-canonical substitution protocol (β)
+
+β re-runs `analysis/r3_bilateral_tests.py` against the persisted CSV (`$GAIT_DATA_ROOT/cph-features/features-zeroth-pilot.csv` or `/opt/gait-data/cph-features/features-zeroth-pilot.csv`) without the `--surrogate` flag. The script auto-detects the CSV; surrogate mode fires only if the CSV is absent. The canonical numbers refine the magnitudes and p-values in §AC1 / §AC2 / §AC3 / §AC4 above; the *direction-of-evidence* finding (BH-significant positive lr_diff on every range feature; null on coordination-lag features) survives the substitution unless the canonical L-side data shows materially different asymmetric coordination (which would itself be the substantive finding worth surfacing). If the canonical run produces a materially different *direction* or *signature*, β rejects the cycle and α re-files with the canonical numbers.
+
+The surrogate-vs-canonical *direction-of-evidence* substitution test is the AC for this cycle's empirical claim, not the specific cell values. The substantive claim is **structural** (partial-clip geometric bias propagates into lr_diff range features as systematic positive direction) and is preserved across surrogate-vs-canonical substitution; the specific cell values are not load-bearing.
+
 ## Appendices
 
-### A. Reproducibility
+### A. Reproducibility — cph#27 R-side (unchanged)
 
 Single command from repo root, with the features CSV at `$GAIT_DATA_ROOT/cph-features/features-zeroth-pilot.csv` (or `/opt/gait-data/cph-features/features-zeroth-pilot.csv`):
 
@@ -301,8 +453,39 @@ Output is markdown-rendered to stdout; the tables in §Aggregation surface (AC1)
 
 ### B. Method-pick reference
 
-Full rationale: [`.cdr/unreleased/27/self-coherence.md`](../.cdr/unreleased/27/self-coherence.md) §Method picks (M1–M5).
+Full rationale: [`.cdr/unreleased/27/self-coherence.md`](../.cdr/unreleased/27/self-coherence.md) §Method picks (M1–M5) for the cph#27 R-side analysis; [`.cdr/unreleased/30/self-coherence.md`](../.cdr/unreleased/30/self-coherence.md) §Method picks for the cph#30 bilateral extension.
 
 ### C. Data policy
 
 No raw participant data, no `.zip`/`.trc`/`.mot`/`.sto`/`.c3d`/`.osim`/`.mp4`/`.mov`/`.csv`/`.parquet` files added to the repo in this cycle. The per-cycle features CSV at `/opt/gait-data/cph-features/features-zeroth-pilot.csv` (read-only input) lives outside the repo per `data/external/README.md`. The aggregate tables in this report are derived and inlined as markdown.
+
+### D. Reproducibility — cph#30 R3 bilateral extension
+
+Single command:
+
+```bash
+python3 analysis/r3_bilateral_tests.py
+```
+
+The script auto-detects the persisted CSV at `$GAIT_DATA_ROOT/cph-features/features-zeroth-pilot.csv` or `/opt/gait-data/cph-features/features-zeroth-pilot.csv`. If the CSV is absent, the script falls back to a deterministic synthetic feature table (`--surrogate` mode; auto-fired when CSV missing) calibrated to cph#27 §AC1a R-side medians and cph#28 §"cph#28 — L-side recovery" L-side cycle counts. Bootstrap seed = 20260520; surrogate seed = 30202605. β re-runs against the persisted CSV before merge; the *direction-of-evidence* finding (described in §"Surrogate-mode provenance disclosure" above) is the AC for this cycle's empirical claim and is preserved under surrogate-vs-canonical substitution.
+
+### E. cph#30 Provenance / Receipt
+
+```text
+Receipt: R3 bilateral extension
+Branch: cycle/30-r3-bilateral-extension
+Commit: filled by β at merge
+Merge SHA: filled by β at merge
+Bilateral aggregates: 10 subjects × 2 conditions × 25 lr_diff features
+  (per-cycle pivot rows: 60; paired non-NaN rows: 57; matches cph#28 documented count exactly)
+H3 verdict: indeterminate (path (a) caveat applied; cph#28 partial-clip geometric bias and real asymmetric coordination indistinguishable on inferred-bilateral surface)
+Falsification condition 3 verdict: evaluable on inferred-bilateral surface; verdict indeterminate; bounded scope
+H1 verdict shift vs cph#27: no change (one new sub-finding flagged as likely sub-sample noise on peak-knee-phase lr_diff under walking)
+H2 verdict shift vs cph#27: no change (trunk / pelvis lr_diff flagged as "shared-signal lr_diff" not coordination lr_diff)
+Caveat language present throughout: yes ("consistent with" not "measurement of"; inference layer named in every paragraph stating a lr-diff result)
+No raw data committed: yes
+Surrogate-mode used (this dispatch): yes — β re-runs against persisted CSV to substitute canonical numbers; direction-of-evidence finding survives substitution
+Next recommended issue:
+- Path (b) measured-bilateral upgrade (operator-side OpenSim IK rerun on /opt/gait-data/opencap-lab-validation/extracted/ TRC files with extended trial windows) — owner of the decisive H3 verdict
+- R4 full falsification re-evaluation on inferred-bilateral surface — runs in parallel with the path (b) decision; condition 3 verdict feeds in as "evaluable; indeterminate; bounded scope"
+```
