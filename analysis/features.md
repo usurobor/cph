@@ -26,8 +26,9 @@ Every feature row should include:
 - cycle number (column `cycle_number`)
 - quality flag (column `quality_flag`; values `ok`/`short`/`long` per `analysis/feature-table-schema.md` §"quality_flag")
 - exclusion flag (column `exclusion_flag`; derived as `quality_flag != "ok"`)
+- detection method (column `detection_method`; values `measured`/`inferred_contralateral`/`inferred_contralateral_partial` per `analysis/feature-table-schema.md` §"detection_method"; carries the path-(a) honesty caveat at the data-row level — `measured` is the default on `scripts/segmentation.py::Cycle` and the only value emitted on the R-side / standard detector path, while `inferred_contralateral` / `inferred_contralateral_partial` are emitted by `scripts/segmentation_contralateral.py::segment_trial_with_contralateral_l` for L-side cycles built via half-stride offset from the contralateral heel-strike, with `_partial` marking matched-duration windows clipped at the trial end. Excluded from per-feature aggregation by `analysis/r3_subject_aggregate_tests.py::NON_FEATURE_COLS`.)
 
-Column names match what `scripts/features.py::extract_features` emits and what `analysis/feature-table-schema.md` §"Identification" prescribes. Without this indexing, feature values cannot be interpreted.
+Column names match what `scripts/features.py::extract_features` emits and what `analysis/feature-table-schema.md` §"Identification" / §"Detection provenance" prescribe. Without this indexing, feature values cannot be interpreted.
 
 ## First-pass set (currently implemented)
 
