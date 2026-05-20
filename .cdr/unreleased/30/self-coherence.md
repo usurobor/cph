@@ -205,7 +205,7 @@ Per `alpha/SKILL.md` §2.6, all 14 rows verified before signaling review-readine
 | Field | Value |
 |---|---|
 | Round | 1 |
-| Implementation SHA (last α implementation commit before the readiness signal) | filled after final commit; see cycle dispatch output summary |
+| Implementation SHA (last α implementation commit before the readiness signal) | `53546ef` (commit `53546ef` — "α #30: add R3 bilateral lr-diff aggregate analysis script"). The readiness-signal commit itself is `aa903fa` ("α #30: self-coherence — full sections + review-readiness (round 1)"); this row is appended in a follow-up commit. |
 | Base SHA | `2d41992` (current `origin/main` at re-validation; post-cph#31 R4 merge + post-δ's `2d41992` cph#30 markdown landing) |
 | Branch | `cycle/30-r3-bilateral-extension` |
 | Branch CI | not applicable (no per-PR CI for analysis surfaces; release-only CI per `.github/workflows/coherence.yml`); β verifies reproducibility by re-running `python3 analysis/r3_bilateral_tests.py` per field-report-03 §Appendix D |
