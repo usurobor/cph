@@ -2,6 +2,44 @@
 
 Project changelog: what shipped, what changed, what's still open. Empirical state lives in the latest merged field report; live operational status lives in [PROJECT.md](PROJECT.md); the gate-based roadmap lives in [ROADMAP.md](ROADMAP.md).
 
+## 0.4.0 — R4 full falsification re-evaluation; construct survives subject to anchor caveats (2026-05-20)
+
+**Where we were.** After cph#27 (R3 R-side aggregate; partial GO on R-side; 5 of 6 falsification conditions evaluated NOT triggered on R-side surfaces; condition 3 not testable on this archive) and cph#28 (R1 L-cycle recovery via half-stride contralateral inference; R1 → GO with bounded scope; condition 3 surface lifted from "not testable" to "evaluable on inferred-bilateral"), the project had partial coverage of the falsification table but no full 6-condition synthesis report at adequate empirical coverage. cph#28's open-issues list named the R4 full re-evaluation as the now-reachable substantive verdict. cph#31's open question: does the construct survive the full 6-condition table when each row is walked one by one with explicit testability + verdict + bounded scope, applying the threshold rule in `docs/concepts/support-path.md` §Falsification?
+
+**What this version unblocked.** The full 6-condition synthesis exists. cph#31 walks each condition in [`docs/concepts/support-path.md`](docs/concepts/support-path.md) §Falsification one by one against the post-cph#27 + cph#28 surfaces. **Tally: 0 of 6 triggered; 5 of 6 cleanly NOT triggered (conditions 1, 2, 4, 5, 6); 1 of 6 (condition 3, L/R asymmetry) evaluable on the inferred-bilateral surface with the substantive triggered / not triggered verdict owned by cph#30 (R3 bilateral extension) and treated as non-contributory to the threshold tally per the doc's "Empirical-data prerequisite" reading.** Wave-level verdict: **construct survives R4 contact** (0–1 triggered → survives bucket), subject to four anchor caveats: R-side scope for conditions 1/2/6 (bilateral lr-diff readings owned by cph#30); condition 3 deferral to cph#30; path (a) honesty on all bilateral readings (inference not measurement; partial-clip coverage 0.80–0.94); "survives R4" ≠ "construct validated." R4 transitions from "fully evaluable on inferred-bilateral surface" → "construct survives subject to anchor caveats."
+
+**What is now read (R4 evidence at synthesis depth, no new compute).**
+
+- **Conditions 1, 2, 6** — anchored on cph#27 R-side aggregate: 7 of 25 features BH-significant at q<0.05 with r_rb = ±1.0 on four (every subject moves in the same direction); three candidate support-path hypotheses surfaced (Lateral-trunk substitution path; Distal sagittal contraction under proximal compensation; Cadence-slowdown signature) mutually distinguishable on R-side.
+- **Condition 3** — anchored on cph#28 surface lift: 57 inferred-partial L cycles; 57 bilateral (subject, trial_id, cycle_number) pairs; `lr_asymmetry` features computable on 60 rows; surface availability confirmed, substantive lr-diff aggregate verdict deferred to cph#30.
+- **Condition 4** — anchored on R1 OpenCap-vs-reference comparison from cph#22/26: Pearson r̄ 0.93–0.96 across 3 Video backbones × 60 trials. Unchanged.
+- **Condition 5** — anchored on feature-extraction missingness: 0.00% missingness across 35 columns × 117 cycles (post-cph#28).
+
+**What is still bounded / blocked.**
+
+- **Condition 3 substantive verdict** owned by cph#30 (R3 bilateral extension). When cph#30 lands, the condition 3 row updates to triggered / not triggered with cph#30's surface anchor; the wave-level tally re-reads predictably (0 of 6 or 1 of 6 — either way still in the "survives" bucket).
+- **All bilateral readings ride on path (a) inference.** The half-stride contralateral assumption is itself a property a bilateral asymmetry analysis intends to test; magnitudes from any bilateral surface should be reported as "consistent with" not "measurement of." Path (b) (operator-side OpenSim IK rerun on the reachable TRC files in `/opt/gait-data/opencap-lab-validation/extracted/`) remains the path to truly measured bilateral data and is the upgrade option if cph#30's bilateral findings surface ambiguities that path (a) cannot resolve.
+- **R-side scope on conditions 1, 2, 6.** Bilateral lr-diff readings on these conditions are downstream of cph#30; if cph#30's findings flip any of the three, the cph#31 verdicts would need updating (named in cph#31's §"Open issues").
+- **Within-subject within-condition cycle-level repeatability** — n=3 cycles per (subject, condition) is too thin for within-subject ICC. The condition 1 verdict reads cross-subject consistency, not within-subject stability. Named as cph#27 §Debt D2; carried.
+- **First-pass PCA / formal clustering** — held for R6. Condition 6 is read at feature-family distinguishability depth; cluster structure is downstream. Named as cph#27 §Debt D3; carried.
+- **R5 (friend pre-pilot)** still blocked behind R3-bilateral closure (cph#30). R4 GO is a necessary but not sufficient R5 prerequisite.
+- **R6 (AI classification)** still blocked. R4 GO does not unblock R6; the confound-check sweep is a separate gate.
+
+**The new question.** With R4 synthesis complete and the wave-level "survives subject to caveats" verdict on `main`, does cph#30's bilateral extension confirm the construct on the inferred-bilateral surface, or does it surface ambiguities that require the path (b) measured-bilateral upgrade to resolve? cph#30 owns the answer.
+
+### Changed (file-level)
+
+- [`reports/field-report-04-falsification-evaluation.md`](reports/field-report-04-falsification-evaluation.md) — new synthesis report. Carries the 6-row condition table (one row per condition with testability + verdict + bounded scope), the wave-level threshold tally, the standing-decision implications for R1 / R3 / R5 / R6, the open issues from cph#31, and a methodological note on why no new compute was commissioned. No new analysis script; this is an analysis-only synthesis cycle anchored on cph#27 + cph#28 evidence already on `main`.
+- [`PROJECT.md`](PROJECT.md), [`ROADMAP.md`](ROADMAP.md) — realigned to the R4 "construct survives subject to caveats" reading. R4 phase block transitions from "fully evaluable on inferred-bilateral surface" → "construct survives subject to anchor caveats" with the 4-caveat list named in-place; PROJECT.md §"Current empirical decision" / §"Current blocker" / §"Next action" / §"Open issues" / §"Last field report" all updated; R5 phase status carries the explicit "R3-bilateral closure is the active blocker; R4 is a necessary-but-not-sufficient R5 prerequisite" note.
+
+### Decision
+
+R4 transitions to **construct survives subject to anchor caveats** (0 of 6 triggered; ≪ the 4-condition fundamental-revision threshold; clean within the 0–1 "survives" bucket). cph#28 R1 GO with bounded scope stands. cph#27 R3 partial GO on R-side stands. The Coherence Path Hypothesis is neither validated nor refuted; "survives R4" is a non-refutation gate, not a validation. The project has moved from "does the construct survive at adequate empirical coverage?" to "does the bilateral extension (cph#30) confirm the inferred-bilateral surface findings, and is the path (b) measured-bilateral upgrade required?"
+
+### Next gate
+
+[cph#30](https://github.com/usurobor/cph/issues/30) — R3 bilateral extension on the inferred-bilateral surface (active in parallel with cph#31; not yet landed on `main` at cph#31 run time). Owner of the substantive condition 3 verdict + the bilateral lr-diff aggregate.
+
 ## 0.3.2 — R1 GO with bounded scope via cph#28 L-cycle recovery (2026-05-19)
 
 **Where we were.** R1 was REVISE. R3 was partial GO on R-side post-cph#27. L-side cycle yield was 1/60 trials (subject8/walkingTS1 only) — a property of the source archive's R-aligned ~1.3–1.5 s trial cropping rather than of `scripts/segmentation.py::detect_heel_strikes`, which fired HS on all 60 L sides but lacked the second L HS needed for cycle bracketing in 59/60 trials. cph#28's open question: can L-side cycles be recovered well enough to satisfy R1's bilateral gate without requiring new captures?
