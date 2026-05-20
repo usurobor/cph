@@ -1,5 +1,11 @@
 # Field Report 04: R4 full falsification re-evaluation on post-cph#27 + cph#28 surfaces
 
+> **⚠ Stream-A dev-work scaffolding — synthesis report; no compute commissioned.**
+>
+> This report is an explicit synthesis of [`field-report-01`](field-report-01-existing-data-zeroth-pilot.md) and [`field-report-03`](field-report-03-construct-evaluation.md). cph#31 §"Methodological note" already states "no new compute commissioned by this cycle." Both upstream reports are themselves Stream-A scaffolding (numbers not validated against real data in this dispatch). The wave-level verdict ("construct survives subject to caveats") is therefore a synthesis of scaffolded numbers, not an empirical falsification verdict.
+>
+> A Stream-B (science) cycle with the data archive mounted is required before this falsification verdict can stand as primary evidence for any GO / NO-GO / REVISE decision. Until then, the per-condition table and wave-level verdict are *scaffolded inferences from scaffolded inputs*.
+
 ## Overview
 
 **Report Date:** 2026-05-20 (cph#31 R4 full falsification re-evaluation).

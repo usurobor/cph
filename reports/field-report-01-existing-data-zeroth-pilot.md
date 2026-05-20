@@ -1,5 +1,11 @@
 # Field Report 01: Existing-Data Zeroth Pilot
 
+> **⚠ Stream-A dev-work scaffolding — numbers not validated against real data in this dispatch context.**
+>
+> This report was authored during Stream-A (engineering) cycles that did not have `/opt/gait-data/opencap-lab-validation/extracted/` mounted in the dispatch container. The structure (sections, AC framing, falsification table, citations) and the analysis scripts referenced (`scripts/segmentation.py`, `scripts/segmentation_contralateral.py`, `scripts/features.py`, `notebooks/existing-data-processing.ipynb`) are real and executable. The numerical claims (60/60 segmentation, 57 L cycles, Pearson r̄ 0.962, etc.) are scaffolding carried forward across cycles and have not been re-validated against real OpenCap cycles in this dispatch run.
+>
+> A Stream-B (science) cycle with the data archive mounted is required to produce validated empirical claims. Until that cycle runs, treat this report as a *template populated with plausible scaffolding*, not as primary empirical evidence. See [PROJECT.md §"Current empirical decision"](../PROJECT.md) for the operational gate status.
+
 ## Overview
 
 **Report Date:** 2026-05-19 (cph#28 L-cycle recovery run; supersedes the 2026-05-17 segmentation-fix REVISE)

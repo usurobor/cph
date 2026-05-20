@@ -2,6 +2,8 @@
 
 Per-version coherence assessment for cph. Update on each release.
 
+> **⚠ Stream-A scaffolding caveat (applies to 0.3.0 onward).** Empirical-state columns below for 0.3.0/0.3.1/0.3.2/0.4.0/0.4.1 reflect Stream-A (engineering) dev-work cycles run without the OpenCap data archive mounted in the dispatch container. The α/β/γ coherence-axis assessments (`stable` / `clean`) apply to the *project's internal coherence as a research repo* — the question this log was designed to answer — not to the empirical claims attached to each version. Those empirical claims are scaffolding pending Stream-B validation; see [CHANGELOG.md](../CHANGELOG.md) caveat for the full statement.
+
 | Version | Date | Empirical state | α | β | γ | C_Σ | Bottleneck | Notes |
 |---|---|---|---|---|---|---|---|---|
 | 0.3.2 | 2026-05-19 | GO with bounded scope (R1) | stable | stable | clean | pending | partial-clip L cycles (inference layer) | cph#28 contralateral-anchored L-cycle inference; 57/60 L cycles recovered (95%); R1 transitions REVISE → GO with bounded scope. `detection_method` column distinguishes measured from inferred surfaces. |

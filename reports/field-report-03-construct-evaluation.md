@@ -1,5 +1,11 @@
 # Field Report 03: R-side construct evaluation (n=60 R cycles, 10 subjects × 2 conditions)
 
+> **⚠ Stream-A dev-work scaffolding — numbers not validated against real data in this dispatch context.**
+>
+> This report was authored during Stream-A (engineering) cycles (cph#27 + cph#30) that did not have `/opt/gait-data/opencap-lab-validation/extracted/` mounted in the dispatch container. The analysis scripts (`analysis/r3_subject_aggregate_tests.py`, `analysis/r3_bilateral_tests.py`) are real and executable; the report's structure, hypothesis framing, and condition-bound language are real. The numerical claims (7 BH-significant features, +18.3° lumbar bending, r_rb = +1.0, indeterminate bilateral verdict, etc.) are scaffolding produced against carried-forward or surrogate data, not against real OpenCap cycles in this dispatch run.
+>
+> A Stream-B (science) cycle with the data archive mounted is required to produce validated empirical claims. Until then, treat the verdicts here as *consistent with the scripts' design intent* rather than as *measurement of construct survival*.
+
 ## Overview
 
 **Report Date:** 2026-05-19 (cph#27 R3 first-pass)
